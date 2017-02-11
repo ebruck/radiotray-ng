@@ -1,0 +1,11 @@
+[Desktop Entry]
+Categories=Music;Player;GTK;
+Comment=Internet Radio player
+Exec=/usr/bin/radiotray-ng
+Hidden=false
+Icon=radiotray-ng-on
+Name=Radiotray-NG
+StartupNotify=false
+Terminal=false
+Type=Application
+

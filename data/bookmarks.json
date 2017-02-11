@@ -1,0 +1,227 @@
+[
+   {
+      "group" : "Jazz",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Smooth Jazz",
+            "url" : "http://smoothjazz.com/streams/smoothjazz_128.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Sonic Universe",
+            "url" : "http://somafm.com/sonicuniverse.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Latin",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Top Latino Radio",
+            "url" : "http://online.radiodifusion.net:8020/listen.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Reggaeton 24/7",
+            "url" : "http://cc.net2streams.com/tunein.php/reggaeton/playlist.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Classic Rock",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "181.FM Classic Hits",
+            "url" : "http://www.181.fm/winamp.pls?station=181-greatoldies&file=181-greatoldies.pls"
+         },
+         {
+            "image" : null,
+            "name" : ".977 Classic Rock",
+            "url" : "http://www.977music.com/tunein/web/classicrock.asx"
+         },
+         {
+            "image" : null,
+            "name" : "Covers",
+            "url" : "http://somafm.com/covers.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Classical",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "KDFC",
+            "url" : "http://provisioning.streamtheworld.com/pls/KDFCFM.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Classic FM",
+            "url" : "http://media-ice.musicradio.com/ClassicFMMP3.m3u"
+         },
+         {
+            "image" : null,
+            "name" : "WCPE",
+            "url" : "http://www.ibiblio.org/wcpe/wcpe.pls"
+         },
+         {
+            "image" : null,
+            "name" : "CINEMIX",
+            "url" : "http://cinemix.us/cine.asx"
+         }
+      ]
+   },
+   {
+      "group" : "Pop / Rock",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Radio Paradise",
+            "url" : "http://www.radioparadise.com/musiclinks/rp_128.m3u"
+         },
+         {
+            "image" : null,
+            "name" : ".977 The Hitz Channel",
+            "url" : "http://www.977music.com/tunein/web/hitz.asx"
+         },
+         {
+            "image" : null,
+            "name" : "Indie Pop Rocks!",
+            "url" : "http://somafm.com/indiepop.pls"
+         },
+         {
+            "image" : null,
+            "name" : "PopTron",
+            "url" : "http://somafm.com/poptron.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Oldies",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "AM 1710",
+            "url" : "http://lin2.ash.fast-serv.com:9022/listen.pls"
+         },
+         {
+            "image" : null,
+            "name" : "AM 600",
+            "url" : "http://206.190.133.196:7013/listen.pls"
+         },
+         {
+            "image" : null,
+            "name" : "WNAR",
+            "url" : "http://live.wnar-am.com:8500/listen.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Chill",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Lounge Radio",
+            "url" : "http://www.lounge-radio.com/listen128.m3u"
+         },
+         {
+            "image" : null,
+            "name" : "Beat Blender",
+            "url" : "http://somafm.com/beatblender.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Secret Agent",
+            "url" : "http://somafm.com/secretagent.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Groove Salad",
+            "url" : "http://somafm.com/groovesalad.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Illinois Street Lounge",
+            "url" : "http://somafm.com/illstreet.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Country",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Boot Liquor",
+            "url" : "http://somafm.com/bootliquor.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Highway 181",
+            "url" : "http://www.181.fm/winamp.pls?station=181-highway&file=181-highway.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Country 108",
+            "url" : "http://www.country108.com/listen.pls"
+         }
+      ]
+   },
+   {
+      "group" : "Techno / Electronic",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Drone Zone",
+            "url" : "http://somafm.com/dronezone.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Space Station Soma",
+            "url" : "http://somafm.com/spacestation.pls"
+         },
+         {
+            "image" : null,
+            "name" : "cliqhop idm",
+            "url" : "http://somafm.com/cliqhop.pls"
+         },
+         {
+            "image" : null,
+            "name" : "Black Rock FM",
+            "url" : "http://somafm.com/brfm.pls"
+         },
+         {
+            "image" : null,
+            "name" : "New Dance Radio",
+            "url" : "http://jbstream.net/tunein.php/blackoutworm/playlist.asx"
+         },
+         {
+            "image" : null,
+            "name" : "DubStep Beyond",
+            "url" : "http://somafm.com/play/dubstep32"
+         }
+      ]
+   },
+   {
+      "group" : "Community",
+      "image" : null,
+      "stations" : [
+         {
+            "image" : null,
+            "name" : "Jupiter Broadcast",
+            "url" : "http://jblive.fm/"
+         }
+      ]
+   }
+]

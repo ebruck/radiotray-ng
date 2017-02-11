@@ -1,0 +1,17 @@
+function(add_gmock_test target)
+    add_executable(${target} ${ARGN})
+    target_link_libraries(${target} config playlist bookmarks event_bus ${GMOCK_BOTH_LIBRARIES} ${XDG_BASEDIR_LIBRARIES} ${Boost_LIBRARIES} ${CURL_LIBRARIES} ${JSONCPP_LIBRARIES} pthread)
+    target_include_directories(${target} PRIVATE ${JSONCPP_INCLUDE_DIRS})
+    add_test(${target} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target})
+endfunction()
+
+# utests
+add_gmock_test(pls_decoder_utests pls_decoder_test.cpp)
+add_gmock_test(m3u_decoder_utests m3u_decoder_test.cpp)
+add_gmock_test(asx_decoder_utests asx_decoder_test.cpp)
+add_gmock_test(asf_decoder_utests asf_decoder_test.cpp)
+add_gmock_test(ram_decoder_utests ram_decoder_test.cpp)
+add_gmock_test(xspf_decoder_utests xspf_decoder_test.cpp)
+add_gmock_test(event_bus_utests event_bus_test.cpp)
+add_gmock_test(bookmarks_utests bookmarks_test.cpp)
+add_gmock_test(config_utests config_test.cpp)

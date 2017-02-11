@@ -1,0 +1,434 @@
+// Copyright 2017 Edward G. Bruck <ed.bruck1@gmail.com>
+//
+// This file is part of Radiotray-NG.
+//
+// Radiotray-NG is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Radiotray-NG is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
+
+#include <radiotray-ng/player/player.hpp>
+#include <radiotray-ng/g_threading_helper.hpp>
+#include <radiotray-ng/common.hpp>
+#include <rtng_user_agent.hpp>
+
+
+Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
+	: main_loop(nullptr)
+	, pipeline(nullptr)
+	, souphttpsrc(nullptr)
+	, clock(nullptr)
+	, clock_id(0)
+	, buffering(false)
+	, event_bus(std::move(event_bus))
+	, config(std::move(config))
+{
+	LOG(info) << "starting gst thread";
+
+	std::unique_lock<std::mutex> lock(main_loop_mutex);
+
+	this->gst_player_thread = std::thread(&Player::gst_thread, this);
+
+	// wait for main_loop to be ready...
+	main_loop_ready_cv.wait(lock);
+}
+
+
+Player::~Player()
+{
+	LOG(info) << "stopping gst thread";
+
+	if (g_main_loop_is_running(this->main_loop))
+	{
+		g_main_loop_quit(this->main_loop);
+	}
+
+	if (this->gst_player_thread.joinable())
+	{
+		this->gst_player_thread.join();
+	}
+}
+
+
+bool Player::play_next()
+{
+	this->stop();
+
+	if (!this->current_playlist.empty())
+	{
+		g_object_set(this->pipeline, "uri", this->current_playlist.front().c_str(), NULL);
+
+		this->current_playlist.erase(this->current_playlist.begin());
+
+		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+
+		this->buffering = true;
+
+		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
+		{
+			LOG(error) << "Failed to set pipeline to: GST_STATE_PAUSED";
+			return false;
+		}
+
+		return true;
+	}
+
+	LOG(info) << "playlist is empty";
+
+	return false;
+}
+
+
+bool Player::play(const playlist_t& playlist)
+{
+	if (!g_main_loop_is_running(this->main_loop))
+	{
+		LOG(error) << "main_loop not ready";
+		return false;
+	}
+
+	if (playlist.empty())
+	{
+		LOG(error) << "playlist is empty";
+		return false;
+	}
+
+	this->current_playlist = playlist;
+
+	if (!this->play_next())
+	{
+		this->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY,
+			"Unable to set the pipeline to the playing state!");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+void Player::stop()
+{
+	GstState state;
+	gst_element_get_state(GST_ELEMENT(this->pipeline), &state, NULL, GST_CLOCK_TIME_NONE);
+
+	if (state != GST_STATE_NULL)
+	{
+		gst_element_set_state(GST_ELEMENT(this->pipeline), GST_STATE_NULL);
+
+		// Clear the flag just in case since stopping emits a pause which will register for a
+		// buffering timeout.
+		this->buffering = false;
+
+		// abort outstanding callback...
+		if (this->clock_id)
+		{
+			LOG(info) << "canceling outstanding clock request";
+			gst_clock_id_unschedule(this->clock_id);
+			this->clock_id = 0;
+		}
+
+		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
+	}
+}
+
+
+void Player::volume(const uint32_t percent)
+{
+	gdouble volume{percent/100.0};
+
+	g_object_set(G_OBJECT(this->pipeline), "volume", volume, NULL);
+
+	this->event_bus->publish_only(IEventBus::event::volume_changed, VOLUME_LEVEL_KEY, std::to_string(percent));
+
+	this->config->set_uint32(VOLUME_LEVEL_KEY, percent);
+}
+
+
+void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
+{
+	// set our user-agent...
+	if (g_object_class_find_property(G_OBJECT_GET_CLASS(obj), "source"))
+	{
+		GObject* source_element;
+		g_object_get(obj, "source", &source_element, NULL);
+
+		// todo: detect distro at runtime instead of what we were compiled on...
+		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source_element), "user-agent"))
+		{
+			g_object_set(source_element, "user-agent", RTNG_USER_AGENT, NULL);
+		}
+
+		g_object_unref(source_element);
+	}
+}
+
+
+gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
+{
+	Player* player{(Player*)user_data};
+
+	player->clock_id = 0;
+
+	if (player->buffering)
+	{
+		LOG(error) << "buffering timeout, restarting stream...";
+
+		// kick it... (Should we play next?)
+		gst_element_set_state(player->pipeline, GST_STATE_NULL);
+		gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
+		gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+	}
+
+	return TRUE;
+}
+
+
+gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpointer user_data)
+{
+	Player* player{static_cast<Player*>(user_data)};
+
+	switch (GST_MESSAGE_TYPE (message))
+	{
+		case GST_MESSAGE_ERROR:
+		{
+			GError* err;
+			gchar* debug_info;
+			gst_message_parse_error(message, &err, &debug_info);
+
+			LOG(error) << "error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message;
+			LOG(error) << "debugging information: " << ((debug_info) ? debug_info : "none");
+
+			gst_element_set_state(player->pipeline, GST_STATE_NULL);
+			gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
+
+			if (!player->play_next())
+			{
+				LOG(debug) << "setting state to: " << STATE_STOPPED;
+
+				player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
+				player->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, err->message);
+			}
+
+			g_clear_error(&err);
+			g_free(debug_info);
+		}
+		break;
+
+		case GST_MESSAGE_EOS:
+		{
+			LOG(debug) << "end-of-stream reached";
+
+			if (!player->play_next())
+			{
+				LOG(debug) << "setting state to: " << STATE_STOPPED;
+
+				player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
+			}
+		}
+		break;
+
+		case GST_MESSAGE_BUFFERING:
+		{
+			gint percent;
+			gst_message_parse_buffering(message, &percent);
+
+			// are we done?
+			if (percent == 100)
+			{
+				player->buffering = false;
+				LOG(debug) << "setting state to: GST_STATE_PLAYING";
+				gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PLAYING);
+			}
+			else
+			{
+				// buffering busy?
+				if (!player->buffering)
+				{
+					// we were not buffering but PLAYING, then pause the pipeline
+					LOG(debug) << "setting state to: GST_STATE_PAUSED";
+					gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PAUSED);
+				}
+
+				player->buffering = true;
+			}
+		}
+		break;
+
+		case GST_MESSAGE_TAG:
+		{
+			if (player->event_bus)
+			{
+				IEventBus::event_data_t notify_data;
+
+				GstTagList* tags;
+				gst_message_parse_tag(message, &tags);
+				gst_tag_list_foreach(tags, static_cast<GstTagForeachFunc>(&Player::for_each_tag_cb), &notify_data);
+				gst_tag_list_free(tags);
+
+				player->event_bus->publish(IEventBus::event::tags_changed, notify_data);
+			}
+		}
+		break;
+
+		case GST_MESSAGE_STATE_CHANGED:
+		{
+			GstState old_state;
+			GstState new_state;
+			gst_message_parse_state_changed(message, &old_state, &new_state, nullptr);
+
+			if (GST_MESSAGE_SRC(message) == GST_OBJECT(player->pipeline))
+			{
+				if (new_state == GST_STATE_PLAYING)
+				{
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+				}
+				else if (new_state == GST_STATE_PAUSED)
+				{
+					// abort outstanding callback...
+					if (player->clock_id)
+					{
+						LOG(info) << "canceling outstanding clock request";
+
+						gst_clock_id_unschedule(player->clock_id);
+					}
+
+					if (!player->buffering)
+					{
+						break;
+					}
+
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_BUFFERING);
+
+					// start timer to abort if buffering stalls...
+					player->clock_id = gst_clock_new_single_shot_id(player->clock, gst_clock_get_time(player->clock) + (10 * GST_SECOND));
+					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, NULL);
+				}
+			}
+		}
+		break;
+
+		default:
+			break;
+	}
+
+	return TRUE;
+}
+
+
+void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer user_data)
+{
+	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
+
+	gint count = gst_tag_list_get_tag_size(list, tag);
+
+	for (gint i = 0; i < count; i++)
+	{
+		gchar* str{nullptr};
+
+		if (gst_tag_get_type(tag) == G_TYPE_STRING)
+		{
+			if (!gst_tag_list_get_string_index(list, tag, i, &str))
+			{
+				LOG(error) << "gst_tag_list_get_string_index failed for tag: " << gst_tag_get_nick(tag);
+				g_free(str);
+				continue;
+			}
+		}
+		else
+		{
+			str = g_strdup_value_contents(gst_tag_list_get_value_index(list, tag, i));
+		}
+
+		event_data[gst_tag_get_nick(tag)] = str;
+
+		g_free(str);
+	}
+}
+
+
+void Player::gst_thread()
+{
+	GstBus* bus;
+
+	radiotray_ng::g_threading_helper gth;
+
+	// gstreamer setup...
+	{
+		std::unique_lock<std::mutex> lock(this->main_loop_mutex);
+
+		gst_init(nullptr, nullptr);
+
+		if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
+		{
+			LOG(error) << "could not create playbin element";
+
+			gst_deinit();
+
+			main_loop_ready_cv.notify_one();
+			return;
+		}
+
+		if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)
+		{
+			LOG(error) << "could not create souphttpsrc element";
+
+			gst_object_unref(this->pipeline);
+			gst_deinit();
+
+			main_loop_ready_cv.notify_one();
+			return;
+		}
+
+		// set buffer size & volume
+		if (this->config)
+		{
+			uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+
+			LOG(info) << BUFFER_SIZE_KEY << "=" << buffer_size;
+
+			g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size, NULL);
+
+			this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+		}
+
+		// get clock for buffering timeouts...
+		this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));
+
+		// gst main loop
+		this->main_loop = g_main_loop_new(NULL, FALSE);
+
+		// setup callbacks...
+		bus = gst_element_get_bus(this->pipeline);
+		gst_bus_add_watch(bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
+
+		g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
+	}
+
+	// signal that we are starting our loop
+	main_loop_ready_cv.notify_one();
+
+	g_main_loop_run(this->main_loop);
+
+	// shutdown
+	g_main_loop_unref(this->main_loop);
+	gst_object_unref(bus);
+
+	gst_element_set_state(this->pipeline, GST_STATE_NULL);
+	gst_object_unref(this->pipeline);
+
+	gst_element_set_state(this->souphttpsrc, GST_STATE_NULL);
+	gst_object_unref(this->souphttpsrc);
+
+	gst_object_unref(G_OBJECT(this->clock));
+
+	gst_deinit();
+}
