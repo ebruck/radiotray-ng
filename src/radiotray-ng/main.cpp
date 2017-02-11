@@ -45,36 +45,36 @@ void init_logging()
 
 	namespace keywords = boost::log::keywords;
 
-    auto sink = boost::log::add_file_log
-    (
-        keywords::file_name = xdg_data_home_dir + "radiotray-ng-%5N.log",
-        keywords::rotation_size = 1024 * 64, // 64K logs
-        keywords::open_mode = std::ios_base::app,
-		keywords::auto_flush = true,
-        keywords::format =
-        (
-            boost::log::expressions::stream
-                << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "[%Y-%m-%d %H:%M:%S.%f]")
-                << " [" << boost::log::expressions::attr< boost::log::attributes::current_thread_id::value_type >("ThreadID")
-                << "] [" << std::setw(5) << std::left << boost::log::trivial::severity << "] " <<  boost::log::expressions::smessage
-        )
-    );
+	auto sink = boost::log::add_file_log
+		(
+			keywords::file_name = xdg_data_home_dir + "radiotray-ng-%5N.log",
+			keywords::rotation_size = 1024 * 64, // 64K logs
+			keywords::open_mode = std::ios_base::app,
+			keywords::auto_flush = true,
+			keywords::format =
+				(
+					boost::log::expressions::stream
+					<< boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "[%Y-%m-%d %H:%M:%S.%f]")
+					<< " [" << boost::log::expressions::attr< boost::log::attributes::current_thread_id::value_type >("ThreadID")
+					<< "] [" << std::setw(5) << std::left << boost::log::trivial::severity << "] " <<  boost::log::expressions::smessage
+				)
+		);
 
-    boost::log::add_common_attributes();
+	boost::log::add_common_attributes();
 
-    sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector
-    (
-    	keywords::target = xdg_data_home_dir + "logs/",
-    	keywords::max_size = 1024 * 512 // ~512K of logs
-    ));
+	sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector
+		(
+			keywords::target = xdg_data_home_dir + "logs/",
+			keywords::max_size = 1024 * 512 // ~512K of logs
+		));
 
-    sink->locked_backend()->scan_for_files();
+	sink->locked_backend()->scan_for_files();
 
-    boost::log::core::get()->add_sink(sink);
+	boost::log::core::get()->add_sink(sink);
 }
 
 
-void set_logging_level(std::shared_ptr<IConfig>& config)
+void set_logging_level(std::shared_ptr<IConfig> config)
 {
 	if (config->get_bool(DEBUG_LOGGING_KEY, DEFAULT_DEBUG_LOGGING_VALUE))
 	{
@@ -91,7 +91,7 @@ void set_logging_level(std::shared_ptr<IConfig>& config)
 }
 
 
-void set_config_defaults(std::shared_ptr<IConfig>& config, const std::string& config_path)
+void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& config_path)
 {
 	namespace fs = boost::filesystem;
 
@@ -114,7 +114,7 @@ void set_config_defaults(std::shared_ptr<IConfig>& config, const std::string& co
 }
 
 
-void set_bookmark_defaults(std::shared_ptr<IBookmarks>& bookmarks)
+void set_bookmark_defaults(std::shared_ptr<IBookmarks> bookmarks)
 {
 	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE);
 
