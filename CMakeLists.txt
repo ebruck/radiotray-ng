@@ -82,7 +82,6 @@ add_subdirectory(src/radiotray-ng/playlist)
 add_subdirectory(src/radiotray-ng/bookmarks)
 add_subdirectory(src/radiotray-ng/event_bus)
 add_subdirectory(src/radiotray-ng/player)
-add_subdirectory(src/radiotray-ng/gui/ncurses)
 add_subdirectory(src/radiotray-ng/notification)
 add_subdirectory(src/radiotray-ng/media_keys)
 add_subdirectory(tests/runners/) # test apps
@@ -94,6 +93,8 @@ if (APPINDICATOR_FOUND)
     target_compile_definitions(player PRIVATE APPINDICATOR_GUI)
     add_subdirectory(src/radiotray-ng/gui/appindicator)
     add_subdirectory(debian)
+else()
+    add_subdirectory(src/radiotray-ng/gui/ncurses)
 endif()
 
 # user agent
