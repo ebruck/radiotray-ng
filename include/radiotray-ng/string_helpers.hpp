@@ -28,7 +28,6 @@
 
 namespace radiotray_ng
 {
-	// http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 	inline std::string& ltrim(std::string& str)
 	{
 		auto it2 = std::find_if(str.begin(), str.end(), [](char ch){ return !std::isspace<char>(ch , std::locale::classic()); });
@@ -72,18 +71,22 @@ namespace radiotray_ng
 	}
 
 
-	// found at http://www.cplusplus.com/forum/beginner/19034/ (for now, but has problems)
 	inline std::string word_wrap(std::string str, size_t width)
 	{
 	    size_t curWidth = width;
 
 	    while (curWidth < str.length())
 	    {
-	        std::string::size_type spacePos = str.rfind( ' ', curWidth );
+	        std::string::size_type spacePos = str.rfind(' ', curWidth);
 
 	        if (spacePos == std::string::npos)
 	        {
-	            spacePos = str.find( ' ', curWidth );
+	            spacePos = str.find(' ', curWidth);
+
+	            if (spacePos == std::string::npos)
+	            {
+	            	break;
+	            }
 	        }
 
 	        if (spacePos != std::string::npos)
@@ -109,7 +112,7 @@ namespace radiotray_ng
 	    return s;
 	}
 
-	// borrowed from boost 1.61 (stock Ubuntu 16.04 is using 1.58)
+
 	inline void load_string_file(const std::string& p, std::string& str)
 	{
 		std::ifstream file;

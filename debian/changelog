@@ -1,6 +1,11 @@
+radiotray-ng (0.1.1) unstable; urgency=low
+
+	  * Fixed word_wrap infinite loop
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sun, 12 Feb 2017 12:58:39 -0800
+ 
 radiotray-ng (0.1.0) unstable; urgency=low
 
 	  * Initial release.
 
  -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 11 Feb 2017 12:10:00 -0800
- 
