@@ -117,8 +117,6 @@ void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& con
 void set_bookmark_defaults(std::shared_ptr<IBookmarks> bookmarks)
 {
 	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE);
-
-	bookmarks->save();
 }
 
 
@@ -176,24 +174,24 @@ int main(int argc, char* argv[])
 	bookmark_file = config->get_string(BOOKMARKS_KEY, "");
 	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(bookmark_file)};
 
-	if (!bookmarks->load())
-	{
-		// not there, so lets set some defaults
-		set_bookmark_defaults(bookmarks);
-	}
-
 	std::shared_ptr<IEventBus> event_bus{std::make_shared<EventBus>()};
 	std::shared_ptr<IPlayer> player{std::make_shared<Player>(config, event_bus)};
 	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
 
-	// addons etc.
-	MediaKeys mm(radiotray_ng);
+	if (!bookmarks->load())
+	{
+		// User can reload once they fix the error...
+		set_bookmark_defaults(bookmarks);
+	}
 
 #ifdef APPINDICATOR_GUI
 	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));
 #else
 	auto gui(std::make_shared<NCursesGui>(radiotray_ng, event_bus));
 #endif
+
+	// addons etc.
+	MediaKeys mm(radiotray_ng);
 
 	// todo: support start playing passed group/station...
 	gui->run(argc, argv);
