@@ -1,4 +1,4 @@
-# Radiotray-NG: An Internet radio player #
+# Radiotray-NG: An Internet radio player for Linux #
 
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 

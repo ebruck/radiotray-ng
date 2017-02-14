@@ -30,7 +30,7 @@ void print_group(const IBookmarks::group_data_t& group_data)
 	{
 		std::cout << "   └── " << s.name  << std::endl;
 		std::cout << "       " << s.url   << std::endl;
-		std::cout << "       " << s.image << std::endl;
+		std::cout << "       " << ((s.image.empty()) ? "null" : s.image) << std::endl;
 	}
 }
 
@@ -40,17 +40,19 @@ int main(int argc, char** argv)
 	if (argc > 1)
 	{
 		Bookmarks bm(argv[1]);
-		bm.load();
 
-		for(size_t i = 0; i < bm.size(); ++i)
+		if (bm.load())
 		{
-			print_group(bm[i]);
-		}
+			for(size_t i = 0; i < bm.size(); ++i)
+			{
+				print_group(bm[i]);
+			}
 
-		// save?
-		if (argc == 3)
-		{
-			bm.save();
+			// save?
+			if (argc == 3)
+			{
+				bm.save();
+			}
 		}
 	}
 
