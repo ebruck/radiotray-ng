@@ -1,8 +1,17 @@
+radiotray-ng (0.1.2) unstable; urgency=low
+
+      *  Fixed gdk threading not being initialized before calling gtk_init      
+      *  Don't overwrite bad bookmarks file on startup
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Wed, 15 Feb 2017 19:47:03 -0800
+
+
 radiotray-ng (0.1.1) unstable; urgency=low
 
 	  * Fixed word_wrap infinite loop
 
  -- Edward G. Bruck <ed.bruck1@gmail.com>  Sun, 12 Feb 2017 12:58:39 -0800
+
  
 radiotray-ng (0.1.0) unstable; urgency=low
 
