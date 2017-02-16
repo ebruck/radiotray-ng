@@ -20,9 +20,7 @@
 #include <radiotray-ng/i_event_bus.hpp>
 #include <map>
 #include <mutex>
-#include <condition_variable>
 #include <vector>
-#include <thread>
 
 
 class EventBus final : public IEventBus
@@ -38,7 +36,6 @@ public:
 	bool publish_only(const IEventBus::event ev, const std::string& key, const std::string& value);
 
 private:
-	void publish_thread();
 
 	using event_map_t = std::map<IEventBus::event, event_callback_t>;
 	using event_map_list_t = std::map<IEventBus::event, std::vector<event_callback_t>>;
