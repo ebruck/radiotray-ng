@@ -17,13 +17,12 @@
 
 #include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
+#include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/notification/notification.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
-#include <radiotray-ng/string_helpers.hpp>
-
 #include <cmath>
 
 

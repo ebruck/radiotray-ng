@@ -16,7 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/asf_decoder.hpp>
-#include <radiotray-ng/string_helpers.hpp>
+#include <radiotray-ng/helpers.hpp>
 #include <regex>
 #include <sstream>
 

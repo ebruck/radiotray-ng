@@ -42,6 +42,9 @@ find_package(GMock)
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
 pkg_search_module(GSTREAMER   REQUIRED gstreamer-1.0)
 pkg_search_module(XDG_BASEDIR REQUIRED libxdg-basedir)
+if (NOT APPLE)
+    pkg_search_module(LIBBSD  REQUIRED libbsd)
+endif(NOT APPLE)
 
 # flags
 add_definitions("-std=c++11 -DBOOST_LOG_DYN_LINK")

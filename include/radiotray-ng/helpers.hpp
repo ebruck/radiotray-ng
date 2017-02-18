@@ -21,6 +21,7 @@
 #include <locale>
 #include <string>
 #include <wordexp.h>
+#include <basedir.h>
 
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -121,5 +122,13 @@ namespace radiotray_ng
 		std::size_t sz = static_cast<std::size_t>(boost::filesystem::file_size(p));
 		str.resize(sz, '\0');
 		file.read(&str[0], sz);
+	}
+
+
+	inline std::string get_data_dir(const std::string& app_name)
+	{
+		std::string xdg_data_home_dir = xdgConfigHome(nullptr);
+		xdg_data_home_dir += std::string("/") + app_name + std::string("/");
+		return xdg_data_home_dir;
 	}
 }

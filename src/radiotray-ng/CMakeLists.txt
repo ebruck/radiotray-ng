@@ -29,6 +29,7 @@ target_link_libraries(
   ${JSONCPP_LIBRARIES}
   ${GSTREAMER_LIBRARIES}
   ${GIO_LIBRARIES}
+  ${LIBBSD_LIBRARIES}
   pthread
 )
     

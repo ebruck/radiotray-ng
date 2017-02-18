@@ -16,6 +16,8 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/common.hpp>
+#include <radiotray-ng/pidfile.hpp>
+#include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
 #include <radiotray-ng/config/config.hpp>
 #include <radiotray-ng/player/player.hpp>
@@ -29,7 +31,6 @@
 #include <radiotray-ng/gui/appindicator/appindicator_gui.hpp>
 #endif
 
-#include <basedir.h>
 #include <boost/filesystem.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
@@ -40,8 +41,7 @@
 
 void init_logging()
 {
-	std::string xdg_data_home_dir = xdgConfigHome(nullptr);
-	xdg_data_home_dir += std::string("/") + APP_NAME + std::string("/");
+	std::string xdg_data_home_dir = radiotray_ng::get_data_dir(APP_NAME);
 
 	namespace keywords = boost::log::keywords;
 
@@ -124,8 +124,7 @@ bool create_data_dir(std::string& config_path)
 {
 	namespace fs = boost::filesystem;
 
-	std::string xdg_data_home_dir = xdgConfigHome(nullptr);
-	xdg_data_home_dir += std::string("/") + APP_NAME + std::string("/");
+	std::string xdg_data_home_dir = radiotray_ng::get_data_dir(APP_NAME);
 
 	if (!fs::exists(xdg_data_home_dir))
 	{
@@ -144,6 +143,13 @@ bool create_data_dir(std::string& config_path)
 
 int main(int argc, char* argv[])
 {
+	radiotray_ng::Pidfile pf(APP_NAME);
+
+	if (pf.is_running())
+	{
+		return 1;
+	}
+
 	init_logging();
 
 	LOG(info) << APP_NAME << " v" << RTNG_VERSION << " starting up";

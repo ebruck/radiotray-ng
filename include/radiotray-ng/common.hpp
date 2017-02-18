@@ -18,7 +18,7 @@
 #pragma once
 
 #include <boost/log/trivial.hpp>
-#include <radiotray-ng/string_helpers.hpp>
+#include <radiotray-ng/helpers.hpp>
 #include <vector>
 #include <string>
 #include <iomanip>

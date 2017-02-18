@@ -21,7 +21,7 @@
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/g_threading_helper.hpp>
-#include <radiotray-ng/string_helpers.hpp>
+#include <radiotray-ng/helpers.hpp>
 #include <rtng_user_agent.hpp>
 
 #include <boost/filesystem.hpp>

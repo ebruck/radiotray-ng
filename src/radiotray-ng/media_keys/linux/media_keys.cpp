@@ -194,8 +194,8 @@ void media_keys_t::gio_thread()
 		nullptr,
 		nullptr);
 
-    g_object_unref(proxy);
-    g_main_loop_unref(this->main_loop);
+	g_object_unref(proxy);
+	g_main_loop_unref(this->main_loop);
 }
 
 
