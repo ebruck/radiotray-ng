@@ -155,6 +155,7 @@ libgtk-3-dev
 libnotify-dev
 lsb-release
 libbsd-dev
+libncurses5-dev
 cmake
 
 ```

@@ -130,7 +130,7 @@ bool create_data_dir(std::string& config_path)
 	{
 		if (!fs::create_directory(xdg_data_home_dir))
 		{
-			LOG(error) << "failed to create dir: " << xdg_data_home_dir;
+			std::cerr << "failed to create dir: " << xdg_data_home_dir;
 			return false;
 		}
 	}
@@ -143,6 +143,12 @@ bool create_data_dir(std::string& config_path)
 
 int main(int argc, char* argv[])
 {
+	std::string config_path;
+	if (!create_data_dir(config_path))
+	{
+		return 1;
+	}
+
 	radiotray_ng::Pidfile pf(APP_NAME);
 
 	if (pf.is_running())
@@ -153,15 +159,6 @@ int main(int argc, char* argv[])
 	init_logging();
 
 	LOG(info) << APP_NAME << " v" << RTNG_VERSION << " starting up";
-
-	std::string config_path;
-	if (!create_data_dir(config_path))
-	{
-		LOG(fatal) << "could not create config directory";
-		return 1;
-	}
-
-	LOG(info) << "config path: " << config_path;
 
 	std::shared_ptr<IConfig> config{std::make_shared<Config>(config_path + RTNG_CONFIG_FILE)};
 
