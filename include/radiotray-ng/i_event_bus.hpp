@@ -43,7 +43,7 @@ public:
 
 	using event_data_t = std::map<std::string, std::string>;
 
-	using event_callback_t = std::function<void (const IEventBus::event&, IEventBus::event_data_t& data) >;
+	using event_callback_t = std::function<void (const IEventBus::event&, IEventBus::event_data_t& data)>;
 
 	virtual ~IEventBus() = default;
 

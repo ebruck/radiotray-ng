@@ -36,7 +36,6 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
-#include <exception>
 
 
 void init_logging()
@@ -172,11 +171,7 @@ int main(int argc, char* argv[])
 	// adjust logging level...
 	set_logging_level(config);
 
-	// load bookmarks or create a new one
-	std::string bookmark_file;
-	bookmark_file = config->get_string(BOOKMARKS_KEY, "");
-	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(bookmark_file)};
-
+	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
 	std::shared_ptr<IEventBus> event_bus{std::make_shared<EventBus>()};
 	std::shared_ptr<IPlayer> player{std::make_shared<Player>(config, event_bus)};
 	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};

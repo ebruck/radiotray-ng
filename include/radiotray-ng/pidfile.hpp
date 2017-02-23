@@ -35,9 +35,7 @@ namespace radiotray_ng
 			: pfh(nullptr)
 			, already_running(false)
 		{
-			const std::string xdg_data_home_dir = radiotray_ng::get_data_dir(app_name);
-
-			std::string pid_file = xdg_data_home_dir + "/" + app_name + ".pid";
+			std::string pid_file{radiotray_ng::get_data_dir(app_name) + "/" + app_name + ".pid"};
 
 			pid_t otherpid;
 			this->pfh = pidfile_open(pid_file.c_str(), 0600, &otherpid);
