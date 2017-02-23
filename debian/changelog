@@ -1,13 +1,15 @@
 radiotray-ng (0.1.3) unstable; urgency=low
 
       * Support building on 32bit architectures
-      * Added 24x24 icons and pid file to prevent multiple instances from running
+      * Added 24x24 icons and pid file to prevent multiple instances from
+        running
 
  -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 18 Feb 2017 14:44:27 -0800
 
+
 radiotray-ng (0.1.2) unstable; urgency=low
 
-      *  Fixed gdk threading not being initialized before calling gtk_init      
+      *  Fixed gdk threading not being initialized before calling gtk_init
       *  Don't overwrite bad bookmarks file on startup
 
  -- Edward G. Bruck <ed.bruck1@gmail.com>  Wed, 15 Feb 2017 19:47:03 -0800
@@ -19,7 +21,7 @@ radiotray-ng (0.1.1) unstable; urgency=low
 
  -- Edward G. Bruck <ed.bruck1@gmail.com>  Sun, 12 Feb 2017 12:58:39 -0800
 
- 
+
 radiotray-ng (0.1.0) unstable; urgency=low
 
 	  * Initial release.

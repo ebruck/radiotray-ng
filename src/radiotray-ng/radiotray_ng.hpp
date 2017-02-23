@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <radiotray-ng/notification/notification.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
 #include <condition_variable>
@@ -26,7 +27,6 @@
 class IBookmarks;
 class IConfig;
 class IPlayer;
-class INotification;
 
 
 class RadiotrayNG final : public IRadioTrayNG
@@ -109,7 +109,7 @@ private:
 	void register_handlers();
 	void clear_tags();
 
-	std::shared_ptr<INotification> notification;
+	Notification notification;
 
 	std::string notification_image;
 	std::pair<std::string, std::string> last_notification;

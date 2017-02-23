@@ -1,9 +1,9 @@
 [Desktop Entry]
-Categories=Music;Player;GTK;
-Comment=Internet Radio player
+Categories=AudioVideo;Audio;Player;GTK;
+Comment=Interent Radio Player for Ubuntu
 Exec=/usr/bin/radiotray-ng
 Hidden=false
-Icon=radiotray-ng-on
+Icon=radiotray-ng-notification
 Name=Radiotray-NG
 StartupNotify=false
 Terminal=false

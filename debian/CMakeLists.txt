@@ -4,8 +4,7 @@ message( "Building version: ${PROJECT_VERSION}..." )
 
 set(CPACK_PACKAGE_VENDOR              "Edward G. Bruck")
 set(CPACK_PACKAGE_CONTACT             "ed.bruck1@gmail.com")
-set(CPACK_PACKAGE_DESCRIPTION         "Internet radio stream player")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Internet radio stream player for Ubuntu and other debian based Linux Systems.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple Internet Radio Player for Ubuntu\n Radiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
 set(CPACK_PACKAGE_NAME                "radiotray-ng")
 set(CPACK_PACKAGE_VERSION             ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
@@ -27,20 +26,21 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS      "libc6, libbsd0, libcurl3, libjsoncpp1, li
 set(CPACK_GENERATOR                   "DEB")
 set(CPACK_PACKAGE_FILE_NAME            ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/debian/postinst;${PROJECT_SOURCE_DIR}/debian/postrm)
-  
-INCLUDE( CPack )
 
+INCLUDE(CPack)
+ 
 set(DESTINATION_DIR /usr/share/radiotray-ng)
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/256x256/apps/"      DESTINATION "/usr/share/icons/hicolor/256x256/apps/"      FILES_MATCHING PATTERN "*.png")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/24x24/apps/"        DESTINATION "/usr/share/icons/hicolor/24x24/apps/"        FILES_MATCHING PATTERN "*.png")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-dark/apps/24/"  DESTINATION "/usr/share/icons/ubuntu-mono-dark/apps/24/"  FILES_MATCHING PATTERN "*.svg")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-light/apps/24/" DESTINATION "/usr/share/icons/ubuntu-mono-light/apps/24/" FILES_MATCHING PATTERN "*.svg")
+execute_process(COMMAND gzip -9 -c "${PROJECT_SOURCE_DIR}/debian/changelog" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.gz")
+
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/256x256/apps/"      DESTINATION "/usr/share/icons/hicolor/256x256/apps"      FILES_MATCHING PATTERN "*.png")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/24x24/apps/"        DESTINATION "/usr/share/icons/hicolor/24x24/apps"        FILES_MATCHING PATTERN "*.png")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-dark/apps/24/"  DESTINATION "/usr/share/icons/ubuntu-mono-dark/apps/24"  FILES_MATCHING PATTERN "*.svg")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-light/apps/24/" DESTINATION "/usr/share/icons/ubuntu-mono-light/apps/24" FILES_MATCHING PATTERN "*.svg")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/about/radiotray-ng.png"     DESTINATION ${DESTINATION_DIR})
 install(FILES     "${PROJECT_SOURCE_DIR}/data/bookmarks.json"             DESTINATION ${DESTINATION_DIR})
 install(FILES     "${PROJECT_SOURCE_DIR}/COPYING"                         DESTINATION ${DESTINATION_DIR})
 install(PROGRAMS  "${PROJECT_BINARY_DIR}/radiotray-ng"                    DESTINATION "/usr/bin/")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"       DESTINATION "/usr/share/applications/")
 install(FILES     "${PROJECT_SOURCE_DIR}/debian/copyright"                DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
-install(FILES     "${PROJECT_SOURCE_DIR}/debian/changelog"                DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
-
+install(FILES     "${PROJECT_BINARY_DIR}/changelog.gz"                    DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")

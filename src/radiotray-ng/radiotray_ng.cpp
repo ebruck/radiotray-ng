@@ -21,7 +21,6 @@
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
-#include <radiotray-ng/notification/notification.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
 #include <cmath>
 
@@ -33,7 +32,6 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, player(std::move(player))
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
-	, notification(new Notification())
 {
 	this->notification_image = this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE);
 
@@ -58,7 +56,7 @@ void RadiotrayNG::stop()
 	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE) &&
 		this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
 	{
-		this->notification->notify("Stopped", this->get_station(), this->notification_image);
+		this->notification.notify("Stopped", this->get_station(), this->notification_image);
 	}
 
 	this->player->stop();
@@ -268,7 +266,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			this->notification->notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
 			return;
 		}
 
@@ -276,13 +274,13 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 		{
 			if (data[STATE_KEY] == STATE_CONNECTING)
 			{
-				this->notification->notify("Connecting", APP_NAME_DISPLAY, this->notification_image);
+				this->notification.notify("Connecting", APP_NAME_DISPLAY, this->notification_image);
 				return;
 			}
 
 			if (data[STATE_KEY] == STATE_BUFFERING)
 			{
-				this->notification->notify("Buffering", this->get_station(), this->notification_image);
+				this->notification.notify("Buffering", this->get_station(), this->notification_image);
 				return;
 			}
 		}
@@ -293,7 +291,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 void RadiotrayNG::on_station_error_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
 	// always show errors
-	this->notification->notify("Error", data[ERROR_KEY], this->notification_image);
+	this->notification.notify("Error", data[ERROR_KEY], this->notification_image);
 }
 
 
@@ -314,7 +312,7 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 				{
 					if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 					{
-						this->notification->notify(this->last_notification.first, this->last_notification.second, this->notification_image);
+						this->notification.notify(this->last_notification.first, this->last_notification.second, this->notification_image);
 					}
 				}
 			}
@@ -329,7 +327,7 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 
 				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 				{
-					this->notification->notify(this->last_notification.first, this->last_notification.second, this->notification_image);
+					this->notification.notify(this->last_notification.first, this->last_notification.second, this->notification_image);
 				}
 			}
 		}
@@ -438,13 +436,13 @@ bool RadiotrayNG::reload_bookmarks()
 	if (result)
 	{
 		// always show...
-		this->notification->notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
+		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
 				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
 	}
 	else
 	{
 		// always show...
-		this->notification->notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
+		this->notification.notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
 				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
 	}
 
