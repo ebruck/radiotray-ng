@@ -33,6 +33,10 @@ set(DESTINATION_DIR /usr/share/radiotray-ng)
 
 execute_process(COMMAND gzip -9 -c "${PROJECT_SOURCE_DIR}/debian/changelog" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.gz")
 
+# for 16.04
+execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/debian/postinst)
+execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/debian/postrm)
+
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/256x256/apps/"      DESTINATION "/usr/share/icons/hicolor/256x256/apps"      FILES_MATCHING PATTERN "*.png")
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/24x24/apps/"        DESTINATION "/usr/share/icons/hicolor/24x24/apps"        FILES_MATCHING PATTERN "*.png")
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-dark/apps/24/"  DESTINATION "/usr/share/icons/ubuntu-mono-dark/apps/24"  FILES_MATCHING PATTERN "*.svg")
