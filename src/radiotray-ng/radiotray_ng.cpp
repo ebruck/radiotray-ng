@@ -413,6 +413,14 @@ void RadiotrayNG::volume_up()
 }
 
 
+void RadiotrayNG::volume_up_msg()
+{
+	this->volume_up();
+
+	this->display_volume_level();
+}
+
+
 void RadiotrayNG::volume_down()
 {
 	uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
@@ -426,6 +434,24 @@ void RadiotrayNG::volume_down()
 
 		this->config->save();
 	}
+}
+
+
+void RadiotrayNG::volume_down_msg()
+{
+	this->volume_down();
+
+	this->display_volume_level();
+}
+
+
+void RadiotrayNG::display_volume_level()
+{
+	// Always show since media keys don't repeat, which makes it hard to tell if the volume is changing...
+	std::string volume_str = "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
+
+	this->notification.notify(volume_str, APP_NAME_DISPLAY,
+			radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
 }
 
 

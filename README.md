@@ -1,4 +1,4 @@
-# Radiotray-NG: An Internet radio player for Linux #
+# Radiotray-NG: An Internet radio player for Ubuntu #
 
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 
@@ -79,19 +79,26 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "sleep-timer" : 30,
    "split-title" : true,
    "tag-info-verbose" : true,
-   "volume-level" : 100
+   "volume-level" : 100,
+   "media-key-mapping : false,
+   "media-key-volume-up" : "Next",
+   "media-key-volume-down" : "Previous"
 }
 ```
 
 
 ```
-           bookmarks: location of bookmarks file
-       debug-logging: enable/disable verbose debug logging
-notification-verbose: more status information than normal
-       notifications: turns on/off notification messages
-         sleep-timer: value is in minutes
-         split-title: attempts to reformat the notification into title/artist
-    tag-info-verbose: displays in the menu stream information such as bitrate etc.
+            bookmarks: location of bookmarks file
+        debug-logging: enable/disable verbose debug logging
+ notification-verbose: more status information than normal
+        notifications: turns on/off notification messages
+          sleep-timer: value is in minutes
+          split-title: attempts to reformat the notification into title/artist
+     tag-info-verbose: displays in the menu stream information such as bitrate etc.
+    media-key-mapping: enable the mapping of media keys to volume up/down
+  media-key-volume-up: Media key to use for volume up (See GrabMediaPlayerKeys api for possible values.)
+media-key-volume-down: Media key to use for volume down (See GrabMediaPlayerKeys api for possible values.)
+   
 ```
 Do not edit the config while Radiotray-NG is running or your changes will be lost.
 

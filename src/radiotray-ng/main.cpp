@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 #endif
 
 	// addons etc.
-	MediaKeys mm(radiotray_ng);
+	MediaKeys mm(radiotray_ng, config);
 
 	// todo: support start playing passed group/station...
 	gui->run(argc, argv);

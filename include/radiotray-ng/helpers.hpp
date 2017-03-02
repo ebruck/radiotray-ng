@@ -131,4 +131,10 @@ namespace radiotray_ng
 		xdg_data_home_dir += std::string("/") + app_name + std::string("/");
 		return xdg_data_home_dir;
 	}
+
+	inline std::string to_lower(std::string str)
+	{
+		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+		return str;
+	}
 }

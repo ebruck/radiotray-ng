@@ -46,7 +46,11 @@ public:
 
 	void volume_up();
 
+	void volume_up_msg();
+
 	void volume_down();
+
+	void volume_down_msg();
 
 	void stop();
 
@@ -106,6 +110,7 @@ private:
 	void on_tags_changed_event_notification(const IEventBus::event& ev, IEventBus::event_data_t& data);
 	void on_tags_changed_event_processing(const IEventBus::event& ev, IEventBus::event_data_t& data);
 
+	void display_volume_level();
 	void register_handlers();
 	void clear_tags();
 

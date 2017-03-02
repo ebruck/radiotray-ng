@@ -31,7 +31,11 @@ public:
 
 	virtual void volume_up() = 0;
 
+	virtual void volume_up_msg() = 0;
+
 	virtual void volume_down() = 0;
+
+	virtual void volume_down_msg() = 0;
 
 	virtual void stop() = 0;
 
