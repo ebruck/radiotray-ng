@@ -32,6 +32,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, player(std::move(player))
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
+	, current_station_index(0)
 {
 	this->notification_image = this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE);
 
@@ -164,6 +165,18 @@ void RadiotrayNG::set_station(const std::string& group, const std::string& stati
 
 	this->group = group;
 	this->station = station;
+
+	if (this->bookmarks->get_group_stations(group, this->current_group_stations))
+	{
+		for(size_t i=0; i < this->current_group_stations.size(); ++i)
+		{
+			if (this->current_group_stations[i].name == station)
+			{
+				this->current_station_index = i;
+				break;
+			}
+		}
+	}
 }
 
 
@@ -196,6 +209,30 @@ void RadiotrayNG::set_volume(const std::string& volume)
 	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
 
 	this->volume = volume;
+}
+
+
+void RadiotrayNG::next_station_msg()
+{
+	if (this->current_station_index < this->current_group_stations.size()-1)
+	{
+		if (this->state == STATE_PLAYING)
+		{
+			this->play(this->group, this->current_group_stations[++this->current_station_index].name);
+		}
+	}
+}
+
+
+void RadiotrayNG::previous_station_msg()
+{
+	if (this->current_station_index > 0)
+	{
+		if (this->state == STATE_PLAYING)
+		{
+			this->play(this->group, this->current_group_stations[--this->current_station_index].name);
+		}
+	}
 }
 
 
@@ -464,6 +501,9 @@ bool RadiotrayNG::reload_bookmarks()
 		// always show...
 		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
 				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+
+		// force reloading of current groups station list...
+		this->set_station(this->group, this->station);
 	}
 	else
 	{

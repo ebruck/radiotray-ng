@@ -174,13 +174,14 @@ int main(int argc, char* argv[])
 	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
 	std::shared_ptr<IEventBus> event_bus{std::make_shared<EventBus>()};
 	std::shared_ptr<IPlayer> player{std::make_shared<Player>(config, event_bus)};
-	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
 
 	if (!bookmarks->load())
 	{
 		// User can reload once they fix the error...
 		set_bookmark_defaults(bookmarks);
 	}
+
+	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
 
 #ifdef APPINDICATOR_GUI
 	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));

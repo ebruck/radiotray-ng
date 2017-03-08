@@ -1,4 +1,4 @@
-# Radiotray-NG: An Internet radio player for Ubuntu #
+# Radiotray-NG: An Internet radio player for Linux #
 
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 
@@ -27,7 +27,7 @@ The version here is what "I" wanted out of RadioTray.
 * Cross compile on Mac (via brew packages) using a very simple ncurses interface.
 * Full AppIndicator support
 * No groups within groups by design to keep the interface clean.
-* Volume up/down support using mouse wheel
+* Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
 
 ## Future: ##
@@ -80,27 +80,32 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "split-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
-   "media-key-mapping : false,
-   "media-key-volume-up" : "Next",
-   "media-key-volume-down" : "Previous"
+   "media-key-mapping" : false,
+   "media-key-previous-station" : "Previous",
+   "media-key-next-station" : "Next",
+   "media-key-volume-up" : "",
+   "media-key-volume-down" : ""
 }
 ```
 
 
 ```
-            bookmarks: location of bookmarks file
-        debug-logging: enable/disable verbose debug logging
- notification-verbose: more status information than normal
-        notifications: turns on/off notification messages
-          sleep-timer: value is in minutes
-          split-title: attempts to reformat the notification into title/artist
-     tag-info-verbose: displays in the menu stream information such as bitrate etc.
-    media-key-mapping: enable the mapping of media keys to volume up/down
-  media-key-volume-up: Media key to use for volume up (See GrabMediaPlayerKeys api for possible values.)
-media-key-volume-down: Media key to use for volume down (See GrabMediaPlayerKeys api for possible values.)
-   
+                 bookmarks: location of bookmarks file
+             debug-logging: enable/disable verbose debug logging
+      notification-verbose: more status information than normal
+             notifications: turns on/off notification messages
+               sleep-timer: value is in minutes
+               split-title: attempts to reformat the notification into title/artist
+          tag-info-verbose: displays in the menu stream information such as bitrate etc.
+         media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
+media-key-previous-station: Media key to use for previous station within current group
+    media-key-next-station: Media key to use for next station within current group
+       media-key-volume-up: Media key to use for volume up
+     media-key-volume-down: Media key to use for volume down
+      
 ```
 Do not edit the config while Radiotray-NG is running or your changes will be lost.
+Media keys are test first for volume and then station switching. No checks are made to see if a key assignment collides with another action.
 
 ## Bookmarks Format ##
 
@@ -150,20 +155,7 @@ Install these packages:
 
 
 ```
-libcurl4-openssl-dev
-libjsoncpp-dev
-libxdg-basedir-dev
-libnotify-dev
-libboost-filesystem-dev
-libgstreamer1.0-dev
-libappindicator-dev
-libboost-log-dev
-libgtk-3-dev
-libnotify-dev
-lsb-release
-libbsd-dev
-libncurses5-dev
-cmake
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev cmake
 
 ```
 

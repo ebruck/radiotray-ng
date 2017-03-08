@@ -116,3 +116,5 @@ add_custom_command(
 )
 
 add_custom_target(user-agent ALL DEPENDS rtng_user_agent.hpp)
+
+set(CONFIGURED_ONCE TRUE CACHE INTERNAL "A flag showing that CMake has configured at least once.")

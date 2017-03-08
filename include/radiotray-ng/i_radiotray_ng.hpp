@@ -69,5 +69,9 @@ public:
 
 	virtual void set_volume(const std::string& volume) = 0;
 
+	virtual void previous_station_msg() = 0;
+
+	virtual void next_station_msg() = 0;
+
 	virtual bool reload_bookmarks() = 0;
 };

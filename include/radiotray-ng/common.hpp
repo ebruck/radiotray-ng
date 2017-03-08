@@ -69,6 +69,8 @@ using playlist_t = std::vector<std::string>;
 #define MEDIA_KEY_MAPPING                 "media-key-mapping"
 #define VOLUME_DOWN_MEDIA_KEY             "media-key-volume-up"
 #define VOLUME_UP_MEDIA_KEY               "media-key-volume-down"
+#define PREVIOUS_STAITON_MEDIA_KEY        "media-key-previous-station"
+#define NEXT_STAITON_MEDIA_KEY            "media-key-next-station"
 
 // conf files etc.
 #define RTNG_BOOKMARK_FILE                "bookmarks.json"
@@ -96,8 +98,10 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_DEBUG_LOGGING_VALUE        (false)
 #define DEFAULT_SLEEP_TIMER_VALUE          uint32_t(60)
 #define DEFAULT_MEDIA_KEY_MAPPING          (false)
-#define DEFAULT_VOLUME_UP_MEDIA_KEY        "Next"
-#define DEFAULT_VOLUME_DOWN_MEDIA_KEY      "Previous"
+#define DEFAULT_VOLUME_UP_MEDIA_KEY        ""
+#define DEFAULT_VOLUME_DOWN_MEDIA_KEY      ""
+#define DEFAULT_PREVIOUS_STATION_MEDIA_KEY "Previous"
+#define DEFAULT_NEXT_STATION_MEDIA_KEY     "Next"
 
 // icons
 #define RADIOTRAY_NG_ICON_ON               "radiotray-ng-on"

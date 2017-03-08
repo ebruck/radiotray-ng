@@ -392,6 +392,8 @@ bool Bookmarks::get_group_stations(const std::string& group_name, std::vector<IB
 
 	if (this->find_group(group_name, group_index))
 	{
+		stations.clear();
+
 		for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 		{
 			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString()});
