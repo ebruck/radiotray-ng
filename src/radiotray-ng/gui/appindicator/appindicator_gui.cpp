@@ -479,11 +479,14 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer data)
 		radiotray_ng::load_string_file(license_file, license);
 	}
 
+	std::string copyright{"(" + std::string(RTNG_GIT_VERSION) + ")"};
+	copyright += "\n\n" APP_COPYRIGHT;
+
 	gtk_show_about_dialog(nullptr
 		, "program-name", APP_NAME_DISPLAY
 		, "version", "v" RTNG_VERSION
 		, "license", license.c_str()
-		, "copyright", APP_COPYRIGHT
+		, "copyright", copyright.c_str()
 		, "website", APP_WEBSITE
 		, nullptr);
 }

@@ -19,6 +19,12 @@ else()
     endif()
 endif()
 
+find_program(GIT_EXECUTABLE NAMES git)
+  
+if (GIT_EXECUTABLE)
+    execute_process(COMMAND git describe --tags --dirty OUTPUT_VARIABLE RTNG_GIT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif() 
+
 set(RTNG_USER_AGENT "${CMAKE_PROJECT_NAME}/${PROJECT_VERSION} (${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}; ${USER_AGENT_DISTRO}/${USER_AGENT_DISTRO_RELEASE} (${USER_AGENT_DISTRO_CODENAME}))")
 configure_file(${PROJECT_SOURCE_DIR}/rtng_user_agent.hpp.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rtng_user_agent.hpp.tmp)
 
