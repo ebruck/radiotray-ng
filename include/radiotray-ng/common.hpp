@@ -69,7 +69,7 @@ using playlist_t = std::vector<std::string>;
 #define MEDIA_KEY_MAPPING                 "media-key-mapping"
 #define VOLUME_DOWN_MEDIA_KEY             "media-key-volume-up"
 #define VOLUME_UP_MEDIA_KEY               "media-key-volume-down"
-#define PREVIOUS_STAITON_MEDIA_KEY        "media-key-previous-station"
+#define PREVIOUS_STATION_MEDIA_KEY        "media-key-previous-station"
 #define NEXT_STAITON_MEDIA_KEY            "media-key-next-station"
 
 // conf files etc.

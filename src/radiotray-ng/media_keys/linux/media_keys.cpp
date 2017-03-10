@@ -38,17 +38,22 @@ public:
 		, main_loop(nullptr)
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 	{
-		// install volume up/down?
+		// install extra media key mappings?
 		if (this->config->get_bool(MEDIA_KEY_MAPPING, DEFAULT_MEDIA_KEY_MAPPING))
 		{
-			this->volume_key_map[radiotray_ng::to_lower(this->config->get_string(VOLUME_UP_MEDIA_KEY, DEFAULT_VOLUME_UP_MEDIA_KEY))] = true;
-			this->volume_key_map[radiotray_ng::to_lower(this->config->get_string(VOLUME_DOWN_MEDIA_KEY, DEFAULT_VOLUME_DOWN_MEDIA_KEY))] = false;
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(VOLUME_UP_MEDIA_KEY, DEFAULT_VOLUME_UP_MEDIA_KEY))] =
+							std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
 
-			this->station_key_map[radiotray_ng::to_lower(this->config->get_string(NEXT_STAITON_MEDIA_KEY, DEFAULT_NEXT_STATION_MEDIA_KEY))] = true;
-			this->station_key_map[radiotray_ng::to_lower(this->config->get_string(PREVIOUS_STAITON_MEDIA_KEY, DEFAULT_PREVIOUS_STATION_MEDIA_KEY))] = false;
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(VOLUME_DOWN_MEDIA_KEY, DEFAULT_VOLUME_DOWN_MEDIA_KEY))] =
+							std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
 
-			LOG(info) << "mapping volume up/down to: "<< this->config->get_string(VOLUME_UP_MEDIA_KEY, DEFAULT_VOLUME_UP_MEDIA_KEY) << ", "
-				<< this->config->get_string(VOLUME_DOWN_MEDIA_KEY, DEFAULT_VOLUME_DOWN_MEDIA_KEY);
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(NEXT_STAITON_MEDIA_KEY, DEFAULT_NEXT_STATION_MEDIA_KEY))] =
+				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng.get());
+
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(PREVIOUS_STATION_MEDIA_KEY, DEFAULT_PREVIOUS_STATION_MEDIA_KEY))] =
+							std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
+
+			this->log_media_keys();
 		}
 
 		LOG(info) << "starting gio thread for: " << this->app_name;
@@ -76,6 +81,15 @@ public:
 		}
 	}
 
+	void log_media_keys()
+	{
+		LOG(info) << "mapping volume up/down to: "<< this->config->get_string(VOLUME_UP_MEDIA_KEY, DEFAULT_VOLUME_UP_MEDIA_KEY) << ", "
+			<< this->config->get_string(VOLUME_DOWN_MEDIA_KEY, DEFAULT_VOLUME_DOWN_MEDIA_KEY);
+
+		LOG(info) << "mapping station previous/next to: "<< this->config->get_string(PREVIOUS_STATION_MEDIA_KEY, DEFAULT_PREVIOUS_STATION_MEDIA_KEY) << ", "
+			<< this->config->get_string(NEXT_STAITON_MEDIA_KEY, DEFAULT_NEXT_STATION_MEDIA_KEY);
+	}
+
 private:
 	void gio_thread();
 
@@ -90,8 +104,7 @@ private:
 	std::mutex  main_loop_mutex;
 	std::condition_variable main_loop_ready_cv;
 
-	std::map<std::string, bool> volume_key_map;
-	std::map<std::string, bool> station_key_map;
+	std::map<std::string, std::function<void ()>> media_keys;
 };
 
 
@@ -148,42 +161,12 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 	// use media key mapping?
 	if (media_keys->config->get_bool(MEDIA_KEY_MAPPING, DEFAULT_MEDIA_KEY_MAPPING))
 	{
-		// volume switching...
+		auto it = media_keys->media_keys.find(radiotray_ng::to_lower(key_pressed));
+
+		if (it != media_keys->media_keys.end())
 		{
-			auto it = media_keys->volume_key_map.find(radiotray_ng::to_lower(key_pressed));
-
-			if (it != media_keys->volume_key_map.end())
-			{
-				if (it->second == true)
-				{
-					media_keys->radiotray_ng->volume_up_msg();
-					return;
-				}
-				else
-				{
-					media_keys->radiotray_ng->volume_down_msg();
-					return;
-				}
-			}
-		}
-
-		// station switching...
-		{
-			auto it = media_keys->station_key_map.find(radiotray_ng::to_lower(key_pressed));
-
-			if (it != media_keys->station_key_map.end())
-			{
-				if (it->second == true)
-				{
-					media_keys->radiotray_ng->next_station_msg();
-					return;
-				}
-				else
-				{
-					media_keys->radiotray_ng->previous_station_msg();
-					return;
-				}
-			}
+			it->second();
+			return;
 		}
 	}
 

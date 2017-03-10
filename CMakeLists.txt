@@ -102,7 +102,7 @@ endif()
 
 # user agent
 add_custom_command(
-     OUTPUT  rtng_user_agent.hpp
+     OUTPUT  rtng_user_agent
     COMMENT "Generating rtng_user_agent.hpp"
     COMMAND ${CMAKE_COMMAND}
         -D PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -115,6 +115,6 @@ add_custom_command(
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-add_custom_target(user-agent ALL DEPENDS rtng_user_agent.hpp)
+add_custom_target(user-agent ALL DEPENDS rtng_user_agent)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL "A flag showing that CMake has configured at least once.")

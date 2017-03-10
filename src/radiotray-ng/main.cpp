@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
 	init_logging();
 
-	LOG(info) << APP_NAME << " v" << RTNG_VERSION << " starting up";
+	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
 
 	std::shared_ptr<IConfig> config{std::make_shared<Config>(config_path + RTNG_CONFIG_FILE)};
 

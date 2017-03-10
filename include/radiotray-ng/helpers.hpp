@@ -132,6 +132,7 @@ namespace radiotray_ng
 		return xdg_data_home_dir;
 	}
 
+
 	inline std::string to_lower(std::string str)
 	{
 		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
