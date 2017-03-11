@@ -36,7 +36,7 @@ The version here is what "I" wanted out of RadioTray.
 * Finish ncurses interface
 * Mac support (icons, menu, media keys etc.) (I need help here.)
 * Native support for Gnome desktop? (AppIndicator plugin seems to work fine though.)
-* Script to convert RadioTray's bookmarks.xml to the new format.
+* ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 * Mpris support?
 * Better handling of any JSON parsing errors.
 
@@ -104,8 +104,8 @@ media-key-previous-station: Media key to use for previous station within current
      media-key-volume-down: Media key to use for volume down
       
 ```
-Do not edit the config while Radiotray-NG is running or your changes will be lost.
-Media keys are test first for volume and then station switching. No checks are made to see if a key assignment collides with another action.
+* Do not edit the config while Radiotray-NG is running or your changes will be lost.
+* No checks are made if a media key assignment collides with another action.
 
 ## Bookmarks Format ##
 
@@ -148,6 +148,15 @@ A group's image specifies the notification icon to display and is inherited by a
 A station with an image overrides the group image.
 
 Use the "Preferences/Reload Bookmarks" option to see your changes.
+
+## Convert RadioTray bookmarks ##
+
+The rt2rtng script will convert your RadioTray bookmarks.xml to Radiotray-NG's JSON format. All groups within groups are moved to the root and any empty ones are removed.
+It's not a perfect conversion and will no doubt require some editing.
+
+```
+$ /usr/share/radiotray-ng/rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
+```
 
 ## To Build: ##
 

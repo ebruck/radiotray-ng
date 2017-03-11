@@ -115,7 +115,7 @@ void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& con
 
 void set_bookmark_defaults(std::shared_ptr<IBookmarks> bookmarks)
 {
-	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE);
+	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE_VALUE);
 }
 
 
