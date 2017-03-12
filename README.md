@@ -56,7 +56,6 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screen_shot_4.png)
 ![Screenshot](images/screen_shot_5.png)
 
-###############################################################################
 
 ## Install ##
 
@@ -64,10 +63,10 @@ Download the latest Debian package from the repo's release page.
 
 https://github.com/ebruck/radiotray-ng/releases
 
+
 ## Config File ##
 
 A config is created in your ~/.config/radiotray-ng directory with the following defaults:
-
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
@@ -87,8 +86,6 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "media-key-volume-down" : ""
 }
 ```
-
-
 ```
                  bookmarks: location of bookmarks file
              debug-logging: enable/disable verbose debug logging
@@ -102,16 +99,15 @@ media-key-previous-station: Media key to use for previous station within current
     media-key-next-station: Media key to use for next station within current group
        media-key-volume-up: Media key to use for volume up
      media-key-volume-down: Media key to use for volume down
-      
+
 ```
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
 
+
 ## Bookmarks Format ##
 
 Bookmarks are defined in the following JSON format:
-
-
 ```
 [
    {
@@ -123,7 +119,7 @@ Bookmarks are defined in the following JSON format:
             "name" : "station name",
             "url" : "http://station/station.pls"
          },
-         ...         
+         ...
         ]
    },
    {
@@ -141,36 +137,29 @@ Bookmarks are defined in the following JSON format:
    ...
 ]
 ```
-
-   
-Group with the name "root" is treated differently and is rendered at the base of the menu.
-A group's image specifies the notification icon to display and is inherited by all of the stations.
-A station with an image overrides the group image.
+Group with the name "root" is treated differently and is rendered at the base of the menu. A group's image specifies the notification icon to display and is inherited by all of the stations. A station with an image overrides the group image.
 
 Use the "Preferences/Reload Bookmarks" option to see your changes.
 
-## Convert RadioTray bookmarks ##
 
-The rt2rtng script will convert your RadioTray bookmarks.xml to Radiotray-NG's JSON format. All groups within groups are moved to the root and any empty ones are removed.
-It's not a perfect conversion and will no doubt require some editing.
+## Convert RadioTray Bookmarks ##
+
+The rt2rtng script will convert your RadioTray bookmarks.xml file. All groups within groups are moved to the root and any empty ones are removed. It's not a perfect conversion and will no doubt require some editing.
 
 ```
 $ /usr/share/radiotray-ng/rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
+
 ## To Build: ##
 
 Install these packages:
-
-
 ```
 libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev cmake
-
 ```
 
+
 ## GoogleTest (optional) ##
-
-
 ```
 $ git clone git@github.com:google/googletest.git
 $ cd googletest
@@ -182,10 +171,7 @@ $ sudo make install
 
 
 ## Build Radiotray-NG & Debian Package ##
-
-
 ```
 $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
 $ make package
-
 ```
