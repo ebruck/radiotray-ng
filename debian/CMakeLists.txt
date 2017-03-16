@@ -22,7 +22,7 @@ endif()
 
 set(CPACK_DEBIAN_PACKAGE_PRIORITY     "optional")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER   "Edward G. Bruck <ed.bruck1@gmail.com>")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS      "libc6, libbsd0, libcurl3, libjsoncpp1, libxdg-basedir1, libnotify4, libboost-filesystem1.58.0 | libboost-filesystem1.61.0, libboost-system1.58.0 | libboost-system1.61.0, libboost-log1.58.0 | libboost-log1.61.0, libboost-thread1.58.0 | libboost-thread1.61.0, libgstreamer1.0-0, libappindicator1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS      "libc6, libbsd0, libcurl3, libjsoncpp1, libxdg-basedir1, libnotify4, python2.7, python-lxml, libboost-filesystem1.58.0 | libboost-filesystem1.61.0, libboost-system1.58.0 | libboost-system1.61.0, libboost-log1.58.0 | libboost-log1.61.0, libboost-thread1.58.0 | libboost-thread1.61.0, libgstreamer1.0-0, libappindicator1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad")
 set(CPACK_GENERATOR                   "DEB")
 set(CPACK_PACKAGE_FILE_NAME            ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/debian/postinst;${PROJECT_SOURCE_DIR}/debian/postrm)

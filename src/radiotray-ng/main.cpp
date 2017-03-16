@@ -171,9 +171,9 @@ int main(int argc, char* argv[])
 	// adjust logging level...
 	set_logging_level(config);
 
-	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
-	std::shared_ptr<IEventBus> event_bus{std::make_shared<EventBus>()};
-	std::shared_ptr<IPlayer> player{std::make_shared<Player>(config, event_bus)};
+	auto bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
+	auto event_bus{std::make_shared<EventBus>()};
+	auto player{std::make_shared<Player>(config, event_bus)};
 
 	if (!bookmarks->load())
 	{
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 		set_bookmark_defaults(bookmarks);
 	}
 
-	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
+	auto radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
 
 #ifdef APPINDICATOR_GUI
 	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));
