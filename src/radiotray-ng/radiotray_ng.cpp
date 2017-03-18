@@ -370,7 +370,7 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 			if (this->last_notification.first != data[TAG_TITLE])
 			{
 				this->last_notification.first = data[TAG_TITLE];
-				this->last_notification.second = APP_NAME_DISPLAY;
+				this->last_notification.second = this->station;
 
 				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 				{
