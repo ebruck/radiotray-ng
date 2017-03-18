@@ -125,5 +125,5 @@ private:
 	std::pair<std::string, std::string> last_notification;
 
 	std::vector<IBookmarks::station_data_t> current_group_stations;
-	size_t current_station_index;
+	int current_station_index;
 };

@@ -32,7 +32,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, player(std::move(player))
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
-	, current_station_index(0)
+	, current_station_index(-1)
 {
 	this->notification_image = this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE);
 
@@ -166,6 +166,10 @@ void RadiotrayNG::set_station(const std::string& group, const std::string& stati
 	this->group = group;
 	this->station = station;
 
+	// This allows us to start playing the first station in a group if we've reloaded
+	// the bookmarks file and it's no longer within it.
+	this->current_station_index = -1;
+
 	if (this->bookmarks->get_group_stations(group, this->current_group_stations))
 	{
 		for(size_t i=0; i < this->current_group_stations.size(); ++i)
@@ -214,11 +218,14 @@ void RadiotrayNG::set_volume(const std::string& volume)
 
 void RadiotrayNG::next_station_msg()
 {
-	if (this->current_station_index < this->current_group_stations.size()-1)
+	if (this->state == STATE_PLAYING)
 	{
-		if (this->state == STATE_PLAYING)
+		if (!this->current_group_stations.empty())
 		{
-			this->play(this->group, this->current_group_stations[++this->current_station_index].name);
+			if (this->current_station_index < int(this->current_group_stations.size()-1))
+			{
+				this->play(this->group, this->current_group_stations[++this->current_station_index].name);
+			}
 		}
 	}
 }
@@ -226,11 +233,14 @@ void RadiotrayNG::next_station_msg()
 
 void RadiotrayNG::previous_station_msg()
 {
-	if (this->current_station_index > 0)
+	if (this->state == STATE_PLAYING)
 	{
-		if (this->state == STATE_PLAYING)
+		if (!this->current_group_stations.empty())
 		{
-			this->play(this->group, this->current_group_stations[--this->current_station_index].name);
+			if (this->current_station_index > 0)
+			{
+				this->play(this->group, this->current_group_stations[--this->current_station_index].name);
+			}
 		}
 	}
 }
