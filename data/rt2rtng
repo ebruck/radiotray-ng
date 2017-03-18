@@ -41,12 +41,11 @@ def walk_bookmarks(root, group_func, bookmark_func, group=""):
 
 
 def group_callback(group_name):
-    if group_name != 'root':
-        if len(bookmarks):
-            if not bookmarks[0].has_key(group_name):
-                bookmarks.append({'group' : group_name, 'image' : '', 'stations' : [] })
-        else:
+    if len(bookmarks):
+        if not bookmarks[0].has_key(group_name):
             bookmarks.append({'group' : group_name, 'image' : '', 'stations' : [] })
+    else:
+        bookmarks.append({'group' : group_name, 'image' : '', 'stations' : [] })
 
 
 def bookmark_callback(group, radio_name, url):
