@@ -54,7 +54,7 @@ bool XspfDecoder::decode(const std::string& content, playlist_t& playlist)
 	{
 		std::string url{match[1]};
 		playlist.push_back(radiotray_ng::trim(url));
-	    search = match.suffix().str();
+		search = match.suffix().str();
 	}
 
 	return !playlist.empty();

@@ -51,14 +51,14 @@ bool AsxDecoder::decode(const std::string& content, playlist_t& playlist)
 	playlist.clear();
 
 	std::regex  regex("href[ ]*=[ \"']*(.*?)[ \"']", std::regex::icase);
-	std::smatch match;	
+	std::smatch match;
 	std::string search{content};
-	
+
 	while (std::regex_search(search, match, regex))
 	{
 		std::string url{match[1]};
 		playlist.push_back(radiotray_ng::trim(url));
-	    search = match.suffix().str();
+		search = match.suffix().str();
 	}
 
 	return !playlist.empty();
