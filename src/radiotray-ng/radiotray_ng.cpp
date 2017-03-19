@@ -218,14 +218,11 @@ void RadiotrayNG::set_volume(const std::string& volume)
 
 void RadiotrayNG::next_station_msg()
 {
-	if (this->state == STATE_PLAYING)
+	if (!this->current_group_stations.empty())
 	{
-		if (!this->current_group_stations.empty())
+		if (this->current_station_index < int(this->current_group_stations.size()-1))
 		{
-			if (this->current_station_index < int(this->current_group_stations.size()-1))
-			{
-				this->play(this->group, this->current_group_stations[++this->current_station_index].name);
-			}
+			this->play(this->group, this->current_group_stations[++this->current_station_index].name);
 		}
 	}
 }
@@ -233,14 +230,11 @@ void RadiotrayNG::next_station_msg()
 
 void RadiotrayNG::previous_station_msg()
 {
-	if (this->state == STATE_PLAYING)
+	if (!this->current_group_stations.empty())
 	{
-		if (!this->current_group_stations.empty())
+		if (this->current_station_index > 0)
 		{
-			if (this->current_station_index > 0)
-			{
-				this->play(this->group, this->current_group_stations[--this->current_station_index].name);
-			}
+			this->play(this->group, this->current_group_stations[--this->current_station_index].name);
 		}
 	}
 }
