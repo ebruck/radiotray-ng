@@ -54,3 +54,7 @@ local.properties
 .recommenders/
 
 .idea/
+
+.vscode/
+
+build/

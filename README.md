@@ -32,10 +32,9 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Future: ##
 
-* Cross platform bookmark editor application. (I like editing the JSON by hand, but some may not care for that.) 
+* Cross platform bookmark editor application. (Work is underway. Thanks Mike!) 
 * Finish ncurses interface
 * Mac support (icons, menu, media keys etc.) (I need help here.)
-* Native support for Gnome desktop? (AppIndicator plugin seems to work fine though.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 * Mpris support?
 * Better handling of any JSON parsing errors.
