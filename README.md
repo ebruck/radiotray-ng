@@ -3,8 +3,7 @@
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 
 technologies it used had moved on to newer versions and the bugs started piling up.
-I did my best to help users, but a new start was required. So, in early 2016 I began
-to write a new version. 
+I did my best to help users, but a new start was required.
 
 The version here is what "I" wanted out of RadioTray.
 
@@ -78,6 +77,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "split-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
+   "volume-step" : 1,
    "media-key-mapping" : false,
    "media-key-previous-station" : "Previous",
    "media-key-next-station" : "Next",
@@ -93,6 +93,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
                sleep-timer: value is in minutes
                split-title: attempts to reformat the notification into title/artist
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
+               volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: Media key to use for previous station within current group
     media-key-next-station: Media key to use for next station within current group
@@ -146,7 +147,7 @@ Use the "Preferences/Reload Bookmarks" option to see your changes.
 The rt2rtng script will convert your RadioTray bookmarks.xml file. All groups within groups are moved to the root and any empty ones are removed. It's not a perfect conversion and will no doubt require some editing.
 
 ```
-$ /usr/share/radiotray-ng/rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
+$ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
 

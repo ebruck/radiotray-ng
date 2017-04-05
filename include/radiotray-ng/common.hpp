@@ -62,6 +62,7 @@ using playlist_t = std::vector<std::string>;
 #define NOTIFICATION_VERBOSE_KEY          "notification-verbose"
 #define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
 #define SPLIT_TITLE_KEY                   "split-title"
+#define VOLUME_STEP_KEY                   "volume-step"
 #define VOLUME_LEVEL_KEY                  "volume-level"
 #define VOLUME_MAX_LEVEL_KEY              "volume-max-level"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
@@ -95,6 +96,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_STATION_IMAGE_VALUE        ""
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE     uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE         uint32_t(100)
+#define DEFAULT_VOLUME_STEP_VALUE          uint32_t(1)
 #define DEFAULT_DEBUG_LOGGING_VALUE        (false)
 #define DEFAULT_SLEEP_TIMER_VALUE          uint32_t(60)
 #define DEFAULT_MEDIA_KEY_MAPPING_VALUE    (false)

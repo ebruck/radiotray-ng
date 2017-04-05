@@ -440,17 +440,10 @@ void RadiotrayNG::play()
 
 void RadiotrayNG::volume_up()
 {
-	uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t max_volume{this->config->get_uint32(VOLUME_MAX_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_MAX_VALUE)};
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
 
-	if (++volume <= this->config->get_uint32(VOLUME_MAX_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_MAX_VALUE))
-	{
-		this->volume = std::to_string(volume);
-		this->player->volume(volume);
-
-		LOG(debug) << "volume: " << this->volume;
-
-		this->config->save();
-	}
+	this->set_and_save_volume(std::min(volume + this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE), max_volume));
 }
 
 
@@ -464,17 +457,10 @@ void RadiotrayNG::volume_up_msg()
 
 void RadiotrayNG::volume_down()
 {
-	uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t volume_step{this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE)};
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
 
-	if (volume > 0)
-	{
-		this->volume = std::to_string(--volume);
-		this->player->volume(volume);
-
-		LOG(debug) << "volume: " << this->volume;
-
-		this->config->save();
-	}
+	this->set_and_save_volume((volume > volume_step) ? (volume - volume_step) : 0);
 }
 
 
@@ -485,6 +471,21 @@ void RadiotrayNG::volume_down_msg()
 	this->display_volume_level();
 }
 
+
+void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
+{
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+
+	if (new_volume != volume)
+	{
+		this->volume = std::to_string(new_volume);
+		this->player->volume(new_volume);
+
+		LOG(debug) << "volume: " << this->volume;
+
+		this->config->save();
+	}
+}
 
 void RadiotrayNG::display_volume_level()
 {

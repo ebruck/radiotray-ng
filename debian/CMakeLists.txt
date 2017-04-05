@@ -44,7 +44,7 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-light/apps/24/" DESTIN
 install(FILES     "${PROJECT_SOURCE_DIR}/data/about/radiotray-ng.png"     DESTINATION ${DESTINATION_DIR})
 install(FILES     "${PROJECT_SOURCE_DIR}/data/bookmarks.json"             DESTINATION ${DESTINATION_DIR})
 install(FILES     "${PROJECT_SOURCE_DIR}/COPYING"                         DESTINATION ${DESTINATION_DIR})
-install(PROGRAMS  "${PROJECT_SOURCE_DIR}/data/rt2rtng"                    DESTINATION ${DESTINATION_DIR})
+install(PROGRAMS  "${PROJECT_SOURCE_DIR}/data/rt2rtng"                    DESTINATION "/usr/bin/")
 install(PROGRAMS  "${PROJECT_BINARY_DIR}/radiotray-ng"                    DESTINATION "/usr/bin/")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"       DESTINATION "/usr/share/applications/")
 install(FILES     "${PROJECT_SOURCE_DIR}/debian/copyright"                DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")

@@ -117,6 +117,7 @@ private:
 
 	void display_volume_level();
 	void register_handlers();
+	void set_and_save_volume(uint32_t new_volume);
 	void clear_tags();
 
 	Notification notification;
