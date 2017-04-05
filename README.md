@@ -95,10 +95,10 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
                volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
-media-key-previous-station: Media key to use for previous station within current group
-    media-key-next-station: Media key to use for next station within current group
-       media-key-volume-up: Media key to use for volume up
-     media-key-volume-down: Media key to use for volume down
+media-key-previous-station: media key to use for previous station within current group
+    media-key-next-station: media key to use for next station within current group
+       media-key-volume-up: media key to use for volume up
+     media-key-volume-down: media key to use for volume down
 
 ```
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
