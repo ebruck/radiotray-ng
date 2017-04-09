@@ -68,6 +68,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
+   "compact-menu" : false,
    "debug-logging" : false,
    "last-station" : "",
    "last-station-group" : "",
@@ -87,6 +88,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 ```
                  bookmarks: location of bookmarks file
+             compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
       notification-verbose: more status information than normal
              notifications: turns on/off notification messages

@@ -213,9 +213,12 @@ void AppindicatorGui::build_bookmarks_menu_item()
 
 void AppindicatorGui::add_separator(GtkWidget* menu)
 {
-	GtkWidget* menu_items = gtk_menu_item_new();
-	gtk_menu_append(GTK_MENU(menu), menu_items);
-	gtk_widget_show(menu_items);
+	if (!this->config->get_bool(COMPACT_MENU_KEY, DEFAULT_COMPACT_MENU_VALUE))
+	{
+		GtkWidget* menu_items = gtk_menu_item_new();
+		gtk_menu_append(GTK_MENU(menu), menu_items);
+		gtk_widget_show(menu_items);
+	}
 }
 
 
