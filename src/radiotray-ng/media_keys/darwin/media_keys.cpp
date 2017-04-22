@@ -24,7 +24,7 @@ class media_keys_t
 };
 
 
-MediaKeys::MediaKeys(std::shared_ptr<IRadioTrayNG> /*radiotray_ng*/)
+MediaKeys::MediaKeys(std::shared_ptr<IRadioTrayNG> /*radiotray_ng*/, std::shared_ptr<IConfig> /*config*/)
 	: media_keys_impl(std::make_shared<media_keys_t>())
 {
 }

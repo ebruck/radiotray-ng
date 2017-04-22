@@ -17,7 +17,7 @@ project(radiotray-ng CXX)
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 4)
+set(PROJECT_VERSION_PATCH 5)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -49,6 +49,8 @@ endif(NOT APPLE)
 # flags
 add_definitions("-std=c++11 -DBOOST_LOG_DYN_LINK")
 set(warnings "-Wall -Wextra -Werror")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 
 if (NOT CONFIGURED_ONCE)
     set(CMAKE_CXX_FLAGS "${warnings}"
@@ -62,8 +64,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_D
 
 # notification & ncurses based on platform
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    pkg_search_module(NCURSES      REQUIRED ncurses)
     pkg_search_module(APPINDICATOR REQUIRED appindicator-0.1)
+if (NOT APPINDICATOR_FOUND)
+    pkg_search_module(NCURSES      REQUIRED ncurses)
+endif()
     pkg_search_module(NOTIFY       REQUIRED libnotify)
     pkg_search_module(GIO          REQUIRED gio-2.0)
 else()
@@ -102,7 +106,7 @@ endif()
 
 # user agent
 add_custom_command(
-     OUTPUT  rtng_user_agent.hpp
+     OUTPUT  rtng_user_agent
     COMMENT "Generating rtng_user_agent.hpp"
     COMMAND ${CMAKE_COMMAND}
         -D PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -115,4 +119,6 @@ add_custom_command(
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-add_custom_target(user-agent ALL DEPENDS rtng_user_agent.hpp)
+add_custom_target(user-agent ALL DEPENDS rtng_user_agent)
+
+set(CONFIGURED_ONCE TRUE CACHE INTERNAL "A flag showing that CMake has configured at least once.")

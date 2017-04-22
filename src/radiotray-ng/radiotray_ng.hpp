@@ -20,11 +20,12 @@
 #include <radiotray-ng/notification/notification.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
+#include <radiotray-ng/i_bookmarks.hpp>
 #include <condition_variable>
 #include <memory>
 #include <string>
+#include <vector>
 
-class IBookmarks;
 class IConfig;
 class IPlayer;
 
@@ -46,7 +47,11 @@ public:
 
 	void volume_up();
 
+	void volume_up_msg();
+
 	void volume_down();
+
+	void volume_down_msg();
 
 	void stop();
 
@@ -82,6 +87,10 @@ public:
 
 	bool reload_bookmarks();
 
+	void next_station_msg();
+
+	void previous_station_msg();
+
 private:
 	std::shared_ptr<IConfig>    config;
 	std::shared_ptr<IBookmarks> bookmarks;
@@ -106,11 +115,16 @@ private:
 	void on_tags_changed_event_notification(const IEventBus::event& ev, IEventBus::event_data_t& data);
 	void on_tags_changed_event_processing(const IEventBus::event& ev, IEventBus::event_data_t& data);
 
+	void display_volume_level();
 	void register_handlers();
+	void set_and_save_volume(uint32_t new_volume);
 	void clear_tags();
 
 	Notification notification;
 
 	std::string notification_image;
 	std::pair<std::string, std::string> last_notification;
+
+	std::vector<IBookmarks::station_data_t> current_group_stations;
+	int current_station_index;
 };

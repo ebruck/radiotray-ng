@@ -213,9 +213,12 @@ void AppindicatorGui::build_bookmarks_menu_item()
 
 void AppindicatorGui::add_separator(GtkWidget* menu)
 {
-	GtkWidget* menu_items = gtk_menu_item_new();
-	gtk_menu_append(GTK_MENU(menu), menu_items);
-	gtk_widget_show(menu_items);
+	if (!this->config->get_bool(COMPACT_MENU_KEY, DEFAULT_COMPACT_MENU_VALUE))
+	{
+		GtkWidget* menu_items = gtk_menu_item_new();
+		gtk_menu_append(GTK_MENU(menu), menu_items);
+		gtk_widget_show(menu_items);
+	}
 }
 
 
@@ -479,11 +482,13 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer data)
 		radiotray_ng::load_string_file(license_file, license);
 	}
 
+	std::string copyright{RTNG_GIT_VERSION};
+	copyright += "\n\n" APP_COPYRIGHT;
+
 	gtk_show_about_dialog(nullptr
 		, "program-name", APP_NAME_DISPLAY
-		, "version", "v" RTNG_VERSION
 		, "license", license.c_str()
-		, "copyright", APP_COPYRIGHT
+		, "copyright", copyright.c_str()
 		, "website", APP_WEBSITE
 		, nullptr);
 }

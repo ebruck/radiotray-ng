@@ -35,6 +35,9 @@ namespace
 	const std::string STATION_NAME_B{"station b"};
 	const std::string STATION_URL_B{"url b"};
 	const std::string STATION_IMAGE_B{"url b"};
+
+	const std::string GROUP_C{"group c"};
+	const std::string GROUP_IMAGE_C{"image c"};
 }
 
 
@@ -57,6 +60,16 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 		ASSERT_TRUE(stations[0].name == "name");
 		ASSERT_TRUE(stations[0].url == "url");
 		ASSERT_TRUE(stations[0].image == "image");
+
+		ASSERT_TRUE(bm.add_group(GROUP_C, GROUP_IMAGE_C));
+		ASSERT_TRUE(bm.get_group_stations(GROUP_C, stations));
+		EXPECT_EQ(stations.size(), size_t(0));
+		bm.add_station(GROUP_C, "name", "url", "image");
+		ASSERT_TRUE(bm.get_group_stations(GROUP_C, stations));
+		EXPECT_EQ(stations.size(), size_t(1));
+		ASSERT_TRUE(stations[0].name == "name");
+		ASSERT_TRUE(stations[0].url == "url");
+		ASSERT_TRUE(stations[0].image == "image");
 	}
 
 	EXPECT_EQ(bm[0].group, GROUP_A);
@@ -67,6 +80,7 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 	EXPECT_EQ(bm[0].group, GROUP_B);
 	EXPECT_EQ(bm[0].image, GROUP_IMAGE_B);
 	ASSERT_TRUE(bm.remove_group(GROUP_B));
+	ASSERT_TRUE(bm.remove_group(GROUP_C));
 	EXPECT_EQ(bm.size(), size_t(0));
 	EXPECT_THROW(bm[100], std::out_of_range);
 }

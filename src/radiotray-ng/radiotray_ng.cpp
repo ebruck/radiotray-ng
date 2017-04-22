@@ -32,6 +32,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, player(std::move(player))
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
+	, current_station_index(-1)
 {
 	this->notification_image = this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE);
 
@@ -164,6 +165,22 @@ void RadiotrayNG::set_station(const std::string& group, const std::string& stati
 
 	this->group = group;
 	this->station = station;
+
+	// This allows us to start playing the first station in a group if we've reloaded
+	// the bookmarks file and it's no longer within it.
+	this->current_station_index = -1;
+
+	if (this->bookmarks->get_group_stations(group, this->current_group_stations))
+	{
+		for(size_t i=0; i < this->current_group_stations.size(); ++i)
+		{
+			if (this->current_group_stations[i].name == station)
+			{
+				this->current_station_index = i;
+				break;
+			}
+		}
+	}
 }
 
 
@@ -196,6 +213,30 @@ void RadiotrayNG::set_volume(const std::string& volume)
 	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
 
 	this->volume = volume;
+}
+
+
+void RadiotrayNG::next_station_msg()
+{
+	if (!this->current_group_stations.empty())
+	{
+		if (this->current_station_index < int(this->current_group_stations.size()-1))
+		{
+			this->play(this->group, this->current_group_stations[++this->current_station_index].name);
+		}
+	}
+}
+
+
+void RadiotrayNG::previous_station_msg()
+{
+	if (!this->current_group_stations.empty())
+	{
+		if (this->current_station_index > 0)
+		{
+			this->play(this->group, this->current_group_stations[--this->current_station_index].name);
+		}
+	}
 }
 
 
@@ -323,7 +364,7 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 			if (this->last_notification.first != data[TAG_TITLE])
 			{
 				this->last_notification.first = data[TAG_TITLE];
-				this->last_notification.second = APP_NAME_DISPLAY;
+				this->last_notification.second = this->station;
 
 				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 				{
@@ -399,12 +440,46 @@ void RadiotrayNG::play()
 
 void RadiotrayNG::volume_up()
 {
-	uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t max_volume{this->config->get_uint32(VOLUME_MAX_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_MAX_VALUE)};
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
 
-	if (++volume <= this->config->get_uint32(VOLUME_MAX_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_MAX_VALUE))
+	this->set_and_save_volume(std::min(volume + this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE), max_volume));
+}
+
+
+void RadiotrayNG::volume_up_msg()
+{
+	this->volume_up();
+
+	this->display_volume_level();
+}
+
+
+void RadiotrayNG::volume_down()
+{
+	const uint32_t volume_step{this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE)};
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+
+	this->set_and_save_volume((volume > volume_step) ? (volume - volume_step) : 0);
+}
+
+
+void RadiotrayNG::volume_down_msg()
+{
+	this->volume_down();
+
+	this->display_volume_level();
+}
+
+
+void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
+{
+	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+
+	if (new_volume != volume)
 	{
-		this->volume = std::to_string(volume);
-		this->player->volume(volume);
+		this->volume = std::to_string(new_volume);
+		this->player->volume(new_volume);
 
 		LOG(debug) << "volume: " << this->volume;
 
@@ -412,20 +487,13 @@ void RadiotrayNG::volume_up()
 	}
 }
 
-
-void RadiotrayNG::volume_down()
+void RadiotrayNG::display_volume_level()
 {
-	uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	// Always show since media keys don't repeat, which makes it hard to tell if the volume is changing...
+	std::string volume_str = "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
-	if (volume > 0)
-	{
-		this->volume = std::to_string(--volume);
-		this->player->volume(volume);
-
-		LOG(debug) << "volume: " << this->volume;
-
-		this->config->save();
-	}
+	this->notification.notify(volume_str, APP_NAME_DISPLAY,
+			radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
 }
 
 
@@ -438,6 +506,9 @@ bool RadiotrayNG::reload_bookmarks()
 		// always show...
 		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
 				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+
+		// force reloading of current groups station list...
+		this->set_station(this->group, this->station);
 	}
 	else
 	{

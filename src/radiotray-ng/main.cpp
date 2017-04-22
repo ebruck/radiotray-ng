@@ -115,7 +115,7 @@ void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& con
 
 void set_bookmark_defaults(std::shared_ptr<IBookmarks> bookmarks)
 {
-	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE);
+	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE_VALUE);
 }
 
 
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
 	init_logging();
 
-	LOG(info) << APP_NAME << " v" << RTNG_VERSION << " starting up";
+	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
 
 	std::shared_ptr<IConfig> config{std::make_shared<Config>(config_path + RTNG_CONFIG_FILE)};
 
@@ -171,16 +171,17 @@ int main(int argc, char* argv[])
 	// adjust logging level...
 	set_logging_level(config);
 
-	std::shared_ptr<IBookmarks> bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
-	std::shared_ptr<IEventBus> event_bus{std::make_shared<EventBus>()};
-	std::shared_ptr<IPlayer> player{std::make_shared<Player>(config, event_bus)};
-	std::shared_ptr<IRadioTrayNG> radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
+	auto bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
+	auto event_bus{std::make_shared<EventBus>()};
+	auto player{std::make_shared<Player>(config, event_bus)};
 
 	if (!bookmarks->load())
 	{
 		// User can reload once they fix the error...
 		set_bookmark_defaults(bookmarks);
 	}
+
+	auto radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
 
 #ifdef APPINDICATOR_GUI
 	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));
@@ -189,7 +190,7 @@ int main(int argc, char* argv[])
 #endif
 
 	// addons etc.
-	MediaKeys mm(radiotray_ng);
+	MediaKeys mm(radiotray_ng, config);
 
 	// todo: support start playing passed group/station...
 	gui->run(argc, argv);

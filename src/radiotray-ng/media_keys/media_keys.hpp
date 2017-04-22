@@ -20,13 +20,14 @@
 #include <memory>
 
 class IRadioTrayNG;
+class IConfig;
 class media_keys_t;
 
 
 class MediaKeys
 {
 public:
-	MediaKeys(std::shared_ptr<IRadioTrayNG> radiotray_ng);
+	MediaKeys(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IConfig> config);
 
 private:
 	std::shared_ptr<media_keys_t> media_keys_impl;

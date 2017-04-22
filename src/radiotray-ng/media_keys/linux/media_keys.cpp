@@ -18,38 +18,52 @@
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/media_keys/media_keys.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
+#include <radiotray-ng/i_config.hpp>
 
 #include <condition_variable>
 #include <gio/gio.h>
 #include <radiotray-ng/g_threading_helper.hpp>
 #include <mutex>
 #include <thread>
+#include <map>
 
 #include <unistd.h>
 
 class media_keys_t
 {
 public:
-	media_keys_t(std::shared_ptr<IRadioTrayNG> radiotray_ng)
+	media_keys_t(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IConfig> config)
 		: radiotray_ng(std::move(radiotray_ng))
+		, config(std::move(config))
 		, main_loop(nullptr)
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 	{
-		if (this->radiotray_ng)
+		// install extra media key mappings?
+		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
 		{
-			LOG(info) << "starting gio thread for: " << this->app_name;
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_UP_KEY, DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE))] =
+							std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
 
-			std::unique_lock<std::mutex> lock(main_loop_mutex);
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE))] =
+							std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
 
-			this->gio_player_thread = std::thread(&media_keys_t::gio_thread, this);
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
+				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng.get());
 
-			// wait for main_loop to be ready...
-			main_loop_ready_cv.wait(lock);
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE))] =
+							std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
+
+			this->log_media_keys();
 		}
-		else
-		{
-			LOG(error) << "radiotray_ng pointer invalid, media key support disabled";
-		}
+
+		LOG(info) << "starting gio thread for: " << this->app_name;
+
+		std::unique_lock<std::mutex> lock(main_loop_mutex);
+
+		this->gio_player_thread = std::thread(&media_keys_t::gio_thread, this);
+
+		// wait for main_loop to be ready...
+		main_loop_ready_cv.wait(lock);
 	}
 
 	~media_keys_t()
@@ -67,18 +81,30 @@ public:
 		}
 	}
 
+	void log_media_keys()
+	{
+		LOG(info) << "mapping volume up/down to: "<< this->config->get_string(MEDIA_KEY_VOLUME_UP_KEY, DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE) << ", "
+			<< this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE);
+
+		LOG(info) << "mapping station previous/next to: "<< this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE) << ", "
+			<< this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE);
+	}
+
 private:
 	void gio_thread();
 
 	static void on_gio_signal(GDBusProxy* proxy, gchar* sender_name, gchar* signal_name, GVariant* parameters, gpointer user_data);
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
+	std::shared_ptr<IConfig> config;
 	GMainLoop* main_loop;
 	const std::string app_name;
 
 	std::thread gio_player_thread;
 	std::mutex  main_loop_mutex;
 	std::condition_variable main_loop_ready_cv;
+
+	std::map<std::string, std::function<void ()>> media_keys;
 };
 
 
@@ -132,7 +158,19 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 		return;
 	}
 
-	LOG(info) << "ignoring " << key_pressed;
+	// use media key mapping?
+	if (media_keys->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
+	{
+		auto it = media_keys->media_keys.find(radiotray_ng::to_lower(key_pressed));
+
+		if (it != media_keys->media_keys.end())
+		{
+			it->second();
+			return;
+		}
+	}
+
+	LOG(debug) << "ignoring " << key_pressed;
 }
 
 
@@ -199,7 +237,7 @@ void media_keys_t::gio_thread()
 }
 
 
-MediaKeys::MediaKeys(std::shared_ptr<IRadioTrayNG> radiotray_ng)
-	: media_keys_impl(std::make_shared<media_keys_t>(radiotray_ng))
+MediaKeys::MediaKeys(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IConfig> config)
+	: media_keys_impl(std::make_shared<media_keys_t>(radiotray_ng, config))
 {
 }

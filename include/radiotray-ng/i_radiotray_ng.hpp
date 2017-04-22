@@ -31,7 +31,11 @@ public:
 
 	virtual void volume_up() = 0;
 
+	virtual void volume_up_msg() = 0;
+
 	virtual void volume_down() = 0;
+
+	virtual void volume_down_msg() = 0;
 
 	virtual void stop() = 0;
 
@@ -64,6 +68,10 @@ public:
 	virtual void set_codec(const std::string& codec) = 0;
 
 	virtual void set_volume(const std::string& volume) = 0;
+
+	virtual void previous_station_msg() = 0;
+
+	virtual void next_station_msg() = 0;
 
 	virtual bool reload_bookmarks() = 0;
 };

@@ -54,18 +54,25 @@ using playlist_t = std::vector<std::string>;
 // config keys
 #define BOOKMARKS_KEY                     "bookmarks"
 #define BUFFER_SIZE_KEY                   "buffer-size"
+#define COMPACT_MENU_KEY                  "compact-menu"
+#define DEBUG_LOGGING_KEY                 "debug-logging"
 #define HTTP_TIMEOUT_KEY                  "http-timeout"
 #define LAST_STATION_GROUP_KEY            "last-station-group"
 #define LAST_STATION_KEY                  "last-station"
+#define MEDIA_KEY_MAPPING_KEY             "media-key-mapping"
+#define MEDIA_KEY_NEXT_STAITON_KEY        "media-key-next-station"
+#define MEDIA_KEY_PREVIOUS_STATION_KEY    "media-key-previous-station"
+#define MEDIA_KEY_VOLUME_DOWN_KEY         "media-key-volume-up"
+#define MEDIA_KEY_VOLUME_UP_KEY           "media-key-volume-down"
 #define NOTIFICATION_IMAGE_KEY            "notification-image"
 #define NOTIFICATION_KEY                  "notifications"
 #define NOTIFICATION_VERBOSE_KEY          "notification-verbose"
-#define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
+#define SLEEP_TIMER_KEY                   "sleep-timer"
 #define SPLIT_TITLE_KEY                   "split-title"
+#define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
 #define VOLUME_LEVEL_KEY                  "volume-level"
 #define VOLUME_MAX_LEVEL_KEY              "volume-max-level"
-#define DEBUG_LOGGING_KEY                 "debug-logging"
-#define SLEEP_TIMER_KEY                   "sleep-timer"
+#define VOLUME_STEP_KEY                   "volume-step"
 
 // conf files etc.
 #define RTNG_BOOKMARK_FILE                "bookmarks.json"
@@ -82,16 +89,23 @@ using playlist_t = std::vector<std::string>;
 
 // defaults
 #define DEFAULT_BUFFER_SIZE_VALUE          uint32_t(128000*10)
+#define DEFAULT_COMPACT_MENU_VALUE         (false)
+#define DEFAULT_DEBUG_LOGGING_VALUE        (false)
 #define DEFAULT_HTTP_TIMEOUT_VALUE         (15)
+#define DEFAULT_MEDIA_KEY_MAPPING_VALUE    (false)
+#define DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE     "Next"
+#define DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE "Previous"
+#define DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE      ""
+#define DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE        ""
 #define DEFAULT_NOTIFICATION_IMAGE_VALUE   "radiotray-ng-notification"
 #define DEFAULT_NOTIFICATION_VALUE         (true)
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE (true)
+#define DEFAULT_SLEEP_TIMER_VALUE          uint32_t(60)
 #define DEFAULT_SPLIT_TITLE_VALUE          (true)
-#define DEFAULT_STATION_IMAGE              ""
+#define DEFAULT_STATION_IMAGE_VALUE        ""
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE     uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE         uint32_t(100)
-#define DEFAULT_DEBUG_LOGGING_VALUE        (false)
-#define DEFAULT_SLEEP_TIMER_VALUE          uint32_t(60)
+#define DEFAULT_VOLUME_STEP_VALUE          uint32_t(1)
 
 // icons
 #define RADIOTRAY_NG_ICON_ON               "radiotray-ng-on"

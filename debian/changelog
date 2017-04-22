@@ -1,3 +1,18 @@
+radiotray-ng (0.1.5) unstable; urgency=low
+
+      * Fixed startup crash seen on some systems using gcc 6.x
+      * Added compact-menu option to disable the use of menu separators
+      * Removed ncurses requirement if appindicator library is found
+      * Notification uses station name if artist tag is missing
+      * Smarter boost dependency detection
+      * Added rt2rtng script for converting RadioTray bookmarks
+      * Fixed user-agent and release build issues
+      * Logging & aboutbox now include git commit used to generate binary
+      * Added optional mapping of media keys for previous/next station etc
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 22 Apr 2017 16:04:25 -0700
+
+
 radiotray-ng (0.1.4) unstable; urgency=low
 
       * Disabling notifications prevented stopping of player
