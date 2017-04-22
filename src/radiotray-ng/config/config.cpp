@@ -28,29 +28,6 @@ Config::Config(const std::string& config_file)
 }
 
 
-bool Config::save()
-{
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
-	LOG(debug) << "saving: " << this->config_file;
-
-	try
-	{
-		std::ofstream ofile(this->config_file);
-		ofile.exceptions(std::ios::failbit);
-
-		ofile << Json::StyledWriter().write(this->config);
-	}
-	catch(std::ios_base::failure& /*e*/)
-	{
-		LOG(error) << "Failed to save: " << this->config_file << " : "<< strerror(errno);
-		return false;
-	}
-
-	return true;
-}
-
-
 bool Config::load()
 {
 	std::lock_guard<std::mutex> lock(this->config_lock);
@@ -69,9 +46,32 @@ bool Config::load()
 			return false;
 		}
 	}
-	catch(std::ios_base::failure& /*e*/)
+	catch(std::exception& /*e*/)
 	{
 		LOG(error) << "Failed to load: " << this->config_file << " : "<< strerror(errno);
+		return false;
+	}
+
+	return true;
+}
+
+
+bool Config::save()
+{
+	std::lock_guard<std::mutex> lock(this->config_lock);
+
+	LOG(debug) << "saving: " << this->config_file;
+
+	try
+	{
+		std::ofstream ofile(this->config_file);
+		ofile.exceptions(std::ios::failbit);
+
+		ofile << Json::StyledWriter().write(this->config);
+	}
+	catch(std::exception& /*e*/)
+	{
+		LOG(error) << "Failed to save: " << this->config_file << " : "<< strerror(errno);
 		return false;
 	}
 

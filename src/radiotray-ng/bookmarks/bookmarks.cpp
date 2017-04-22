@@ -53,7 +53,7 @@ bool Bookmarks::load()
 
 		this->bookmarks = new_bookmarks;
 	}
-	catch(std::ios_base::failure& /*e*/)
+	catch(std::exception& /*e*/)
 	{
 		LOG(error) << "Failed to load: " << this->bookmarks_file << " : "<< strerror(errno);
 		return false;
@@ -74,7 +74,7 @@ bool Bookmarks::save()
 
 		ofile << Json::StyledWriter().write(this->bookmarks);
 	}
-	catch(std::ios_base::failure& /*e*/)
+	catch(std::exception& /*e*/)
 	{
 		LOG(error) << "Failed to save: " << this->bookmarks_file << " : "<< strerror(errno);
 		return false;
