@@ -31,7 +31,7 @@ def walk_bookmarks(root, group_func, bookmark_func, group=""):
         child_name = child.get('name')
         url = child.get('url')
 
-        if child_name == None:
+        if not child_name:
             continue
 
         if  child.tag == 'group':

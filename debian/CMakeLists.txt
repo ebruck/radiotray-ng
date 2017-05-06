@@ -4,7 +4,7 @@ set(BOOST_DEB_VERSION "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUB
 
 set(CPACK_PACKAGE_VENDOR              "Edward G. Bruck")
 set(CPACK_PACKAGE_CONTACT             "ed.bruck1@gmail.com")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple Internet Radio Player for Ubuntu\n Radiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Simple Internet Radio Player\n Radiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
 set(CPACK_PACKAGE_NAME                "radiotray-ng")
 set(CPACK_PACKAGE_VERSION             ${PROJECT_VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})

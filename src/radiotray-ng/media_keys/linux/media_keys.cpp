@@ -27,7 +27,6 @@
 #include <thread>
 #include <map>
 
-#include <unistd.h>
 
 class media_keys_t
 {
@@ -190,7 +189,7 @@ void media_keys_t::gio_thread()
 		proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 			GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
 			nullptr,
-			"org.gnome.SettingsDaemon",
+			"org.gnome.SettingsDaemon.MediaKeys",
 			"/org/gnome/SettingsDaemon/MediaKeys",
 			"org.gnome.SettingsDaemon.MediaKeys",
 			nullptr,
