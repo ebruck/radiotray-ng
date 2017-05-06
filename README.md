@@ -48,11 +48,12 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Screenshots: ##
 
-![Screenshot](images/screen_shot_1.png)
-![Screenshot](images/screen_shot_2.png)
-![Screenshot](images/screen_shot_3.png)
-![Screenshot](images/screen_shot_4.png)
-![Screenshot](images/screen_shot_5.png)
+![Screenshot](images/screenshot_1.png)
+![Screenshot](images/screenshot_2.png)
+![Screenshot](images/screenshot_3.png)
+![Screenshot](images/screenshot_4.png)
+![Screenshot](images/screenshot_6.png)
+![Screenshot](images/screenshot_5.png)
 
 
 ## Install ##
