@@ -34,6 +34,7 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	: radiotray_ng(std::move(radiotray_ng))
 	, bookmarks(std::move(bookmarks))
 	, config(std::move(config))
+	, event_bus(std::move(event_bus))
 	, appindicator(nullptr)
 	, menu(nullptr)
 	, action_menu_item(nullptr)
@@ -42,16 +43,16 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	, sleep_timer_menu_item(nullptr)
 	, sleep_timer_id(0)
 {
-	event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 }
 
@@ -415,8 +416,6 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 {
 	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
 
-	LOG(info) << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer expired";
-
 	if (app->radiotray_ng->get_state() == STATE_PLAYING)
 	{
 		app->radiotray_ng->stop();
@@ -425,6 +424,8 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 	}
 
 	gtk_check_menu_item_set_state(app->sleep_timer_menu_item, FALSE);
+
+	app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer expired");
 
 	return FALSE;
 }
@@ -441,11 +442,12 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 
 		app->sleep_timer_id = 0;
 
-		LOG(info) << "stopping " << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer";
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer stopped");
 	}
 	else
 	{
-		LOG(info) << "starting " << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer";
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
+									 std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " minute sleep timer started");
 
 		app->sleep_timer_id = g_timeout_add(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
 	}

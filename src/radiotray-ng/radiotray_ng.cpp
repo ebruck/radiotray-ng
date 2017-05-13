@@ -336,6 +336,16 @@ void RadiotrayNG::on_station_error_event(const IEventBus::event& /*ev*/, IEventB
 }
 
 
+void RadiotrayNG::on_message_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t &data)
+{
+	if (this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
+	{
+		this->notification.notify(data[MESSAGE_KEY], APP_NAME_DISPLAY,
+			radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+	}
+}
+
+
 void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
 	if (data.count(TAG_TITLE))
@@ -534,4 +544,8 @@ void RadiotrayNG::register_handlers()
 
 	this->event_bus->subscribe(IEventBus::event::station_error,
 		std::bind(&RadiotrayNG::on_station_error_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::first);
+
+	this->event_bus->subscribe(IEventBus::event::message,
+							   std::bind(&RadiotrayNG::on_message_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::last);
+
 }

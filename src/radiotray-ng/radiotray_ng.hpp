@@ -111,7 +111,8 @@ private:
 
 	// event handlers
 	void on_state_changed_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
-	void on_station_error_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
+	void on_station_error_event(const IEventBus::event &ev, IEventBus::event_data_t& data);
+	void on_message_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
 	void on_tags_changed_event_notification(const IEventBus::event& ev, IEventBus::event_data_t& data);
 	void on_tags_changed_event_processing(const IEventBus::event& ev, IEventBus::event_data_t& data);
 

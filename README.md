@@ -35,7 +35,6 @@ The version here is what "I" wanted out of RadioTray.
 * Finish ncurses interface
 * Mac support (icons, menu, media keys etc.) (I need help here.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
-* Mpris support?
 * Better handling of any JSON parsing errors.
 
 **Icons:** [http://www.iconsplace.com/]

@@ -33,6 +33,7 @@ using playlist_t = std::vector<std::string>;
 #define SONG_KEY                          "song"
 #define STATE_KEY                         "state"
 #define BOOKMARKS_KEY                     "bookmarks"
+#define MESSAGE_KEY                       "message"
 
 // state data values
 #define STATE_BUFFERING                   "buffering"

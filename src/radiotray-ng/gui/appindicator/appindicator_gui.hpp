@@ -78,6 +78,7 @@ private:
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IBookmarks>   bookmarks;
 	std::shared_ptr<IConfig>      config;
+	std::shared_ptr<IEventBus>    event_bus;
 
 	struct menu_item_data
 	{
