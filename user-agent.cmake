@@ -1,5 +1,3 @@
-# todo: enhance player to detect the distro information at runtime
-
 find_program(LSB_RELEASE_EXECUTABLE NAMES lsb_release)
 
 if (LSB_RELEASE_EXECUTABLE)
@@ -13,9 +11,7 @@ else()
         set(USER_AGENT_DISTRO_CODENAME "El Capitan")
         execute_process(COMMAND sw_vers -productVersion OUTPUT_VARIABLE USER_AGENT_DISTRO_RELEASE  OUTPUT_STRIP_TRAILING_WHITESPACE)
     else()
-        set(USER_AGENT_DISTRO          "unknown")
-        set(USER_AGENT_DISTRO_CODENAME "unknown")
-        set(USER_AGENT_DISTRO_RELEASE  "unknown")
+        message(FATAL_ERROR "lsb_release not found!")
     endif()
 endif()
 

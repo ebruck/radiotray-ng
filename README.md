@@ -153,7 +153,7 @@ $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
 
-## To Build: ##
+## To Build on Ubuntu: ##
 
 Install these packages:
 ```
@@ -178,4 +178,12 @@ $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
+```
+
+
+## To Build on Fedora: ##
+
+Install these packages:
+```
+gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator-devel gstreamer-devel boost-devel gstreamer1-devel
 ```
