@@ -431,9 +431,67 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 }
 
 
+bool AppindicatorGui::sleep_timer_dialog()
+{
+	auto dialog = gtk_dialog_new_with_buttons("Edit Sleep Timer",
+											  nullptr,
+											  GTK_DIALOG_DESTROY_WITH_PARENT,
+											  GTK_STOCK_CANCEL,
+											  GTK_RESPONSE_REJECT,
+											  GTK_STOCK_OK,
+											  GTK_RESPONSE_ACCEPT,
+											  nullptr);
+
+	auto entry = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+	auto label = gtk_label_new("Minutes:");
+	auto hbox = gtk_hbox_new(false, 0);
+
+	gtk_entry_set_text(GTK_ENTRY(entry), this->config->get_string(SLEEP_TIMER_KEY, std::to_string(DEFAULT_SLEEP_TIMER_VALUE)).c_str());
+
+	gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(label), false, true, 5);
+	gtk_box_pack_end(GTK_BOX(hbox), GTK_WIDGET(entry), true, true, 5);
+	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), GTK_WIDGET(hbox), true, true, 20);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
+
+	gint ret = gtk_dialog_run(GTK_DIALOG(dialog));
+
+	std::string timeout = gtk_entry_get_text(GTK_ENTRY(entry));
+	gtk_object_destroy((GTK_OBJECT(dialog)));
+
+	if (ret == GTK_RESPONSE_ACCEPT)
+	{
+		if (!timeout.empty())
+		{
+			try
+			{
+				this->config->set_uint32(SLEEP_TIMER_KEY, std::stol(timeout));
+			}
+			catch(std::invalid_argument& ex)
+			{
+				this->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Invalid sleep timer");
+
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
 	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+
+	// Must be a way to toggle without triggering another event?
+	if (app->ignore_sleep_timer_toggle)
+	{
+		app->ignore_sleep_timer_toggle = false;
+		return;
+	}
 
 	// toggle...
 	if (app->sleep_timer_id)
@@ -446,10 +504,19 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 	}
 	else
 	{
-		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
-									 std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " minute sleep timer started");
+		if (app->sleep_timer_dialog())
+		{
+			app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
+				std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " minute sleep timer started");
 
-		app->sleep_timer_id = g_timeout_add(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
+			app->sleep_timer_id = g_timeout_add(
+				app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
+		}
+		else
+		{
+			app->ignore_sleep_timer_toggle = true;
+			gtk_check_menu_item_set_state(app->sleep_timer_menu_item, 0);
+		}
 	}
 }
 
