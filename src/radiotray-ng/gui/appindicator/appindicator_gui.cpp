@@ -454,7 +454,8 @@ bool AppindicatorGui::sleep_timer_dialog()
 	gtk_box_pack_end(GTK_BOX(hbox), GTK_WIDGET(entry), true, true, 5);
 	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), GTK_WIDGET(hbox), true, true, 20);
 	gtk_widget_show_all(GTK_WIDGET(dialog));
-
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
+	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
 	gint ret = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	std::string timeout = gtk_entry_get_text(GTK_ENTRY(entry));
