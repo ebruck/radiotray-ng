@@ -364,15 +364,6 @@ void AppindicatorGui::build_preferences_menu()
 	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
 	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
-
-	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
-
-	// toggle before we hook up callback as a reload loses this state...
-	gtk_check_menu_item_set_state(this->sleep_timer_menu_item, this->sleep_timer_id);
-
-	gtk_menu_append(GTK_MENU(sub_menu_items), (GtkWidget*)this->sleep_timer_menu_item);
-	g_signal_connect(GTK_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
-	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
 }
 
 
@@ -394,6 +385,16 @@ void AppindicatorGui::build_menu()
 
 	// preferences
 	this->build_preferences_menu();
+
+	// add sleep timer
+	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
+
+	// toggle before we hook up callback as a reload loses this state...
+	gtk_check_menu_item_set_state(this->sleep_timer_menu_item, this->sleep_timer_id);
+
+	gtk_menu_append(GTK_MENU(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
+	g_signal_connect(GTK_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
+	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
 
 	// about etc.
 	this->add_separator(this->menu);
@@ -433,7 +434,7 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 
 bool AppindicatorGui::sleep_timer_dialog()
 {
-	auto dialog = gtk_dialog_new_with_buttons("Edit Sleep Timer",
+	auto dialog = gtk_dialog_new_with_buttons("Sleep Timer",
 											  nullptr,
 											  GTK_DIALOG_DESTROY_WITH_PARENT,
 											  GTK_STOCK_CANCEL,
@@ -493,7 +494,6 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 		return;
 	}
 
-	// toggle...
 	if (app->sleep_timer_id)
 	{
 		g_source_remove(app->sleep_timer_id);
