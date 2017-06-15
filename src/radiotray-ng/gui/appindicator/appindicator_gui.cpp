@@ -66,13 +66,15 @@ void AppindicatorGui::on_state_event(const IEventBus::event& /*ev*/, IEventBus::
 
 	if (state == STATE_PLAYING || state == STATE_BUFFERING || state == STATE_CONNECTING)
 	{
-		app_indicator_set_icon(this->appindicator, RADIOTRAY_NG_ICON_ON);
+		app_indicator_set_icon(this->appindicator, radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_ON_KEY,
+			DEFAULT_RADIOTRAY_NG_ICON_ON_VALUE)).c_str());
 		return;
 	}
 
 	if (state == STATE_STOPPED)
 	{
-		app_indicator_set_icon(this->appindicator, RADIOTRAY_NG_ICON_OFF);
+		app_indicator_set_icon(this->appindicator, radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY,
+			DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE)).c_str());
 		return;
 	}
 }
@@ -576,9 +578,10 @@ void AppindicatorGui::gtk_loop(int argc, char* argv[])
 
 	gtk_init(&argc, &argv);
 
-	this->appindicator = app_indicator_new(APP_NAME, RADIOTRAY_NG_ICON_OFF, APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+	const std::string icon_off{radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY, DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE))};
 
-	app_indicator_set_attention_icon(this->appindicator, RADIOTRAY_NG_ICON_OFF);
+	this->appindicator = app_indicator_new(APP_NAME, icon_off.c_str(), APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+	app_indicator_set_attention_icon(this->appindicator, icon_off.c_str());
 	app_indicator_set_status(this->appindicator, APP_INDICATOR_STATUS_ACTIVE);
 
 	g_signal_connect(G_OBJECT(this->appindicator), "scroll-event", G_CALLBACK(on_indicator_scrolled), gpointer(this));

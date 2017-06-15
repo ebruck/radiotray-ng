@@ -34,7 +34,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, state(STATE_STOPPED)
 	, current_station_index(-1)
 {
-	this->notification_image = this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE);
+	this->notification_image = radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE));
 
 	this->set_volume(this->config->get_string(VOLUME_LEVEL_KEY, std::to_string(DEFAULT_VOLUME_LEVEL_VALUE)));
 
@@ -341,7 +341,7 @@ void RadiotrayNG::on_message_event(const IEventBus::event& /*ev*/, IEventBus::ev
 	if (this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
 	{
 		this->notification.notify(data[MESSAGE_KEY], APP_NAME_DISPLAY,
-			radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 	}
 }
 
@@ -409,7 +409,7 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 		}
 		else
 		{
-			this->notification_image = radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE));
+			this->notification_image = radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE));
 		}
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_CONNECTING);
@@ -503,7 +503,7 @@ void RadiotrayNG::display_volume_level()
 	std::string volume_str = "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
 	this->notification.notify(volume_str, APP_NAME_DISPLAY,
-			radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 }
 
 
@@ -515,7 +515,7 @@ bool RadiotrayNG::reload_bookmarks()
 	{
 		// always show...
 		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
-				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+				radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 
 		// force reloading of current groups station list...
 		this->set_station(this->group, this->station);
@@ -524,7 +524,7 @@ bool RadiotrayNG::reload_bookmarks()
 	{
 		// always show...
 		this->notification.notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
-				radiotray_ng::word_expand(this->config->get_string(NOTIFICATION_IMAGE_KEY, DEFAULT_NOTIFICATION_IMAGE_VALUE)));
+				radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 	}
 
 	return result;
