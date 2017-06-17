@@ -84,6 +84,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "media-key-next-station" : "Next",
    "media-key-volume-up" : "",
    "media-key-volume-down" : "",
+   "media-keys-old-dbus-name" : false,
    "radiotray-ng-on" : "radiotray-ng-on",
    "radiotray-ng-off" : "radiotray-ng-off",
    "radiotray-ng-notification" : "radiotray-ng-notification"
@@ -104,6 +105,7 @@ media-key-previous-station: media key to use for previous station within current
     media-key-next-station: media key to use for next station within current group
        media-key-volume-up: media key to use for volume up
      media-key-volume-down: media key to use for volume down
+  media-keys-old-dbus-name: use old dbus name
            radiotray-ng-on: installed theme icon name for "on" or path to image
           radiotray-ng-off: installed theme icon name for "off" or path to image
  radiotray-ng-notification: installed theme icon name for "notification" or path to image

@@ -65,6 +65,7 @@ using playlist_t = std::vector<std::string>;
 #define MEDIA_KEY_PREVIOUS_STATION_KEY    "media-key-previous-station"
 #define MEDIA_KEY_VOLUME_DOWN_KEY         "media-key-volume-down"
 #define MEDIA_KEY_VOLUME_UP_KEY           "media-key-volume-up"
+#define MEDIA_KEY_OLD_DBUS_NAME_KEY       "media-keys-old-dbus-name"
 #define NOTIFICATION_KEY                  "notifications"
 #define NOTIFICATION_VERBOSE_KEY          "notification-verbose"
 #define RADIOTRAY_NG_ICON_ON_KEY          "radiotray-ng-on"
@@ -92,23 +93,25 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
 
 // defaults
-#define DEFAULT_BUFFER_SIZE_VALUE          uint32_t(128000*10)
-#define DEFAULT_COMPACT_MENU_VALUE         (false)
-#define DEFAULT_DEBUG_LOGGING_VALUE        (false)
-#define DEFAULT_HTTP_TIMEOUT_VALUE         (15)
-#define DEFAULT_MEDIA_KEY_MAPPING_VALUE    (false)
+#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(128000*10)
+#define DEFAULT_COMPACT_MENU_VALUE               (false)
+#define DEFAULT_DEBUG_LOGGING_VALUE              (false)
+#define DEFAULT_HTTP_TIMEOUT_VALUE               (15)
+#define DEFAULT_MEDIA_KEY_MAPPING_VALUE          (false)
 #define DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE     "Next"
 #define DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE "Previous"
-#define DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE ""
-#define DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE   ""
-#define DEFAULT_RADIOTRAY_NG_ICON_ON_VALUE      "radiotray-ng-on"
-#define DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE     "radiotray-ng-off"
-#define DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE "radiotray-ng-notification"
-#define DEFAULT_NOTIFICATION_VALUE         (true)
-#define DEFAULT_NOTIFICATION_VERBOSE_VALUE (true)
-#define DEFAULT_SLEEP_TIMER_VALUE          uint32_t(60)
-#define DEFAULT_SPLIT_TITLE_VALUE          (true)
-#define DEFAULT_STATION_IMAGE_VALUE        ""
-#define DEFAULT_VOLUME_LEVEL_MAX_VALUE     uint32_t(200)
-#define DEFAULT_VOLUME_LEVEL_VALUE         uint32_t(100)
-#define DEFAULT_VOLUME_STEP_VALUE          uint32_t(1)
+#define DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE      ""
+#define DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE        ""
+#define DEFAULT_RADIOTRAY_NG_ICON_ON_VALUE       "radiotray-ng-on"
+#define DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE      "radiotray-ng-off"
+#define DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE  "radiotray-ng-notification"
+#define DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE    (false)
+#define DEFAULT_NOTIFICATION_VALUE               (true)
+#define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
+#define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)
+#define DEFAULT_SPLIT_TITLE_VALUE                (true)
+#define DEFAULT_STATION_IMAGE_VALUE              ""
+#define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
+#define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)
+#define DEFAULT_VOLUME_STEP_VALUE                uint32_t(1)
+

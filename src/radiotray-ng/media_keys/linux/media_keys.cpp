@@ -55,7 +55,11 @@ public:
 			this->log_media_keys();
 		}
 
-		LOG(info) << "starting gio thread for: " << this->app_name;
+		// old unity installs may still be using the "incorrect" dbus name...
+		this->dbus_name = (this->config->get_bool(MEDIA_KEY_OLD_DBUS_NAME_KEY,
+			DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE)) ? "org.gnome.SettingsDaemon" : "org.gnome.SettingsDaemon.MediaKeys";
+
+		LOG(info) << "starting gio thread for: " << this->app_name << " using " << this->dbus_name;
 
 		std::unique_lock<std::mutex> lock(main_loop_mutex);
 
@@ -98,6 +102,7 @@ private:
 	std::shared_ptr<IConfig> config;
 	GMainLoop* main_loop;
 	const std::string app_name;
+	std::string dbus_name;
 
 	std::thread gio_player_thread;
 	std::mutex  main_loop_mutex;
@@ -189,7 +194,7 @@ void media_keys_t::gio_thread()
 		proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 			GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
 			nullptr,
-			"org.gnome.SettingsDaemon.MediaKeys",
+			this->dbus_name.c_str(),
 			"/org/gnome/SettingsDaemon/MediaKeys",
 			"org.gnome.SettingsDaemon.MediaKeys",
 			nullptr,
