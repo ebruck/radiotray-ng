@@ -143,3 +143,11 @@ bool Config::get_bool(const std::string& key, const bool default_value)
 
 	return default_value;
 }
+
+
+bool Config::exists(const std::string& key)
+{
+	std::lock_guard<std::mutex> lock(this->config_lock);
+
+	return this->config.isMember(key);
+}

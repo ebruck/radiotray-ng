@@ -38,6 +38,7 @@ TEST(Config, test_that_key_value_are_saved_and_retrieved)
 
 		cfg.set_string("s_key", std::string("new_value"));
 		EXPECT_EQ(cfg.get_string("s_key", ""), "new_value");
+		ASSERT_TRUE(cfg.exists("s_key"));
 	}
 
 	// uint32_t
@@ -47,6 +48,7 @@ TEST(Config, test_that_key_value_are_saved_and_retrieved)
 
 		cfg.set_uint32("u_key", 456);
 		EXPECT_EQ(cfg.get_uint32("u_key", 0), 456);
+		ASSERT_TRUE(cfg.exists("u_key"));
 	}
 
 	// bool
@@ -56,7 +58,10 @@ TEST(Config, test_that_key_value_are_saved_and_retrieved)
 
 		cfg.set_bool("b_key", false);
 		EXPECT_EQ(cfg.get_bool("b_key", true), false);
+		ASSERT_TRUE(cfg.exists("b_key"));
 	}
+
+	ASSERT_FALSE(cfg.exists("exists_test"));
 }
 
 

@@ -36,6 +36,7 @@ public:
 		, config(std::move(config))
 		, main_loop(nullptr)
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
+		, dbus_name("org.gnome.SettingsDaemon.MediaKeys")
 	{
 		// install extra media key mappings?
 		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
@@ -55,9 +56,31 @@ public:
 			this->log_media_keys();
 		}
 
-		// old unity installs may still be using the "incorrect" dbus name...
-		this->dbus_name = (this->config->get_bool(MEDIA_KEY_OLD_DBUS_NAME_KEY,
-			DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE)) ? "org.gnome.SettingsDaemon" : "org.gnome.SettingsDaemon.MediaKeys";
+		// No entry is set, then check to see if GNOME is running...
+		if (!this->config->exists(MEDIA_KEY_OLD_DBUS_NAME_KEY))
+		{
+			auto xdg_current_desktop = std::getenv("XDG_CURRENT_DESKTOP");
+
+			if (xdg_current_desktop)
+			{
+				// if not gnome then assume unity or something else...
+				if (radiotray_ng::to_lower(std::string(xdg_current_desktop)).find("gnome") == std::string::npos)
+				{
+					this->dbus_name = "org.gnome.SettingsDaemon";
+				}
+			}
+			else
+			{
+				LOG(warning) << "could not read XDG_CURRENT_DESKTOP environment variable";
+			}
+		}
+		else
+		{
+			if (this->config->get_bool(MEDIA_KEY_OLD_DBUS_NAME_KEY,	DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE))
+			{
+				this->dbus_name = "org.gnome.SettingsDaemon";
+			}
+		}
 
 		LOG(info) << "starting gio thread for: " << this->app_name << " using " << this->dbus_name;
 
