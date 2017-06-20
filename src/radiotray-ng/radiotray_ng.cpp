@@ -503,7 +503,7 @@ void RadiotrayNG::display_volume_level()
 	std::string volume_str = "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
 	this->notification.notify(volume_str, APP_NAME_DISPLAY,
-			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+		radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 }
 
 
@@ -515,7 +515,7 @@ bool RadiotrayNG::reload_bookmarks()
 	{
 		// always show...
 		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
-				radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 
 		// force reloading of current groups station list...
 		this->set_station(this->group, this->station);
@@ -524,7 +524,7 @@ bool RadiotrayNG::reload_bookmarks()
 	{
 		// always show...
 		this->notification.notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
-				radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 	}
 
 	return result;
@@ -546,6 +546,6 @@ void RadiotrayNG::register_handlers()
 		std::bind(&RadiotrayNG::on_station_error_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::first);
 
 	this->event_bus->subscribe(IEventBus::event::message,
-							   std::bind(&RadiotrayNG::on_message_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::last);
+		std::bind(&RadiotrayNG::on_message_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::last);
 
 }

@@ -19,7 +19,7 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Where Radiotray-NG is: ##
 
-* RadioTray functionality for Ubuntu
+* RadioTray functionality
 * Theme support
 * Debian packaging
 * Some unit tests, but needs more!
@@ -105,7 +105,7 @@ media-key-previous-station: media key to use for previous station within current
     media-key-next-station: media key to use for next station within current group
        media-key-volume-up: media key to use for volume up
      media-key-volume-down: media key to use for volume down
-  media-keys-old-dbus-name: use old dbus name
+  media-keys-old-dbus-name: force the use of old dbus name
            radiotray-ng-on: installed theme icon name for "on" or path to image
           radiotray-ng-off: installed theme icon name for "off" or path to image
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
