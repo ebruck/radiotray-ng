@@ -1,3 +1,13 @@
+radiotray-ng (0.1.6) unstable; urgency=low
+
+      * new icon config overrides
+      * sleep timer dialog added
+      * support for gnome-settings-daemon media key api changes
+      * added Fedora build instructions
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Wed, 28 Jun 2017 20:16:07 -0700
+
+
 radiotray-ng (0.1.5) unstable; urgency=low
 
       * Fixed startup crash seen on some systems using gcc 6.x

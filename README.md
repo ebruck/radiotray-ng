@@ -19,7 +19,7 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Where Radiotray-NG is: ##
 
-* RadioTray functionality for Ubuntu
+* RadioTray functionality
 * Theme support
 * Debian packaging
 * Some unit tests, but needs more!
@@ -35,7 +35,6 @@ The version here is what "I" wanted out of RadioTray.
 * Finish ncurses interface
 * Mac support (icons, menu, media keys etc.) (I need help here.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
-* Mpris support?
 * Better handling of any JSON parsing errors.
 
 **Icons:** [http://www.iconsplace.com/]
@@ -48,11 +47,12 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Screenshots: ##
 
-![Screenshot](images/screen_shot_1.png)
-![Screenshot](images/screen_shot_2.png)
-![Screenshot](images/screen_shot_3.png)
-![Screenshot](images/screen_shot_4.png)
-![Screenshot](images/screen_shot_5.png)
+![Screenshot](images/screenshot_1.png)
+![Screenshot](images/screenshot_2.png)
+![Screenshot](images/screenshot_3.png)
+![Screenshot](images/screenshot_4.png)
+![Screenshot](images/screenshot_6.png)
+![Screenshot](images/screenshot_5.png)
 
 
 ## Install ##
@@ -83,7 +83,11 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "media-key-previous-station" : "Previous",
    "media-key-next-station" : "Next",
    "media-key-volume-up" : "",
-   "media-key-volume-down" : ""
+   "media-key-volume-down" : "",
+   "media-keys-old-dbus-name" : false,
+   "radiotray-ng-on" : "radiotray-ng-on",
+   "radiotray-ng-off" : "radiotray-ng-off",
+   "radiotray-ng-notification" : "radiotray-ng-notification"
 }
 ```
 ```
@@ -101,6 +105,10 @@ media-key-previous-station: media key to use for previous station within current
     media-key-next-station: media key to use for next station within current group
        media-key-volume-up: media key to use for volume up
      media-key-volume-down: media key to use for volume down
+  media-keys-old-dbus-name: force the use of old dbus name
+           radiotray-ng-on: installed theme icon name for "on" or path to image
+          radiotray-ng-off: installed theme icon name for "off" or path to image
+ radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
@@ -153,7 +161,7 @@ $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
 
-## To Build: ##
+## To Build on Ubuntu: ##
 
 Install these packages:
 ```
@@ -178,4 +186,12 @@ $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
+```
+
+
+## To Build on Fedora: ##
+
+Install these packages:
+```
+gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator-devel gstreamer-devel boost-devel gstreamer1-devel
 ```

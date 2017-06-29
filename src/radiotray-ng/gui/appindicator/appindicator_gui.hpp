@@ -73,11 +73,14 @@ private:
 	void update_action_menu_item(const std::string& state);
 	void update_volume_menu_item();
 
+	bool sleep_timer_dialog();
+
 	void gtk_loop(int argc, char* argv[]);
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IBookmarks>   bookmarks;
 	std::shared_ptr<IConfig>      config;
+	std::shared_ptr<IEventBus>    event_bus;
 
 	struct menu_item_data
 	{
@@ -99,4 +102,5 @@ private:
 	GtkCheckMenuItem* sleep_timer_menu_item;
 	guint             sleep_timer_id;
 	std::string       resource_path;
+	bool              ignore_sleep_timer_toggle{false};
 };

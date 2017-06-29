@@ -46,6 +46,8 @@ public:
 
 	bool get_bool(const std::string& key, const bool default_value);
 
+	bool exists(const std::string& key);
+
 private:
 	template<typename T> void private_set_value(const std::string& key, const T& value);
 

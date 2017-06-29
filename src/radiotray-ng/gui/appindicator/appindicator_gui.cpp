@@ -34,6 +34,7 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	: radiotray_ng(std::move(radiotray_ng))
 	, bookmarks(std::move(bookmarks))
 	, config(std::move(config))
+	, event_bus(std::move(event_bus))
 	, appindicator(nullptr)
 	, menu(nullptr)
 	, action_menu_item(nullptr)
@@ -42,16 +43,16 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	, sleep_timer_menu_item(nullptr)
 	, sleep_timer_id(0)
 {
-	event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
-	event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
+	this->event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 }
 
@@ -65,13 +66,15 @@ void AppindicatorGui::on_state_event(const IEventBus::event& /*ev*/, IEventBus::
 
 	if (state == STATE_PLAYING || state == STATE_BUFFERING || state == STATE_CONNECTING)
 	{
-		app_indicator_set_icon(this->appindicator, RADIOTRAY_NG_ICON_ON);
+		app_indicator_set_icon(this->appindicator, radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_ON_KEY,
+			DEFAULT_RADIOTRAY_NG_ICON_ON_VALUE)).c_str());
 		return;
 	}
 
 	if (state == STATE_STOPPED)
 	{
-		app_indicator_set_icon(this->appindicator, RADIOTRAY_NG_ICON_OFF);
+		app_indicator_set_icon(this->appindicator, radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY,
+			DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE)).c_str());
 		return;
 	}
 }
@@ -363,15 +366,6 @@ void AppindicatorGui::build_preferences_menu()
 	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
 	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
-
-	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
-
-	// toggle before we hook up callback as a reload loses this state...
-	gtk_check_menu_item_set_state(this->sleep_timer_menu_item, this->sleep_timer_id);
-
-	gtk_menu_append(GTK_MENU(sub_menu_items), (GtkWidget*)this->sleep_timer_menu_item);
-	g_signal_connect(GTK_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
-	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
 }
 
 
@@ -394,6 +388,16 @@ void AppindicatorGui::build_menu()
 	// preferences
 	this->build_preferences_menu();
 
+	// add sleep timer
+	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
+
+	// toggle before we hook up callback as a reload loses this state...
+	gtk_check_menu_item_set_state(this->sleep_timer_menu_item, this->sleep_timer_id);
+
+	gtk_menu_append(GTK_MENU(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
+	g_signal_connect(GTK_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
+	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
+
 	// about etc.
 	this->add_separator(this->menu);
 
@@ -415,8 +419,6 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 {
 	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
 
-	LOG(info) << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer expired";
-
 	if (app->radiotray_ng->get_state() == STATE_PLAYING)
 	{
 		app->radiotray_ng->stop();
@@ -426,7 +428,61 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 
 	gtk_check_menu_item_set_state(app->sleep_timer_menu_item, FALSE);
 
+	app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer expired");
+
 	return FALSE;
+}
+
+
+bool AppindicatorGui::sleep_timer_dialog()
+{
+	auto dialog = gtk_dialog_new_with_buttons("Sleep Timer",
+											  nullptr,
+											  GTK_DIALOG_DESTROY_WITH_PARENT,
+											  GTK_STOCK_CANCEL,
+											  GTK_RESPONSE_REJECT,
+											  GTK_STOCK_OK,
+											  GTK_RESPONSE_ACCEPT,
+											  nullptr);
+
+	auto entry = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+	auto label = gtk_label_new("Minutes:");
+	auto hbox = gtk_hbox_new(false, 0);
+
+	gtk_entry_set_text(GTK_ENTRY(entry), this->config->get_string(SLEEP_TIMER_KEY, std::to_string(DEFAULT_SLEEP_TIMER_VALUE)).c_str());
+
+	gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(label), false, true, 5);
+	gtk_box_pack_end(GTK_BOX(hbox), GTK_WIDGET(entry), true, true, 5);
+	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), GTK_WIDGET(hbox), true, true, 20);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
+	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+	gint ret = gtk_dialog_run(GTK_DIALOG(dialog));
+
+	std::string timeout = gtk_entry_get_text(GTK_ENTRY(entry));
+	gtk_object_destroy((GTK_OBJECT(dialog)));
+
+	if (ret == GTK_RESPONSE_ACCEPT)
+	{
+		if (!timeout.empty())
+		{
+			try
+			{
+				this->config->set_uint32(SLEEP_TIMER_KEY, std::stol(timeout));
+			}
+			catch(std::invalid_argument& ex)
+			{
+				this->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Invalid sleep timer");
+
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -434,20 +490,36 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 {
 	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
 
-	// toggle...
+	// Must be a way to toggle without triggering another event?
+	if (app->ignore_sleep_timer_toggle)
+	{
+		app->ignore_sleep_timer_toggle = false;
+		return;
+	}
+
 	if (app->sleep_timer_id)
 	{
 		g_source_remove(app->sleep_timer_id);
 
 		app->sleep_timer_id = 0;
 
-		LOG(info) << "stopping " << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer";
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer stopped");
 	}
 	else
 	{
-		LOG(info) << "starting " << app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) << " minute sleep timer";
+		if (app->sleep_timer_dialog())
+		{
+			app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
+				std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " minute sleep timer started");
 
-		app->sleep_timer_id = g_timeout_add(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
+			app->sleep_timer_id = g_timeout_add(
+				app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
+		}
+		else
+		{
+			app->ignore_sleep_timer_toggle = true;
+			gtk_check_menu_item_set_state(app->sleep_timer_menu_item, 0);
+		}
 	}
 }
 
@@ -506,9 +578,10 @@ void AppindicatorGui::gtk_loop(int argc, char* argv[])
 
 	gtk_init(&argc, &argv);
 
-	this->appindicator = app_indicator_new(APP_NAME, RADIOTRAY_NG_ICON_OFF, APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+	const std::string icon_off{radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY, DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE))};
 
-	app_indicator_set_attention_icon(this->appindicator, RADIOTRAY_NG_ICON_OFF);
+	this->appindicator = app_indicator_new(APP_NAME, icon_off.c_str(), APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+	app_indicator_set_attention_icon(this->appindicator, icon_off.c_str());
 	app_indicator_set_status(this->appindicator, APP_INDICATOR_STATUS_ACTIVE);
 
 	g_signal_connect(G_OBJECT(this->appindicator), "scroll-event", G_CALLBACK(on_indicator_scrolled), gpointer(this));

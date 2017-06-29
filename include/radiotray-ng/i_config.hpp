@@ -40,4 +40,6 @@ public:
 	virtual uint32_t get_uint32(const std::string& key, const uint32_t default_value) = 0;
 
 	virtual bool get_bool(const std::string& key, const bool default_value) = 0;
+
+	virtual bool exists(const std::string& key) = 0;
 };
