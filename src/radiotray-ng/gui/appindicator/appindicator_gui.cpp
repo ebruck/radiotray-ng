@@ -21,7 +21,6 @@
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/g_threading_helper.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <rtng_user_agent.hpp>
 
 #include <boost/filesystem.hpp>
@@ -42,7 +41,15 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	, status_menu_item(nullptr)
 	, sleep_timer_menu_item(nullptr)
 	, sleep_timer_id(0)
+	, file_monitor_timer_id(0)
 {
+	// monitor bookmark changes?
+	if (this->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
+	{
+		this->bookmarks_monitor.reset(new radiotray_ng::file_monitor(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
+		this->file_monitor_timer_id= g_timeout_add(15000, on_file_monitor_timer_event, this);
+	}
+
 	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
 		std::placeholders::_2));
 
@@ -434,6 +441,19 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 }
 
 
+gboolean AppindicatorGui::on_file_monitor_timer_event(gpointer data)
+{
+	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+
+	if (app->bookmarks_monitor->changed())
+	{
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Bookmarks changed on disk");
+	}
+
+	return TRUE;
+}
+
+
 bool AppindicatorGui::sleep_timer_dialog()
 {
 	auto dialog = gtk_dialog_new_with_buttons("Sleep Timer",
@@ -524,6 +544,7 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 }
 
 
+
 void AppindicatorGui::on_reload_bookmarks_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
 	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
@@ -594,6 +615,8 @@ void AppindicatorGui::gtk_loop(int argc, char* argv[])
 	this->build_menu();
 
 	gtk_main();
+
+	//g_source_remove(this->file_monitor_timer_id);
 
 	gtk_widget_destroy(this->menu);
 

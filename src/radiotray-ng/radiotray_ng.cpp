@@ -26,7 +26,7 @@
 
 
 RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookmarks> bookmarks,
-	                     std::shared_ptr<IPlayer> player, std::shared_ptr<IEventBus> event_bus)
+	std::shared_ptr<IPlayer> player, std::shared_ptr<IEventBus> event_bus)
 	: config(std::move(config))
 	, bookmarks(std::move(bookmarks))
 	, player(std::move(player))
