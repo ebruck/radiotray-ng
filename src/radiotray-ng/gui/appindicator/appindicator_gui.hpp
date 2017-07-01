@@ -81,7 +81,7 @@ private:
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IBookmarks>   bookmarks;
-	std::unique_ptr<radiotray_ng::file_monitor> bookmarks_monitor;
+	std::unique_ptr<radiotray_ng::FileMonitor> bookmarks_monitor;
 	std::shared_ptr<IConfig>      config;
 	std::shared_ptr<IEventBus>    event_bus;
 

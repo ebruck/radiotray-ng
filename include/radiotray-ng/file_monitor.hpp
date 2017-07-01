@@ -26,10 +26,10 @@
 
 namespace radiotray_ng
 {
-	class file_monitor
+	class FileMonitor
 	{
 	public:
-		file_monitor(const std::string& file)
+		FileMonitor(const std::string& file)
 		{
 			this->inotify_fd = inotify_init();
 
@@ -55,12 +55,12 @@ namespace radiotray_ng
 				return;
 			}
 
-			LOG(info) << "monitoring for changes: " << file;
+			LOG(debug) << "monitoring: " << file;
 
 			this->setup = true;
 		}
 
-		~file_monitor()
+		~FileMonitor()
 		{
 			if (this->setup)
 			{

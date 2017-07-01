@@ -46,8 +46,9 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	// monitor bookmark changes?
 	if (this->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
 	{
-		this->bookmarks_monitor.reset(new radiotray_ng::file_monitor(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
-		this->file_monitor_timer_id= g_timeout_add(15000, on_file_monitor_timer_event, this);
+		this->bookmarks_monitor.reset(new radiotray_ng::FileMonitor(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
+		this->file_monitor_timer_id= g_timeout_add(this->config->get_uint32(FILE_MONITOR_INTERVAL_KEY, DEFAULT_FILE_MONITOR_INTERVAL_VALUE) * 1000,
+			on_file_monitor_timer_event, this);
 	}
 
 	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
