@@ -24,12 +24,14 @@
 #include <fcntl.h>
 #include <string>
 
+
 namespace radiotray_ng
 {
 	class FileMonitor
 	{
 	public:
 		FileMonitor(const std::string& file)
+			: file_to_watch(radiotray_ng::word_expand(file))
 		{
 			this->inotify_fd = inotify_init();
 
@@ -46,9 +48,7 @@ namespace radiotray_ng
 				return;
 			}
 
-			this->watch_fd = inotify_add_watch(this->inotify_fd, radiotray_ng::word_expand(file).c_str(), IN_MODIFY);
-
-			if (this->watch_fd == -1)
+			if (!this->add_watch())
 			{
 				LOG(error) << "could not add inotify watch, monitoring disabled: " << errno;
 				close(this->inotify_fd);
@@ -64,32 +64,73 @@ namespace radiotray_ng
 		{
 			if (this->setup)
 			{
-				inotify_rm_watch(this->inotify_fd, this->watch_fd);
-				close(this->inotify_fd);
+				this->cleanup();
 			}
 		}
 
 		bool changed()
 		{
+			bool modified{false};
+
 			if (this->setup)
 			{
-				inotify_event event;
+				std::vector<inotify_event> events;
 
-				if (read(inotify_fd, &event, sizeof(event)) < 0)
+				inotify_event tmp;
+				while (read(inotify_fd, &tmp, sizeof(tmp)) > 0)
 				{
-					// for now assume nothing changed...
-					return false;
+					events.push_back(tmp);
 				}
 
-				return (event.mask & IN_MODIFY);
+				for(auto event : events)
+				{
+					if (event.mask & IN_MODIFY || event.mask & IN_ATTRIB)
+					{
+						modified = true;
+					}
+
+					if (event.mask & IN_DELETE_SELF || event.mask & IN_MOVE_SELF || event.mask & IN_IGNORED)
+					{
+						inotify_rm_watch(this->inotify_fd, this->watch_fd);
+
+						if (!this->add_watch())
+						{
+							LOG(error) << "could not add inotify watch, monitoring disabled: " << errno;
+
+							close(this->inotify_fd);
+
+							this->setup = false;
+						}
+
+						modified = true;
+
+						break;
+					}
+				}
 			}
 
-			return false;
+			return modified;
 		}
 
 	private:
+
+		bool add_watch()
+		{
+			this->watch_fd = inotify_add_watch(this->inotify_fd, file_to_watch.c_str(),
+				IN_MODIFY | IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF | IN_IGNORED);
+
+			return (this->watch_fd != -1);
+		}
+
+		void cleanup()
+		{
+			inotify_rm_watch(this->inotify_fd, this->watch_fd);
+			close(this->inotify_fd);
+		}
+
 		int inotify_fd;
 		int watch_fd;
+		const std::string file_to_watch;
 		bool setup{false};
 	};
 }
