@@ -48,6 +48,7 @@ endif(NOT APPLE)
 
 # flags
 add_definitions("-std=c++11 -DBOOST_LOG_DYN_LINK")
+add_compile_options("-fdiagnostics-color=auto")
 set(warnings "-Wall -Wextra -Werror")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")

@@ -370,7 +370,12 @@ void AppindicatorGui::build_preferences_menu()
 	GtkWidget* sub_menu_items = gtk_menu_new();
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
-	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
+	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Bookmark Editor...");
+	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
+	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
+	gtk_widget_show(sub_menu_item);
+
+	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
 	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
 	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
@@ -544,6 +549,17 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 	}
 }
 
+
+void AppindicatorGui::on_bookmark_editor_menu_item(GtkWidget* /*widget*/, gpointer data)
+{
+	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+
+	std::string cmd("gedit ");
+
+	cmd += radiotray_ng::word_expand(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE));
+
+	g_spawn_command_line_async(cmd.c_str(), nullptr);
+}
 
 
 void AppindicatorGui::on_reload_bookmarks_menu_item(GtkWidget* /*widget*/, gpointer data)
