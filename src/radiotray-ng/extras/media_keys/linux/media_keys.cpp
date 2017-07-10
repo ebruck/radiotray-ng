@@ -20,10 +20,7 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_config.hpp>
 
-#include <condition_variable>
 #include <gio/gio.h>
-#include <mutex>
-#include <thread>
 #include <map>
 
 
@@ -35,6 +32,7 @@ public:
 		, config(std::move(config))
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 		, dbus_name("org.gnome.SettingsDaemon.MediaKeys")
+		, dbus_proxy(nullptr)
 	{
 		// install extra media key mappings?
 		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
@@ -80,26 +78,12 @@ public:
 			}
 		}
 
-		LOG(info) << "starting gio thread for: " << this->app_name << " using " << this->dbus_name;
-
-		std::unique_lock<std::mutex> lock(this->gio_thread_mutex);
-
-		this->gio_thread_func = std::thread(&media_keys_t::gio_thread, this);
-
-		// wait for gio_thread to be ready...
-		gio_thread_cv.wait(lock);
+		this->gio_start();
 	}
 
 	~media_keys_t()
 	{
-		LOG(info) << "stopping gio thread";
-
-		this->gio_thread_cv.notify_one();
-
-		if (this->gio_thread_func.joinable())
-		{
-			this->gio_thread_func.join();
-		}
+		this->gio_stop();
 	}
 
 	void log_media_keys()
@@ -112,7 +96,8 @@ public:
 	}
 
 private:
-	void gio_thread();
+	void gio_start();
+	void gio_stop();
 
 	static void on_gio_signal(GDBusProxy* proxy, gchar* sender_name, gchar* signal_name, GVariant* parameters, gpointer user_data);
 
@@ -121,11 +106,9 @@ private:
 	const std::string app_name;
 	std::string dbus_name;
 
-	std::thread gio_thread_func;
-	std::mutex  gio_thread_mutex;
-	std::condition_variable gio_thread_cv;
-
 	std::map<std::string, std::function<void ()>> media_keys;
+
+	GDBusProxy* dbus_proxy;
 };
 
 
@@ -195,12 +178,13 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 }
 
 
-void media_keys_t::gio_thread()
+void media_keys_t::gio_start()
 {
 	GError*     error{nullptr};
-	GDBusProxy* proxy{nullptr};
 
-	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+	LOG(info) << "starting media keys";
+
+	this->dbus_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 		GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
 		nullptr,
 		this->dbus_name.c_str(),
@@ -209,17 +193,15 @@ void media_keys_t::gio_thread()
 		nullptr,
 		&error);
 
-	if (proxy == nullptr)
+	if (this->dbus_proxy == nullptr)
 	{
 		LOG(error) << "could not connect to rtng_dbus, media keys disabled";
-
-		this->gio_thread_cv.notify_one();
 		return;
 	}
 
-	g_signal_connect(proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
+	g_signal_connect(this->dbus_proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
 
-	g_dbus_proxy_call(proxy,
+	g_dbus_proxy_call(this->dbus_proxy,
 		"GrabMediaPlayerKeys",
 		g_variant_new("(su)", this->app_name.c_str(), 0),
 		G_DBUS_CALL_FLAGS_NO_AUTO_START,
@@ -227,25 +209,27 @@ void media_keys_t::gio_thread()
 		nullptr,
 		nullptr,
 		nullptr);
+}
 
-	// signal that we are ready...
-	this->gio_thread_cv.notify_one();
 
-	std::unique_lock<std::mutex> lock(this->gio_thread_mutex);
+void media_keys_t::gio_stop()
+{
+	if (this->dbus_proxy)
+	{
+		LOG(info) << "stopping media keys";
 
-	this->gio_thread_cv.wait(lock);
+		// cleanup
+		g_dbus_proxy_call(this->dbus_proxy,
+			"ReleaseMediaPlayerKeys",
+			g_variant_new("(s)", this->app_name.c_str()),
+			G_DBUS_CALL_FLAGS_NO_AUTO_START,
+			-1,
+			nullptr,
+			nullptr,
+			nullptr);
 
-	// cleanup
-	g_dbus_proxy_call(proxy,
-		"ReleaseMediaPlayerKeys",
-		g_variant_new("(s)", this->app_name.c_str()),
-		G_DBUS_CALL_FLAGS_NO_AUTO_START,
-		-1,
-		nullptr,
-		nullptr,
-		nullptr);
-
-	g_object_unref(proxy);
+		g_object_unref(this->dbus_proxy);
+	}
 }
 
 

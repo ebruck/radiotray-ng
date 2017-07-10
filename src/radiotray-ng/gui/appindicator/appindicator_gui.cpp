@@ -20,7 +20,6 @@
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
-#include <radiotray-ng/g_threading_helper.hpp>
 #include <rtng_user_agent.hpp>
 
 #include <boost/filesystem.hpp>
@@ -610,10 +609,8 @@ void AppindicatorGui::stop()
 }
 
 
-void AppindicatorGui::gtk_loop(int argc, char* argv[])
+void AppindicatorGui::run(int argc, char* argv[])
 {
-	radiotray_ng::g_threading_helper gth;
-
 	gtk_init(&argc, &argv);
 
 	const std::string icon_off{radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY, DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE))};
@@ -633,15 +630,7 @@ void AppindicatorGui::gtk_loop(int argc, char* argv[])
 
 	gtk_main();
 
-	//g_source_remove(this->file_monitor_timer_id);
-
 	gtk_widget_destroy(this->menu);
 
 	g_object_unref(G_OBJECT(this->appindicator));
-}
-
-
-void AppindicatorGui::run(int argc, char* argv[])
-{
-	this->gtk_loop(argc, argv);
 }

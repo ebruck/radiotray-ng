@@ -78,8 +78,6 @@ private:
 
 	bool sleep_timer_dialog();
 
-	void gtk_loop(int argc, char* argv[]);
-
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IBookmarks>   bookmarks;
 	std::unique_ptr<radiotray_ng::FileMonitor> bookmarks_monitor;

@@ -27,28 +27,19 @@ Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event
 	, buffering(false)
 	, event_bus(std::move(event_bus))
 	, config(std::move(config))
+	, gst_bus(nullptr)
 {
-	LOG(info) << "starting gst thread";
+	LOG(info) << "starting gstreamer";
 
-	std::unique_lock<std::mutex> lock(this->gst_thread_mutex);
-
-	this->gst_thread = std::thread(&Player::gst_thread_func, this);
-
-	// wait for gst_thread_func to be ready...
-	this->gst_thread_cv.wait(lock);
+	this->gst_start();
 }
 
 
 Player::~Player()
 {
-	LOG(info) << "stopping gst thread";
+	LOG(info) << "stopping gstreamer";
 
-	this->gst_thread_cv.notify_one();
-
-	if (this->gst_thread.joinable())
-	{
-		this->gst_thread.join();
-	}
+	this->gst_stop();
 }
 
 
@@ -83,9 +74,9 @@ bool Player::play_next()
 
 bool Player::play(const playlist_t& playlist)
 {
-	if (!this->gst_thread.joinable())
+	if (this->gst_bus == nullptr)
 	{
-		LOG(error) << "gst_thread not ready";
+		LOG(error) << "gstreamer not ready";
 		return false;
 	}
 
@@ -349,10 +340,8 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 }
 
 
-void Player::gst_thread_func()
+void Player::gst_start()
 {
-	GstBus* bus;
-
 	// gstreamer setup...
 	gst_init(nullptr, nullptr);
 
@@ -361,8 +350,6 @@ void Player::gst_thread_func()
 		LOG(error) << "could not create playbin element";
 
 		gst_deinit();
-
-		this->gst_thread_cv.notify_one();
 		return;
 	}
 
@@ -372,8 +359,6 @@ void Player::gst_thread_func()
 
 		gst_object_unref(this->pipeline);
 		gst_deinit();
-
-		this->gst_thread_cv.notify_one();
 		return;
 	}
 
@@ -393,28 +378,28 @@ void Player::gst_thread_func()
 	this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));
 
 	// setup callbacks...
-	bus = gst_element_get_bus(this->pipeline);
-	gst_bus_add_watch(bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
+	this->gst_bus = gst_element_get_bus(this->pipeline);
+	gst_bus_add_watch(this->gst_bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
 
 	g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
+}
 
-	// signal that we are starting our loop
-	this->gst_thread_cv.notify_one();
 
-	std::unique_lock<std::mutex> lock(this->gst_thread_mutex);
-
-	this->gst_thread_cv.wait(lock);
-
+void Player::gst_stop()
+{
 	// shutdown
-	gst_object_unref(bus);
+	if (this->gst_bus)
+	{
+		gst_object_unref(this->gst_bus);
 
-	gst_element_set_state(this->pipeline, GST_STATE_NULL);
-	gst_object_unref(this->pipeline);
+		gst_element_set_state(this->pipeline, GST_STATE_NULL);
+		gst_object_unref(this->pipeline);
 
-	gst_element_set_state(this->souphttpsrc, GST_STATE_NULL);
-	gst_object_unref(this->souphttpsrc);
+		gst_element_set_state(this->souphttpsrc, GST_STATE_NULL);
+		gst_object_unref(this->souphttpsrc);
 
-	gst_object_unref(G_OBJECT(this->clock));
+		gst_object_unref(G_OBJECT(this->clock));
 
-	gst_deinit();
+		gst_deinit();
+	}
 }

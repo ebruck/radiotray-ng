@@ -22,8 +22,6 @@
 #include <radiotray-ng/i_player.hpp>
 
 #include <gst/gst.h>
-#include <condition_variable>
-#include <thread>
 
 
 class Player final : public IPlayer
@@ -40,6 +38,9 @@ public:
 	void volume(const uint32_t percent);
 
 private:
+	void gst_start();
+	void gst_stop();
+
 	static gboolean handle_messages_cb(GstBus* bus, GstMessage* message, gpointer user_data);
 
 	static void notify_source_cb(GObject* obj, GParamSpec* param, gpointer user_data);
@@ -50,20 +51,16 @@ private:
 
 	bool play_next();
 
-	void gst_thread_func();
-
 	GstElement* pipeline;
 	GstElement* souphttpsrc;
 	GstClock*   clock;
 	GstClockID  clock_id;
 	bool        buffering;
 
-	std::thread gst_thread;
-	std::mutex  gst_thread_mutex;
-	std::condition_variable gst_thread_cv;
-
 	playlist_t current_playlist;
 
 	std::shared_ptr<IEventBus> event_bus;
 	std::shared_ptr<IConfig> config;
+
+	GstBus* gst_bus;
 };
