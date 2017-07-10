@@ -16,13 +16,12 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/common.hpp>
-#include <radiotray-ng/media_keys/media_keys.hpp>
+#include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_config.hpp>
 
 #include <condition_variable>
 #include <gio/gio.h>
-#include <radiotray-ng/g_threading_helper.hpp>
 #include <mutex>
 #include <thread>
 #include <map>
@@ -34,7 +33,6 @@ public:
 	media_keys_t(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IConfig> config)
 		: radiotray_ng(std::move(radiotray_ng))
 		, config(std::move(config))
-		, main_loop(nullptr)
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 		, dbus_name("org.gnome.SettingsDaemon.MediaKeys")
 	{
@@ -84,26 +82,23 @@ public:
 
 		LOG(info) << "starting gio thread for: " << this->app_name << " using " << this->dbus_name;
 
-		std::unique_lock<std::mutex> lock(main_loop_mutex);
+		std::unique_lock<std::mutex> lock(this->gio_thread_mutex);
 
-		this->gio_player_thread = std::thread(&media_keys_t::gio_thread, this);
+		this->gio_thread_func = std::thread(&media_keys_t::gio_thread, this);
 
-		// wait for main_loop to be ready...
-		main_loop_ready_cv.wait(lock);
+		// wait for gio_thread to be ready...
+		gio_thread_cv.wait(lock);
 	}
 
 	~media_keys_t()
 	{
 		LOG(info) << "stopping gio thread";
 
-		if (g_main_loop_is_running(this->main_loop))
-		{
-			g_main_loop_quit(this->main_loop);
-		}
+		this->gio_thread_cv.notify_one();
 
-		if (this->gio_player_thread.joinable())
+		if (this->gio_thread_func.joinable())
 		{
-			this->gio_player_thread.join();
+			this->gio_thread_func.join();
 		}
 	}
 
@@ -123,13 +118,12 @@ private:
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IConfig> config;
-	GMainLoop* main_loop;
 	const std::string app_name;
 	std::string dbus_name;
 
-	std::thread gio_player_thread;
-	std::mutex  main_loop_mutex;
-	std::condition_variable main_loop_ready_cv;
+	std::thread gio_thread_func;
+	std::mutex  gio_thread_mutex;
+	std::condition_variable gio_thread_cv;
 
 	std::map<std::string, std::function<void ()>> media_keys;
 };
@@ -206,48 +200,40 @@ void media_keys_t::gio_thread()
 	GError*     error{nullptr};
 	GDBusProxy* proxy{nullptr};
 
-	radiotray_ng::g_threading_helper gth;
+	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+		GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
+		nullptr,
+		this->dbus_name.c_str(),
+		"/org/gnome/SettingsDaemon/MediaKeys",
+		"org.gnome.SettingsDaemon.MediaKeys",
+		nullptr,
+		&error);
 
-	// scope our locking...
+	if (proxy == nullptr)
 	{
-		std::unique_lock<std::mutex> lock(this->main_loop_mutex);
+		LOG(error) << "could not connect to rtng_dbus, media keys disabled";
 
-		this->main_loop = g_main_loop_new(nullptr, FALSE);
-
-		proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
-			GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
-			nullptr,
-			this->dbus_name.c_str(),
-			"/org/gnome/SettingsDaemon/MediaKeys",
-			"org.gnome.SettingsDaemon.MediaKeys",
-			nullptr,
-			&error);
-
-		if (proxy == nullptr)
-		{
-			LOG(error) << "could not connect to dbus, media keys disabled";
-
-			this->main_loop_ready_cv.notify_one();
-			g_main_loop_unref(this->main_loop);
-			return;
-		}
-
-		g_signal_connect(proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
-
-		g_dbus_proxy_call(proxy,
-			"GrabMediaPlayerKeys",
-			g_variant_new("(su)", this->app_name.c_str(), 0),
-			G_DBUS_CALL_FLAGS_NO_AUTO_START,
-			-1,
-			nullptr,
-			nullptr,
-			nullptr);
+		this->gio_thread_cv.notify_one();
+		return;
 	}
 
-	// signal that we are starting our loop
-	this->main_loop_ready_cv.notify_one();
+	g_signal_connect(proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
 
-	g_main_loop_run(this->main_loop);
+	g_dbus_proxy_call(proxy,
+		"GrabMediaPlayerKeys",
+		g_variant_new("(su)", this->app_name.c_str(), 0),
+		G_DBUS_CALL_FLAGS_NO_AUTO_START,
+		-1,
+		nullptr,
+		nullptr,
+		nullptr);
+
+	// signal that we are ready...
+	this->gio_thread_cv.notify_one();
+
+	std::unique_lock<std::mutex> lock(this->gio_thread_mutex);
+
+	this->gio_thread_cv.wait(lock);
 
 	// cleanup
 	g_dbus_proxy_call(proxy,
@@ -260,7 +246,6 @@ void media_keys_t::gio_thread()
 		nullptr);
 
 	g_object_unref(proxy);
-	g_main_loop_unref(this->main_loop);
 }
 
 

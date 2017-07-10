@@ -24,7 +24,7 @@
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
 #include <radiotray-ng/gui/ncurses/ncurses_gui.hpp>
 #include <radiotray-ng/config/config.hpp>
-#include <radiotray-ng/media_keys/media_keys.hpp>
+#include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <rtng_user_agent.hpp>
 
 #ifdef APPINDICATOR_GUI

@@ -91,7 +91,7 @@ add_subdirectory(src/radiotray-ng/bookmarks)
 add_subdirectory(src/radiotray-ng/event_bus)
 add_subdirectory(src/radiotray-ng/player)
 add_subdirectory(src/radiotray-ng/notification)
-add_subdirectory(src/radiotray-ng/media_keys)
+add_subdirectory(src/radiotray-ng/extras/media_keys)
 add_subdirectory(tests/runners/) # test apps
 
 # which gui?

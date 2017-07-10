@@ -16,7 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/common.hpp>
-#include <radiotray-ng/media_keys/media_keys.hpp>
+#include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 
 class media_keys_t

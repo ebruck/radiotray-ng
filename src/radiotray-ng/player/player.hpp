@@ -50,18 +50,17 @@ private:
 
 	bool play_next();
 
-	void gst_thread();
+	void gst_thread_func();
 
-	GMainLoop*  main_loop;
 	GstElement* pipeline;
 	GstElement* souphttpsrc;
 	GstClock*   clock;
 	GstClockID  clock_id;
 	bool        buffering;
 
-	std::thread gst_player_thread;
-	std::mutex  main_loop_mutex;
-	std::condition_variable main_loop_ready_cv;
+	std::thread gst_thread;
+	std::mutex  gst_thread_mutex;
+	std::condition_variable gst_thread_cv;
 
 	playlist_t current_playlist;
 
