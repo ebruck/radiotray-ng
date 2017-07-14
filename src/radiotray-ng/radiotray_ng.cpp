@@ -22,6 +22,7 @@
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
+#include <json/json.h>
 #include <cmath>
 
 
@@ -141,6 +142,31 @@ std::string RadiotrayNG::get_volume()
 
 	return this->volume;
 }
+
+
+std::string RadiotrayNG::get_bookmarks()
+{
+	return this->bookmarks->dump();
+}
+
+
+std::string RadiotrayNG::get_player_state()
+{
+	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
+
+	Json::Value value;
+
+	value["state"]  = this->state;
+	value["volume"] = this->volume;
+	value["title"]  = this->title;
+	value["artist"] = this->artist;
+	value["station"]= this->station;
+	value["group"]  = this->group;
+	value["image"]  = this->notification_image;
+
+	return value.toStyledString();
+}
+
 
 
 void RadiotrayNG::set_title(const std::string& title)

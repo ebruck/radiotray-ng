@@ -74,4 +74,8 @@ public:
 	virtual void next_station_msg() = 0;
 
 	virtual bool reload_bookmarks() = 0;
+
+	virtual std::string get_player_state() = 0;
+
+	virtual std::string get_bookmarks() = 0;
 };

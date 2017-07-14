@@ -169,7 +169,7 @@ $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 
 Install these packages:
 ```
-libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev cmake
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
 ```
 
 

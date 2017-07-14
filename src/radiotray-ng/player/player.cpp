@@ -342,7 +342,6 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 
 void Player::gst_start()
 {
-	// gstreamer setup...
 	gst_init(nullptr, nullptr);
 
 	if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
@@ -387,7 +386,6 @@ void Player::gst_start()
 
 void Player::gst_stop()
 {
-	// shutdown
 	if (this->gst_bus)
 	{
 		gst_object_unref(this->gst_bus);

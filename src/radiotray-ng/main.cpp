@@ -31,6 +31,10 @@
 #include <radiotray-ng/gui/appindicator/appindicator_gui.hpp>
 #endif
 
+#ifdef RTNG_DBUS
+	#include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
+#endif
+
 #include <boost/filesystem.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
@@ -187,6 +191,10 @@ int main(int argc, char* argv[])
 	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));
 #else
 	auto gui(std::make_shared<NCursesGui>(radiotray_ng, event_bus));
+#endif
+
+#ifdef RTNG_DBUS
+	RtngDbus dbus(radiotray_ng);
 #endif
 
 	// addons etc.

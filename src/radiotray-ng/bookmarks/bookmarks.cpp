@@ -440,3 +440,9 @@ size_t Bookmarks::size()
 {
 	return size_t(this->bookmarks.size());
 }
+
+
+std::string Bookmarks::dump()
+{
+	return this->bookmarks.toStyledString();
+}
