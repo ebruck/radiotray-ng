@@ -162,7 +162,7 @@ std::string RadiotrayNG::get_player_state()
 	value["artist"] = this->artist;
 	value["station"]= this->station;
 	value["group"]  = this->group;
-	value["image"]  = this->notification_image;
+	value["image"]  = radiotray_ng::word_expand(this->notification_image);
 
 	return value.toStyledString();
 }

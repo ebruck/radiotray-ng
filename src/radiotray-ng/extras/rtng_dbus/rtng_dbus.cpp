@@ -16,8 +16,8 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/common.hpp>
-#include "rtng_dbus.hpp"
 #include <radiotray-ng/i_radiotray_ng.hpp>
+#include "rtng_dbus.hpp"
 
 
 namespace
@@ -93,7 +93,10 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 
 	if (method_name == "stop")
 	{
-		this->radiotray_ng->stop();
+		if (this->radiotray_ng->get_state() != STATE_STOPPED)
+		{
+			this->radiotray_ng->stop();
+		}
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}
@@ -174,23 +177,13 @@ void RtngDbus::on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connec
 {
 	try
 	{
-		this->registered_id = connection->register_object(RTNG_DBUS_OBJECT_PATH, introspection_data->lookup_interface(), interface_vtable);
+		this->registered_id = connection->register_object(RTNG_DBUS_OBJECT_PATH, this->introspection_data->lookup_interface(),
+			this->interface_vtable);
 	}
 	catch (const Glib::Error& ex)
 	{
 		LOG(error) << "register_object of object failed: " << RTNG_DBUS_OBJECT_PATH;
 	}
-}
-
-
-void RtngDbus::on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */, const Glib::ustring& /* name */)
-{
-}
-
-
-void RtngDbus::on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
-{
-	connection->unregister_object(this->registered_id);
 }
 
 
@@ -202,7 +195,7 @@ void RtngDbus::dbus_setup()
 
 	try
 	{
-		introspection_data = Gio::DBus::NodeInfo::create_for_xml(INTROSPECTION_XML);
+		this->introspection_data = Gio::DBus::NodeInfo::create_for_xml(INTROSPECTION_XML);
 	}
 	catch (const Glib::Error& ex)
 	{
@@ -212,7 +205,11 @@ void RtngDbus::dbus_setup()
 	}
 
 	this->own_name_id = Gio::DBus::own_name(Gio::DBus::BusType::BUS_TYPE_SESSION, RTNG_DBUS_NAME,
-		sigc::mem_fun(*this, &RtngDbus::on_bus_acquired), sigc::mem_fun(*this, &RtngDbus::on_name_acquired),
-		sigc::mem_fun(*this, &RtngDbus::on_name_lost));
+		sigc::mem_fun(*this, &RtngDbus::on_bus_acquired),
+		Gio::DBus::SlotNameAcquired(),
+		[this](const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&)
+		{
+			connection->unregister_object(this->registered_id);
+		});
 
 }

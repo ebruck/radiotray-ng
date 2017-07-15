@@ -20,7 +20,7 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_config.hpp>
 
-#include <gio/gio.h>
+#include <giomm.h>
 #include <map>
 
 
@@ -38,16 +38,16 @@ public:
 		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
 		{
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_UP_KEY, DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE))] =
-							std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE))] =
-							std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
 				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE))] =
-							std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
 
 			this->log_media_keys();
 		}

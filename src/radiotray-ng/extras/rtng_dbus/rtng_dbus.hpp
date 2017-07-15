@@ -33,20 +33,21 @@ public:
 private:
 	void dbus_setup();
 
-	void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& sender, const Glib::ustring& object_path,
-		const Glib::ustring& interface_name, const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+	void on_method_call(
+		const Glib::RefPtr<Gio::DBus::Connection>& connection,
+		const Glib::ustring& sender,
+		const Glib::ustring& object_path,
+		const Glib::ustring& interface_name,
+		const Glib::ustring& method_name,
+		const Glib::VariantContainerBase& parameters,
 		const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation);
 
 	void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& name);
 
-	void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& name);
-
-	void on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */);
-
 	guint registered_id;
 	guint own_name_id;
 	Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
-	const Gio::DBus::InterfaceVTable interface_vtable;
+	const Gio::DBus::InterfaceVTable  interface_vtable;
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 };
