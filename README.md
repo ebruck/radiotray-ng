@@ -28,6 +28,7 @@ The version here is what "I" wanted out of RadioTray.
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
+* Dbus interface
 
 ## Future: ##
 

@@ -156,13 +156,15 @@ std::string RadiotrayNG::get_player_state()
 
 	Json::Value value;
 
-	value["state"]  = this->state;
-	value["volume"] = this->volume;
-	value["title"]  = this->title;
-	value["artist"] = this->artist;
-	value["station"]= this->station;
-	value["group"]  = this->group;
-	value["image"]  = radiotray_ng::word_expand(this->notification_image);
+	value[DBUS_MSG_STATE_KEY]   = this->state;
+	value[DBUS_MSG_VOLUME_KEY]  = this->volume;
+	value[DBUS_MSG_TITLE_KEY]   = this->title;
+	value[DBUS_MSG_ARTIST_KEY]  = this->artist;
+	value[DBUS_MSG_STATION_KEY] = this->station;
+	value[DBUS_MSG_GROUP_KEY]   = this->group;
+	value[DBUS_MSG_CODEC_KEY]   = this->codec;
+	value[DBUS_MSG_BITRATE_KEY] = this->bitrate;
+	value[DBUS_MSG_IMAGE_KEY]   = radiotray_ng::word_expand(this->notification_image);
 
 	return value.toStyledString();
 }

@@ -48,6 +48,17 @@ using playlist_t = std::vector<std::string>;
 #define TAG_CODEC                         "audio codec"
 #define TAG_TITLE                         "title"
 
+// dbus json state message
+#define DBUS_MSG_STATE_KEY                "state"
+#define DBUS_MSG_VOLUME_KEY               "volume"
+#define DBUS_MSG_TITLE_KEY                "title"
+#define DBUS_MSG_ARTIST_KEY               "artist"
+#define DBUS_MSG_STATION_KEY              "station"
+#define DBUS_MSG_GROUP_KEY                "group"
+#define DBUS_MSG_CODEC_KEY                "codec"
+#define DBUS_MSG_BITRATE_KEY              "bitrate"
+#define DBUS_MSG_IMAGE_KEY                "image"
+
 // http codes
 #define HTTP_OK                           (200)
 #define HTTP_NOT_FOUND                    (404)
