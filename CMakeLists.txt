@@ -65,7 +65,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_D
 
 # notification & ncurses based on platform
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    pkg_search_module(APPINDICATOR REQUIRED appindicator-0.1)
+    pkg_search_module(APPINDICATOR REQUIRED appindicator3-0.1)
 if (NOT APPINDICATOR_FOUND)
     pkg_search_module(NCURSES      REQUIRED ncurses)
 endif()

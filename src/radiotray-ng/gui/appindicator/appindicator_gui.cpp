@@ -178,7 +178,7 @@ void AppindicatorGui::build_bookmarks_menu_item()
 		if (group != ROOT_BOOKMARK_GROUP)
 		{
 			GtkWidget* menu_items = gtk_menu_item_new_with_label(group.c_str());
-			gtk_menu_append(GTK_MENU(this->menu), menu_items);
+			gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_items);
 
 			GtkWidget* sub_menu_items = gtk_menu_new();
 			gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
@@ -186,12 +186,12 @@ void AppindicatorGui::build_bookmarks_menu_item()
 			for(const IBookmarks::station_data_t& s : (*this->bookmarks)[i].stations)
 			{
 				GtkWidget* sub_menu_item = gtk_menu_item_new_with_label(s.name.c_str());
-				gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
+				gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 
 				auto cb_data = new menu_item_data{this->shared_from_this(), group, s.name};
 
-				g_signal_connect_data(GTK_OBJECT(sub_menu_item), "activate",
-					GTK_SIGNAL_FUNC(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
+				g_signal_connect_data(sub_menu_item, "activate",
+					GCallback(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
 
 				gtk_widget_show(sub_menu_item);
 			}
@@ -208,12 +208,12 @@ void AppindicatorGui::build_bookmarks_menu_item()
 		for(const IBookmarks::station_data_t& s : root_stations)
 		{
 			GtkWidget* menu_item = gtk_menu_item_new_with_label(s.name.c_str());
-			gtk_menu_append(GTK_MENU(this->menu), menu_item);
+			gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_item);
 
 			menu_item_data* cb_data = new menu_item_data{this->shared_from_this(), ROOT_BOOKMARK_GROUP, s.name};
 
-			g_signal_connect_data(GTK_OBJECT(menu_item), "activate",
-				GTK_SIGNAL_FUNC(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
+			g_signal_connect_data(menu_item, "activate",
+				GCallback(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
 
 			gtk_widget_show(menu_item);
 		}
@@ -226,7 +226,7 @@ void AppindicatorGui::add_separator(GtkWidget* menu)
 	if (!this->config->get_bool(COMPACT_MENU_KEY, DEFAULT_COMPACT_MENU_VALUE))
 	{
 		GtkWidget* menu_items = gtk_menu_item_new();
-		gtk_menu_append(GTK_MENU(menu), menu_items);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_items);
 		gtk_widget_show(menu_items);
 	}
 }
@@ -326,7 +326,7 @@ void AppindicatorGui::build_status_menu_item()
 	this->add_separator(this->menu);
 
 	this->status_menu_item = gtk_menu_item_new_with_label("status");
-	gtk_menu_append(GTK_MENU(this->menu), this->status_menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->status_menu_item);
 	gtk_widget_set_sensitive(this->status_menu_item, FALSE);
 	gtk_widget_show(this->status_menu_item);
 
@@ -337,7 +337,7 @@ void AppindicatorGui::build_status_menu_item()
 void AppindicatorGui::build_action_menu_item()
 {
 	this->action_menu_item = gtk_menu_item_new_with_label("action");
-	gtk_menu_append(GTK_MENU(this->menu), this->action_menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->action_menu_item);
 	gtk_widget_show(this->action_menu_item);
 
 	g_signal_connect(G_OBJECT(this->action_menu_item), "activate", G_CALLBACK(on_action_menu_item), gpointer(this));
@@ -351,7 +351,7 @@ void AppindicatorGui::build_volume_menu_item()
 	this->add_separator(this->menu);
 
 	this->volume_menu_item = gtk_menu_item_new_with_label("volume");
-	gtk_menu_append(GTK_MENU(this->menu), this->volume_menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->volume_menu_item);
 	gtk_widget_show(this->volume_menu_item);
 
 	this->update_volume_menu_item();
@@ -362,21 +362,21 @@ void AppindicatorGui::build_preferences_menu()
 {
 	this->add_separator(this->menu);
 
-	GtkWidget* menu_items = gtk_image_menu_item_new_from_stock(GTK_STOCK_PREFERENCES, nullptr);
-	gtk_menu_append(GTK_MENU(this->menu), menu_items);
+	GtkWidget* menu_items = gtk_menu_item_new_with_label("Preferences");
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_items);
 	gtk_widget_show(menu_items);
 
 	GtkWidget* sub_menu_items = gtk_menu_new();
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
 	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Bookmark Editor...");
-	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
-	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
+	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
+	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 
 	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
-	gtk_menu_append(GTK_MENU(sub_menu_items), sub_menu_item);
-	g_signal_connect(GTK_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
+	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
+	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 }
 
@@ -404,23 +404,23 @@ void AppindicatorGui::build_menu()
 	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
 
 	// toggle before we hook up callback as a reload loses this state...
-	gtk_check_menu_item_set_state(this->sleep_timer_menu_item, this->sleep_timer_id);
+	gtk_check_menu_item_set_active(this->sleep_timer_menu_item, this->sleep_timer_id);
 
-	gtk_menu_append(GTK_MENU(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
-	g_signal_connect(GTK_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
+	g_signal_connect(G_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
 	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
 
 	// about etc.
 	this->add_separator(this->menu);
 
-	auto menu_items = gtk_image_menu_item_new_from_stock(GTK_STOCK_ABOUT, nullptr);
-	gtk_menu_append(GTK_MENU (this->menu), menu_items);
-	gtk_signal_connect(GTK_OBJECT(menu_items), "activate", GTK_SIGNAL_FUNC(&AppindicatorGui::on_about_menu_item), this);
+	auto menu_items = gtk_menu_item_new_with_label("About");
+	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
+	g_signal_connect(menu_items, "activate", G_CALLBACK(&AppindicatorGui::on_about_menu_item), this);
 	gtk_widget_show(menu_items);
 
-	menu_items = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, nullptr);
-	gtk_menu_append(GTK_MENU (this->menu), menu_items);
-	gtk_signal_connect(GTK_OBJECT(menu_items), "activate", GTK_SIGNAL_FUNC(gtk_main_quit), nullptr);
+	menu_items = gtk_menu_item_new_with_label("Quit");
+	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
+	g_signal_connect(menu_items, "activate", GCallback(gtk_main_quit), nullptr);
 	gtk_widget_show(menu_items);
 
 	app_indicator_set_menu(appindicator, GTK_MENU(this->menu));
@@ -438,7 +438,7 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 		app->update_action_menu_item(STATE_STOPPED);
 	}
 
-	gtk_check_menu_item_set_state(app->sleep_timer_menu_item, FALSE);
+	gtk_check_menu_item_set_active(app->sleep_timer_menu_item, FALSE);
 
 	app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer expired");
 
@@ -462,31 +462,32 @@ gboolean AppindicatorGui::on_file_monitor_timer_event(gpointer data)
 bool AppindicatorGui::sleep_timer_dialog()
 {
 	auto dialog = gtk_dialog_new_with_buttons("Sleep Timer",
-											  nullptr,
-											  GTK_DIALOG_DESTROY_WITH_PARENT,
-											  GTK_STOCK_CANCEL,
-											  GTK_RESPONSE_REJECT,
-											  GTK_STOCK_OK,
-											  GTK_RESPONSE_ACCEPT,
-											  nullptr);
+		nullptr,
+		GTK_DIALOG_DESTROY_WITH_PARENT,
+		"Cancel",
+		GTK_RESPONSE_REJECT,
+		"OK",
+		GTK_RESPONSE_ACCEPT,
+		nullptr);
 
 	auto entry = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
 	auto label = gtk_label_new("Minutes:");
-	auto hbox = gtk_hbox_new(false, 0);
+	auto hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
 	gtk_entry_set_text(GTK_ENTRY(entry), this->config->get_string(SLEEP_TIMER_KEY, std::to_string(DEFAULT_SLEEP_TIMER_VALUE)).c_str());
 
 	gtk_box_pack_start(GTK_BOX(hbox), GTK_WIDGET(label), false, true, 5);
 	gtk_box_pack_end(GTK_BOX(hbox), GTK_WIDGET(entry), true, true, 5);
-	gtk_box_pack_end(GTK_BOX(GTK_DIALOG(dialog)->vbox), GTK_WIDGET(hbox), true, true, 20);
+	gtk_box_pack_end(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), GTK_WIDGET(hbox), true, true, 20);
+
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
 	gint ret = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	std::string timeout = gtk_entry_get_text(GTK_ENTRY(entry));
-	gtk_object_destroy((GTK_OBJECT(dialog)));
+	gtk_widget_destroy(dialog);
 
 	if (ret == GTK_RESPONSE_ACCEPT)
 	{
@@ -543,7 +544,7 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 		else
 		{
 			app->ignore_sleep_timer_toggle = true;
-			gtk_check_menu_item_set_state(app->sleep_timer_menu_item, 0);
+			gtk_check_menu_item_set_active(app->sleep_timer_menu_item, FALSE);
 		}
 	}
 }
@@ -579,27 +580,25 @@ void AppindicatorGui::on_reload_bookmarks_menu_item(GtkWidget* /*widget*/, gpoin
 }
 
 
-void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer data)
+void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer /*data*/)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
-
-	std::string license{"missing"};
-	std::string license_file{app->resource_path + "/COPYING"};
-
-	if (fs::exists(license_file))
+	const gchar* authors[sizeof(APP_AUTHOR)] =
 	{
-		radiotray_ng::load_string_file(license_file, license);
-	}
+		APP_AUTHOR,
+		NULL,
+	};
 
-	std::string copyright{RTNG_GIT_VERSION};
-	copyright += "\n\n" APP_COPYRIGHT;
-
-	gtk_show_about_dialog(nullptr
+	auto dialog = g_object_new(GTK_TYPE_ABOUT_DIALOG
 		, "program-name", APP_NAME_DISPLAY
-		, "license", license.c_str()
-		, "copyright", copyright.c_str()
+		, "license-type", GTK_LICENSE_GPL_3_0
+		, "version", RTNG_GIT_VERSION
+		, "copyright", APP_COPYRIGHT
 		, "website", APP_WEBSITE
+		, "authors", authors
 		, nullptr);
+
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
+	gtk_window_present(GTK_WINDOW(dialog));
 }
 
 
