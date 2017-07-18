@@ -37,8 +37,6 @@ namespace
 		"    </method>"
 		"    <method name='next_station'>"
 		"    </method>"
-		"    <method name='reload_bookmarks'>"
-		"    </method>"
 		"    <method name='get_bookmarks'>"
 		"      <arg type='s' direction='out'/>"
 		"    </method>"
@@ -125,13 +123,6 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 	if (method_name == "next_station")
 	{
 		this->radiotray_ng->next_station_msg();
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-
-	if (method_name == "reload_bookmarks")
-	{
-		this->radiotray_ng->reload_bookmarks();
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}
