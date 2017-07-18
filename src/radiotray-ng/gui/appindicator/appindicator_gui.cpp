@@ -148,9 +148,9 @@ void AppindicatorGui::on_action_menu_item(GtkWidget* /*widget*/, gpointer data)
 
 	if (state == STATE_STOPPED)
 	{
-		app->radiotray_ng->play();
-
 		app->update_action_menu_item(STATE_PLAYING);
+
+		app->radiotray_ng->play();
 
 		return;
 	}
@@ -598,6 +598,9 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer /*data*
 		, nullptr);
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
+
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), nullptr);
+
 	gtk_window_present(GTK_WINDOW(dialog));
 }
 
