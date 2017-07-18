@@ -46,7 +46,7 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	if (this->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
 	{
 		this->bookmarks_monitor.reset(new radiotray_ng::FileMonitor(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
-		this->file_monitor_timer_id= g_timeout_add(this->config->get_uint32(FILE_MONITOR_INTERVAL_KEY, DEFAULT_FILE_MONITOR_INTERVAL_VALUE) * 1000,
+		this->file_monitor_timer_id = g_timeout_add(this->config->get_uint32(FILE_MONITOR_INTERVAL_KEY, DEFAULT_FILE_MONITOR_INTERVAL_VALUE) * 1000,
 			on_file_monitor_timer_event, this);
 	}
 
@@ -568,6 +568,12 @@ void AppindicatorGui::on_reload_bookmarks_menu_item(GtkWidget* /*widget*/, gpoin
 
 	if (app->radiotray_ng->reload_bookmarks())
 	{
+		// reset file monitor...
+		if (app->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
+		{
+			app->bookmarks_monitor.reset(new radiotray_ng::FileMonitor(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
+		}
+
 		gtk_widget_destroy(app->menu);
 
 		app->build_menu();
