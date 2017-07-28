@@ -200,7 +200,6 @@ int main(int argc, char* argv[])
 	// addons etc.
 	MediaKeys mm(radiotray_ng, config);
 
-	// todo: support start playing passed group/station...
 	gui->run(argc, argv);
 
 	LOG(info) << APP_NAME << " shutting down";

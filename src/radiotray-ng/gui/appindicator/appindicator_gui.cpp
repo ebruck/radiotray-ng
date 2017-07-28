@@ -481,9 +481,9 @@ bool AppindicatorGui::sleep_timer_dialog()
 	gtk_box_pack_end(GTK_BOX(hbox), GTK_WIDGET(entry), true, true, 5);
 	gtk_box_pack_end(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), GTK_WIDGET(hbox), true, true, 20);
 
-	gtk_widget_show_all(GTK_WIDGET(dialog));
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
 	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
 	gint ret = gtk_dialog_run(GTK_DIALOG(dialog));
 
 	std::string timeout = gtk_entry_get_text(GTK_ENTRY(entry));
@@ -635,6 +635,15 @@ void AppindicatorGui::run(int argc, char* argv[])
 	gtk_window_set_default_icon_from_file((this->resource_path + RADIOTRAY_NG_LOGO_ICON).c_str(), nullptr);
 
 	this->build_menu();
+
+	// todo: use boost's program options...
+	if (argc > 1)
+	{
+		if (std::string(argv[1]) == "--play")
+		{
+			radiotray_ng->play();
+		}
+	}
 
 	gtk_main();
 
