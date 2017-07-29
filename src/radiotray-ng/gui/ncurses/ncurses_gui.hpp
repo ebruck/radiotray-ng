@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <radiotray-ng/radiotray_ng.hpp>
+#include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
 #include <radiotray-ng/i_gui.hpp>
 #include <memory>
@@ -26,7 +26,7 @@
 class NCursesGui final : public IGui
 {
 public:
-	NCursesGui(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus>& event_bus);
+	NCursesGui(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus);
 
 	NCursesGui() = delete;
 
