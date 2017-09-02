@@ -374,6 +374,9 @@ void AppindicatorGui::build_preferences_menu()
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 
+	// bookmark editor coming soon...
+	gtk_widget_set_sensitive(sub_menu_item, FALSE);
+
 	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));

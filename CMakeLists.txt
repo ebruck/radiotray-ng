@@ -17,7 +17,7 @@ project(radiotray-ng CXX)
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 6)
+set(PROJECT_VERSION_PATCH 7)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -47,7 +47,7 @@ if (NOT APPLE)
 endif(NOT APPLE)
 
 # flags
-set(CMAKE_CXX_VERSION 11)
+set(CMAKE_CXX_STANDARD 11)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
 set(warnings "-Wall -Wextra -Werror")

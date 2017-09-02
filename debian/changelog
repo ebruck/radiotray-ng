@@ -1,3 +1,13 @@
+radiotray-ng (0.1.7) unstable; urgency=low
+
+      * Added dbus interface
+      * Added --play option for resuming playback on startup
+      * Added optional notification of external bookmark file changes
+      * Updated to libappindicator3
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 02 Sep 2017 11:01:19 -0700
+
+
 radiotray-ng (0.1.6) unstable; urgency=low
 
       * new icon config overrides

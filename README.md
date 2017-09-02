@@ -29,6 +29,7 @@ The version here is what "I" wanted out of RadioTray.
 * Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
 * Dbus interface for controlling Radiotray-NG and accessing stream meta data
+* --play command line option for resuming playback
 
 ## Future: ##
 
@@ -168,13 +169,28 @@ $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ## DBus Interface ##
 
 ```
+Available commands:
+
+    volume_up
+    volume_down
+    play
+    stop
+    previous_station
+    next_station
+    get_bookmarks
+    get_player_state
+    play_station 'group' 'station'
+```
+```
+Example:
+
 $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.get_player_state
 {
    "artist" : "Suspense",
    "bitrate" : "24 kb/s",
    "codec" : "MPEG-1 Layer 3 (MP3)",
    "group" : "Old Time Radio",
-   "image" : "/home/ebruck/Dropbox/.radiotray-ng/icons/oldtimeradio.png",
+   "image" : "radiotray-ng-notification",
    "state" : "playing",
    "station" : "AM 1710 Antioch OTR",
    "title" : "Jul 15, 1948: Summer Night w/Ida Lupino",
