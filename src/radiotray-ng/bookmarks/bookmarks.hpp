@@ -64,6 +64,8 @@ public:
 
 	size_t size();
 
+	std::string dump();
+
 private:
 
 	const std::string GROUP_KEY{"group"};

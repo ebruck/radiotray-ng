@@ -12,6 +12,10 @@ else()
         ${NCURSES_LIBRARIES})
 endif()    
 
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    target_link_libraries(radiotray-ng rtng_dbus)
+endif()
+
 target_link_libraries(
   radiotray-ng  
   bookmarks  
@@ -32,6 +36,6 @@ target_link_libraries(
   ${LIBBSD_LIBRARIES}
   pthread
 )
-    
+
 add_dependencies(radiotray-ng user-agent)
-target_include_directories(radiotray-ng PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS})
+target_include_directories(radiotray-ng PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} ${GIOMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})

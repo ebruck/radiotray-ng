@@ -21,7 +21,7 @@
 #include <ncurses.h>
 
 
-NCursesGui::NCursesGui(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus>& event_bus)
+NCursesGui::NCursesGui(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus)
 	: radiotray_ng(std::move(radiotray_ng))
 {
 	event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&NCursesGui::on_tags_event_data, this, std::placeholders::_1,

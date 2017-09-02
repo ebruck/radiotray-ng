@@ -16,15 +16,11 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/common.hpp>
-#include <radiotray-ng/media_keys/media_keys.hpp>
+#include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_config.hpp>
 
-#include <condition_variable>
-#include <gio/gio.h>
-#include <radiotray-ng/g_threading_helper.hpp>
-#include <mutex>
-#include <thread>
+#include <giomm.h>
 #include <map>
 
 
@@ -34,24 +30,24 @@ public:
 	media_keys_t(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IConfig> config)
 		: radiotray_ng(std::move(radiotray_ng))
 		, config(std::move(config))
-		, main_loop(nullptr)
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 		, dbus_name("org.gnome.SettingsDaemon.MediaKeys")
+		, dbus_proxy(nullptr)
 	{
 		// install extra media key mappings?
 		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
 		{
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_UP_KEY, DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE))] =
-							std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE))] =
-							std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
 				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng.get());
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE))] =
-							std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
 
 			this->log_media_keys();
 		}
@@ -82,29 +78,12 @@ public:
 			}
 		}
 
-		LOG(info) << "starting gio thread for: " << this->app_name << " using " << this->dbus_name;
-
-		std::unique_lock<std::mutex> lock(main_loop_mutex);
-
-		this->gio_player_thread = std::thread(&media_keys_t::gio_thread, this);
-
-		// wait for main_loop to be ready...
-		main_loop_ready_cv.wait(lock);
+		this->gio_start();
 	}
 
 	~media_keys_t()
 	{
-		LOG(info) << "stopping gio thread";
-
-		if (g_main_loop_is_running(this->main_loop))
-		{
-			g_main_loop_quit(this->main_loop);
-		}
-
-		if (this->gio_player_thread.joinable())
-		{
-			this->gio_player_thread.join();
-		}
+		this->gio_stop();
 	}
 
 	void log_media_keys()
@@ -117,21 +96,19 @@ public:
 	}
 
 private:
-	void gio_thread();
+	void gio_start();
+	void gio_stop();
 
 	static void on_gio_signal(GDBusProxy* proxy, gchar* sender_name, gchar* signal_name, GVariant* parameters, gpointer user_data);
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IConfig> config;
-	GMainLoop* main_loop;
 	const std::string app_name;
 	std::string dbus_name;
 
-	std::thread gio_player_thread;
-	std::mutex  main_loop_mutex;
-	std::condition_variable main_loop_ready_cv;
-
 	std::map<std::string, std::function<void ()>> media_keys;
+
+	GDBusProxy* dbus_proxy;
 };
 
 
@@ -201,66 +178,58 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 }
 
 
-void media_keys_t::gio_thread()
+void media_keys_t::gio_start()
 {
 	GError*     error{nullptr};
-	GDBusProxy* proxy{nullptr};
 
-	radiotray_ng::g_threading_helper gth;
+	LOG(info) << "starting media keys";
 
-	// scope our locking...
+	this->dbus_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+		GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
+		nullptr,
+		this->dbus_name.c_str(),
+		"/org/gnome/SettingsDaemon/MediaKeys",
+		"org.gnome.SettingsDaemon.MediaKeys",
+		nullptr,
+		&error);
+
+	if (this->dbus_proxy == nullptr)
 	{
-		std::unique_lock<std::mutex> lock(this->main_loop_mutex);
-
-		this->main_loop = g_main_loop_new(nullptr, FALSE);
-
-		proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
-			GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
-			nullptr,
-			this->dbus_name.c_str(),
-			"/org/gnome/SettingsDaemon/MediaKeys",
-			"org.gnome.SettingsDaemon.MediaKeys",
-			nullptr,
-			&error);
-
-		if (proxy == nullptr)
-		{
-			LOG(error) << "could not connect to dbus, media keys disabled";
-
-			this->main_loop_ready_cv.notify_one();
-			g_main_loop_unref(this->main_loop);
-			return;
-		}
-
-		g_signal_connect(proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
-
-		g_dbus_proxy_call(proxy,
-			"GrabMediaPlayerKeys",
-			g_variant_new("(su)", this->app_name.c_str(), 0),
-			G_DBUS_CALL_FLAGS_NO_AUTO_START,
-			-1,
-			nullptr,
-			nullptr,
-			nullptr);
+		LOG(error) << "could not connect to rtng_dbus, media keys disabled";
+		return;
 	}
 
-	// signal that we are starting our loop
-	this->main_loop_ready_cv.notify_one();
+	g_signal_connect(this->dbus_proxy, "g-signal", G_CALLBACK(on_gio_signal), this);
 
-	g_main_loop_run(this->main_loop);
-
-	// cleanup
-	g_dbus_proxy_call(proxy,
-		"ReleaseMediaPlayerKeys",
-		g_variant_new("(s)", this->app_name.c_str()),
+	g_dbus_proxy_call(this->dbus_proxy,
+		"GrabMediaPlayerKeys",
+		g_variant_new("(su)", this->app_name.c_str(), 0),
 		G_DBUS_CALL_FLAGS_NO_AUTO_START,
 		-1,
 		nullptr,
 		nullptr,
 		nullptr);
+}
 
-	g_object_unref(proxy);
-	g_main_loop_unref(this->main_loop);
+
+void media_keys_t::gio_stop()
+{
+	if (this->dbus_proxy)
+	{
+		LOG(info) << "stopping media keys";
+
+		// cleanup
+		g_dbus_proxy_call(this->dbus_proxy,
+			"ReleaseMediaPlayerKeys",
+			g_variant_new("(s)", this->app_name.c_str()),
+			G_DBUS_CALL_FLAGS_NO_AUTO_START,
+			-1,
+			nullptr,
+			nullptr,
+			nullptr);
+
+		g_object_unref(this->dbus_proxy);
+	}
 }
 
 

@@ -48,6 +48,17 @@ using playlist_t = std::vector<std::string>;
 #define TAG_CODEC                         "audio codec"
 #define TAG_TITLE                         "title"
 
+// dbus json state message
+#define DBUS_MSG_STATE_KEY                "state"
+#define DBUS_MSG_VOLUME_KEY               "volume"
+#define DBUS_MSG_TITLE_KEY                "title"
+#define DBUS_MSG_ARTIST_KEY               "artist"
+#define DBUS_MSG_STATION_KEY              "station"
+#define DBUS_MSG_GROUP_KEY                "group"
+#define DBUS_MSG_CODEC_KEY                "codec"
+#define DBUS_MSG_BITRATE_KEY              "bitrate"
+#define DBUS_MSG_IMAGE_KEY                "image"
+
 // http codes
 #define HTTP_OK                           (200)
 #define HTTP_NOT_FOUND                    (404)
@@ -57,6 +68,8 @@ using playlist_t = std::vector<std::string>;
 #define BUFFER_SIZE_KEY                   "buffer-size"
 #define COMPACT_MENU_KEY                  "compact-menu"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
+#define FILE_MONITOR_KEY                  "file-monitor"
+#define FILE_MONITOR_INTERVAL_KEY         "file-monitor-interval"
 #define HTTP_TIMEOUT_KEY                  "http-timeout"
 #define LAST_STATION_GROUP_KEY            "last-station-group"
 #define LAST_STATION_KEY                  "last-station"
@@ -88,7 +101,8 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright (C) 2017 Edward G. Bruck"
+#define APP_COPYRIGHT                     "Copyright © 2017 - The Radiotray-NG Authors"
+#define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
 
@@ -96,6 +110,8 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(128000*10)
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
+#define DEFAULT_FILE_MONITOR_VALUE               (true)
+#define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (30)
 #define DEFAULT_HTTP_TIMEOUT_VALUE               (15)
 #define DEFAULT_MEDIA_KEY_MAPPING_VALUE          (false)
 #define DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE     "Next"
@@ -114,4 +130,3 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)
 #define DEFAULT_VOLUME_STEP_VALUE                uint32_t(1)
-

@@ -74,5 +74,7 @@ public:
 
 	virtual group_data_t operator[](const size_t index) = 0;
 
+	virtual std::string dump() = 0;
+
 	virtual size_t size() = 0;
 };

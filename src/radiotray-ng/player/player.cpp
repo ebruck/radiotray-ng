@@ -16,45 +16,30 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/player/player.hpp>
-#include <radiotray-ng/g_threading_helper.hpp>
-#include <radiotray-ng/common.hpp>
 #include <rtng_user_agent.hpp>
 
 
 Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
-	: main_loop(nullptr)
-	, pipeline(nullptr)
+	: pipeline(nullptr)
 	, souphttpsrc(nullptr)
 	, clock(nullptr)
 	, clock_id(0)
 	, buffering(false)
 	, event_bus(std::move(event_bus))
 	, config(std::move(config))
+	, gst_bus(nullptr)
 {
-	LOG(info) << "starting gst thread";
+	LOG(info) << "starting gstreamer";
 
-	std::unique_lock<std::mutex> lock(main_loop_mutex);
-
-	this->gst_player_thread = std::thread(&Player::gst_thread, this);
-
-	// wait for main_loop to be ready...
-	main_loop_ready_cv.wait(lock);
+	this->gst_start();
 }
 
 
 Player::~Player()
 {
-	LOG(info) << "stopping gst thread";
+	LOG(info) << "stopping gstreamer";
 
-	if (g_main_loop_is_running(this->main_loop))
-	{
-		g_main_loop_quit(this->main_loop);
-	}
-
-	if (this->gst_player_thread.joinable())
-	{
-		this->gst_player_thread.join();
-	}
+	this->gst_stop();
 }
 
 
@@ -89,9 +74,9 @@ bool Player::play_next()
 
 bool Player::play(const playlist_t& playlist)
 {
-	if (!g_main_loop_is_running(this->main_loop))
+	if (this->gst_bus == nullptr)
 	{
-		LOG(error) << "main_loop not ready";
+		LOG(error) << "gstreamer not ready";
 		return false;
 	}
 
@@ -355,80 +340,64 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 }
 
 
-void Player::gst_thread()
+void Player::gst_start()
 {
-	GstBus* bus;
+	gst_init(nullptr, nullptr);
 
-	radiotray_ng::g_threading_helper gth;
-
-	// gstreamer setup...
+	if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
 	{
-		std::unique_lock<std::mutex> lock(this->main_loop_mutex);
+		LOG(error) << "could not create playbin element";
 
-		gst_init(nullptr, nullptr);
-
-		if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
-		{
-			LOG(error) << "could not create playbin element";
-
-			gst_deinit();
-
-			main_loop_ready_cv.notify_one();
-			return;
-		}
-
-		if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)
-		{
-			LOG(error) << "could not create souphttpsrc element";
-
-			gst_object_unref(this->pipeline);
-			gst_deinit();
-
-			main_loop_ready_cv.notify_one();
-			return;
-		}
-
-		// set buffer size & volume
-		if (this->config)
-		{
-			uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-
-			LOG(info) << BUFFER_SIZE_KEY << "=" << buffer_size;
-
-			g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size, NULL);
-
-			this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
-		}
-
-		// get clock for buffering timeouts...
-		this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));
-
-		// gst main loop
-		this->main_loop = g_main_loop_new(NULL, FALSE);
-
-		// setup callbacks...
-		bus = gst_element_get_bus(this->pipeline);
-		gst_bus_add_watch(bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
-
-		g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
+		gst_deinit();
+		return;
 	}
 
-	// signal that we are starting our loop
-	main_loop_ready_cv.notify_one();
+	if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)
+	{
+		LOG(error) << "could not create souphttpsrc element";
 
-	g_main_loop_run(this->main_loop);
+		gst_object_unref(this->pipeline);
+		gst_deinit();
+		return;
+	}
 
-	// shutdown
-	g_main_loop_unref(this->main_loop);
-	gst_object_unref(bus);
+	// set buffer size & volume
+	if (this->config)
+	{
+		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
 
-	gst_element_set_state(this->pipeline, GST_STATE_NULL);
-	gst_object_unref(this->pipeline);
+		LOG(info) << BUFFER_SIZE_KEY << "=" << buffer_size;
 
-	gst_element_set_state(this->souphttpsrc, GST_STATE_NULL);
-	gst_object_unref(this->souphttpsrc);
+		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size, NULL);
 
-	gst_object_unref(G_OBJECT(this->clock));
+		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+	}
 
-	gst_deinit();
+	// get clock for buffering timeouts...
+	this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));
+
+	// setup callbacks...
+	this->gst_bus = gst_element_get_bus(this->pipeline);
+	gst_bus_add_watch(this->gst_bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
+
+	g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
+}
+
+
+void Player::gst_stop()
+{
+	if (this->gst_bus)
+	{
+		gst_object_unref(this->gst_bus);
+
+		gst_element_set_state(this->pipeline, GST_STATE_NULL);
+		gst_object_unref(this->pipeline);
+
+		gst_element_set_state(this->souphttpsrc, GST_STATE_NULL);
+		gst_object_unref(this->souphttpsrc);
+
+		gst_object_unref(G_OBJECT(this->clock));
+
+		gst_deinit();
+	}
 }

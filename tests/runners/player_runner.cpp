@@ -19,6 +19,8 @@
 #include <radiotray-ng/config/config.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
 #include <radiotray-ng/notification/notification.hpp>
+#include <mutex>
+#include <condition_variable>
 #include <iostream>
 #include <iomanip>
 #include <sstream>

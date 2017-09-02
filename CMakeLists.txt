@@ -17,7 +17,7 @@ project(radiotray-ng CXX)
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 6)
+set(PROJECT_VERSION_PATCH 7)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -47,7 +47,9 @@ if (NOT APPLE)
 endif(NOT APPLE)
 
 # flags
-add_definitions("-std=c++11 -DBOOST_LOG_DYN_LINK")
+set(CMAKE_CXX_STANDARD 11)
+add_definitions("-DBOOST_LOG_DYN_LINK")
+add_compile_options("-fdiagnostics-color=auto")
 set(warnings "-Wall -Wextra -Werror")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
@@ -64,12 +66,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_D
 
 # notification & ncurses based on platform
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    pkg_search_module(APPINDICATOR REQUIRED appindicator-0.1)
+    pkg_search_module(APPINDICATOR REQUIRED appindicator3-0.1)
 if (NOT APPINDICATOR_FOUND)
     pkg_search_module(NCURSES      REQUIRED ncurses)
 endif()
     pkg_search_module(NOTIFY       REQUIRED libnotify)
-    pkg_search_module(GIO          REQUIRED gio-2.0)
+    pkg_search_module(GLIBMM       REQUIRED glibmm-2.4)
+    pkg_search_module(GIOMM        REQUIRED giomm-2.4)
 else()
     set(NCURSES_FOUND true)
     set(NCURSES_LIBRARIES ncurses)
@@ -90,14 +93,16 @@ add_subdirectory(src/radiotray-ng/bookmarks)
 add_subdirectory(src/radiotray-ng/event_bus)
 add_subdirectory(src/radiotray-ng/player)
 add_subdirectory(src/radiotray-ng/notification)
-add_subdirectory(src/radiotray-ng/media_keys)
+add_subdirectory(src/radiotray-ng/extras/media_keys)
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    add_subdirectory(src/radiotray-ng/extras/rtng_dbus)
+    target_compile_definitions(radiotray-ng PRIVATE RTNG_DBUS)
+endif()
 add_subdirectory(tests/runners/) # test apps
 
 # which gui?
 if (APPINDICATOR_FOUND)
     target_compile_definitions(radiotray-ng PRIVATE APPINDICATOR_GUI)
-    target_compile_definitions(media_keys PRIVATE APPINDICATOR_GUI)
-    target_compile_definitions(player PRIVATE APPINDICATOR_GUI)
     add_subdirectory(src/radiotray-ng/gui/appindicator)
     add_subdirectory(debian)
 else()

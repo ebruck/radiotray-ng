@@ -19,6 +19,7 @@
 
 #include <radiotray-ng/i_gui.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
+#include <radiotray-ng/file_monitor.hpp>
 
 #include <gtk/gtk.h>
 #include <libappindicator/app-indicator.h>
@@ -56,8 +57,10 @@ private:
 	static void on_station_menu_item(GtkWidget* widget, gpointer data);
 	static void on_action_menu_item(GtkWidget* widget, gpointer data);
 	static void on_reload_bookmarks_menu_item(GtkWidget* widget, gpointer data);
+	static void on_bookmark_editor_menu_item(GtkWidget* widget, gpointer data);
 	static void on_sleep_timer_menu_item(GtkWidget* widget, gpointer data);
 	static gboolean on_timer_event(gpointer data);
+	static gboolean on_file_monitor_timer_event(gpointer data);
 	static void on_indicator_scrolled(GtkWidget* w, gint delta ,GdkScrollDirection direction, gpointer data);
 
 	void build_menu();
@@ -75,10 +78,9 @@ private:
 
 	bool sleep_timer_dialog();
 
-	void gtk_loop(int argc, char* argv[]);
-
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IBookmarks>   bookmarks;
+	std::unique_ptr<radiotray_ng::FileMonitor> bookmarks_monitor;
 	std::shared_ptr<IConfig>      config;
 	std::shared_ptr<IEventBus>    event_bus;
 
@@ -101,6 +103,8 @@ private:
 	GtkWidget*        status_menu_item;
 	GtkCheckMenuItem* sleep_timer_menu_item;
 	guint             sleep_timer_id;
+	guint             file_monitor_timer_id;
 	std::string       resource_path;
 	bool              ignore_sleep_timer_toggle{false};
+
 };

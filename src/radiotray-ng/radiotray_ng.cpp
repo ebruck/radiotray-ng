@@ -22,11 +22,12 @@
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
+#include <json/json.h>
 #include <cmath>
 
 
 RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookmarks> bookmarks,
-	                     std::shared_ptr<IPlayer> player, std::shared_ptr<IEventBus> event_bus)
+	std::shared_ptr<IPlayer> player, std::shared_ptr<IEventBus> event_bus)
 	: config(std::move(config))
 	, bookmarks(std::move(bookmarks))
 	, player(std::move(player))
@@ -141,6 +142,33 @@ std::string RadiotrayNG::get_volume()
 
 	return this->volume;
 }
+
+
+std::string RadiotrayNG::get_bookmarks()
+{
+	return this->bookmarks->dump();
+}
+
+
+std::string RadiotrayNG::get_player_state()
+{
+	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
+
+	Json::Value value;
+
+	value[DBUS_MSG_STATE_KEY]   = this->state;
+	value[DBUS_MSG_VOLUME_KEY]  = this->volume;
+	value[DBUS_MSG_TITLE_KEY]   = this->title;
+	value[DBUS_MSG_ARTIST_KEY]  = this->artist;
+	value[DBUS_MSG_STATION_KEY] = this->station;
+	value[DBUS_MSG_GROUP_KEY]   = this->group;
+	value[DBUS_MSG_CODEC_KEY]   = this->codec;
+	value[DBUS_MSG_BITRATE_KEY] = this->bitrate;
+	value[DBUS_MSG_IMAGE_KEY]   = radiotray_ng::word_expand(this->notification_image);
+
+	return value.toStyledString();
+}
+
 
 
 void RadiotrayNG::set_title(const std::string& title)

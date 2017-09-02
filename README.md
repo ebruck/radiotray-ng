@@ -28,6 +28,8 @@ The version here is what "I" wanted out of RadioTray.
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
+* Dbus interface for controlling Radiotray-NG and accessing stream meta data
+* --play command line option for resuming playback
 
 ## Future: ##
 
@@ -70,6 +72,8 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
    "compact-menu" : false,
    "debug-logging" : false,
+   "file-monitor" : true,
+   "file-monitor-interval" : 30,
    "last-station" : "",
    "last-station-group" : "",
    "notification-verbose" : true,
@@ -94,6 +98,8 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
                  bookmarks: location of bookmarks file
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
+              file-monitor: enable/disable notifcation of bookmark file changes
+     file-monitor-interval: time in seconds to poll for bookmark file changes
       notification-verbose: more status information than normal
              notifications: turns on/off notification messages
                sleep-timer: value is in minutes
@@ -160,12 +166,43 @@ The rt2rtng script will convert your RadioTray bookmarks.xml file. All groups wi
 $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
+## DBus Interface ##
+
+```
+Available commands:
+
+    volume_up
+    volume_down
+    play
+    stop
+    previous_station
+    next_station
+    get_bookmarks
+    get_player_state
+    play_station 'group' 'station'
+```
+```
+Example:
+
+$ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.get_player_state
+{
+   "artist" : "Suspense",
+   "bitrate" : "24 kb/s",
+   "codec" : "MPEG-1 Layer 3 (MP3)",
+   "group" : "Old Time Radio",
+   "image" : "radiotray-ng-notification",
+   "state" : "playing",
+   "station" : "AM 1710 Antioch OTR",
+   "title" : "Jul 15, 1948: Summer Night w/Ida Lupino",
+   "volume" : "15"
+}
+```
 
 ## To Build on Ubuntu: ##
 
 Install these packages:
 ```
-libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev cmake
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
 ```
 
 
@@ -193,5 +230,5 @@ $ sudo apt-get install -f
 
 Install these packages:
 ```
-gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator-devel gstreamer-devel boost-devel gstreamer1-devel
+gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator3-devel gstreamer-devel boost-devel gstreamer1-devel
 ```

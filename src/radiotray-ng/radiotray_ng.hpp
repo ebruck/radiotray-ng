@@ -91,6 +91,10 @@ public:
 
 	void previous_station_msg();
 
+	std::string get_bookmarks();
+
+	std::string get_player_state();
+
 private:
 	std::shared_ptr<IConfig>    config;
 	std::shared_ptr<IBookmarks> bookmarks;

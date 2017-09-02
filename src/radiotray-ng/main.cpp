@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/pidfile.hpp>
 #include <radiotray-ng/helpers.hpp>
@@ -22,13 +23,18 @@
 #include <radiotray-ng/config/config.hpp>
 #include <radiotray-ng/player/player.hpp>
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
-#include <radiotray-ng/gui/ncurses/ncurses_gui.hpp>
 #include <radiotray-ng/config/config.hpp>
-#include <radiotray-ng/media_keys/media_keys.hpp>
+#include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <rtng_user_agent.hpp>
 
 #ifdef APPINDICATOR_GUI
 #include <radiotray-ng/gui/appindicator/appindicator_gui.hpp>
+#else
+#include <radiotray-ng/gui/ncurses/ncurses_gui.hpp>
+#endif
+
+#ifdef RTNG_DBUS
+#include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
 #endif
 
 #include <boost/filesystem.hpp>
@@ -189,10 +195,13 @@ int main(int argc, char* argv[])
 	auto gui(std::make_shared<NCursesGui>(radiotray_ng, event_bus));
 #endif
 
+#ifdef RTNG_DBUS
+	RtngDbus dbus(radiotray_ng);
+#endif
+
 	// addons etc.
 	MediaKeys mm(radiotray_ng, config);
 
-	// todo: support start playing passed group/station...
 	gui->run(argc, argv);
 
 	LOG(info) << APP_NAME << " shutting down";

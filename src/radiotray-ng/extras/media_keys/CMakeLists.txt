@@ -7,5 +7,5 @@ endif()
 add_library(media_keys STATIC ${SRC_FILES})
 
 # todo: if appindicator add the includes
-target_link_libraries(media_keys ${APPINDICATOR_GUI})
-target_include_directories(media_keys PRIVATE ${GIO_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} )
+target_link_libraries(media_keys ${APPINDICATOR_GUI} ${GIOMM_LIBRARIES})
+target_include_directories(media_keys PRIVATE ${GIOMM_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} )
