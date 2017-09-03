@@ -17,9 +17,13 @@ endif()
 
 find_program(GIT_EXECUTABLE NAMES git)
 
+set(RTNG_GIT_VERSION "")
+
 if (GIT_EXECUTABLE)
     execute_process(COMMAND git describe --tags --dirty OUTPUT_VARIABLE RTNG_GIT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-else()
+endif()
+
+if (NOT RTNG_GIT_VERSION)
     set(RTNG_GIT_VERSION "v${PROJECT_VERSION}-unknown")
 endif()
 
