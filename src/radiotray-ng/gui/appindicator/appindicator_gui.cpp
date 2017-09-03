@@ -225,9 +225,9 @@ void AppindicatorGui::add_separator(GtkWidget* menu)
 {
 	if (!this->config->get_bool(COMPACT_MENU_KEY, DEFAULT_COMPACT_MENU_VALUE))
 	{
-		GtkWidget* menu_items = gtk_menu_item_new();
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_items);
-		gtk_widget_show(menu_items);
+		GtkWidget* menu_item = gtk_separator_menu_item_new();
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+		gtk_widget_show(menu_item);
 	}
 }
 
@@ -597,10 +597,18 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer /*data*
 		NULL,
 	};
 
+	std::string version{"v" RTNG_VERSION};
+
+	// if git version differs, then append hash...
+	if (version != RTNG_GIT_VERSION)
+	{
+		version += "\n(" RTNG_GIT_VERSION ")";
+	}
+
 	auto dialog = g_object_new(GTK_TYPE_ABOUT_DIALOG
 		, "program-name", APP_NAME_DISPLAY
 		, "license-type", GTK_LICENSE_GPL_3_0
-		, "version", RTNG_GIT_VERSION
+		, "version", version.c_str()
 		, "copyright", APP_COPYRIGHT
 		, "website", APP_WEBSITE
 		, "authors", authors
