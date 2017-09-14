@@ -361,6 +361,19 @@ void Player::gst_start()
 		return;
 	}
 
+	GstElement* audio_sink;
+	if ((audio_sink = gst_element_factory_make("autoaudiosink", "audio-sink")) == nullptr)
+	{
+		LOG(error) << "could not create autoaudiosink element";
+
+		gst_object_unref(this->pipeline);
+		gst_object_unref(this->souphttpsrc);
+		gst_deinit();
+		return;
+	}
+
+	g_object_set(this->pipeline, "audio-sink", audio_sink, NULL);
+
 	// set buffer size & volume
 	if (this->config)
 	{
