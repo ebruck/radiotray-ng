@@ -387,35 +387,22 @@ void AppindicatorGui::build_preferences_menu()
 }
 
 
-void AppindicatorGui::build_menu()
+void AppindicatorGui::build_sleep_timer_menu_item()
 {
-	this->menu = gtk_menu_new();
-
-	// action (play/stop)
-	this->build_action_menu_item();
-
-	// status (tags)
-	this->build_status_menu_item();
-
-	// volume etc.
-	this->build_volume_menu_item();
-
-	// bookmarks
-	this->build_bookmarks_menu_item();
-
-	// preferences
-	this->build_preferences_menu();
-
 	// add sleep timer
 	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
 
 	// toggle before we hook up callback as a reload loses this state...
 	gtk_check_menu_item_set_active(this->sleep_timer_menu_item, this->sleep_timer_id);
 
-	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
-	g_signal_connect(G_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
-	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), (GtkWidget *) this->sleep_timer_menu_item);
+	g_signal_connect(G_OBJECT((GtkWidget *) this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
+	gtk_widget_show((GtkWidget *) this->sleep_timer_menu_item);
+}
 
+
+void AppindicatorGui::build_about_menu_item()
+{
 	// about etc.
 	this->add_separator(this->menu);
 
@@ -428,6 +415,59 @@ void AppindicatorGui::build_menu()
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", GCallback(gtk_main_quit), nullptr);
 	gtk_widget_show(menu_items);
+}
+
+
+void AppindicatorGui::build_menu()
+{
+	this->menu = gtk_menu_new();
+
+	if (!this->config->get_bool(INVERT_MENU_KEY, DEFAULT_INVERT_MENU_VALUE))
+	{
+		// action (play/stop)
+		this->build_action_menu_item();
+
+		// status (tags)
+		this->build_status_menu_item();
+
+		// volume etc.
+		this->build_volume_menu_item();
+
+		// bookmarks
+		this->build_bookmarks_menu_item();
+
+		// preferences
+		this->build_preferences_menu();
+
+		// sleep timer
+		this->build_sleep_timer_menu_item();
+
+		// about
+		this->build_about_menu_item();
+	}
+	else
+	{
+		// about
+		this->build_about_menu_item();
+
+		// sleep timer
+		this->build_sleep_timer_menu_item();
+
+		// preferences
+		this->build_preferences_menu();
+
+		// bookmarks
+		this->build_bookmarks_menu_item();
+
+		// volume etc.
+		this->build_volume_menu_item();
+
+		// status (tags)
+		this->build_status_menu_item();
+
+		// action (play/stop)
+		this->build_action_menu_item();
+	}
 
 	app_indicator_set_menu(appindicator, GTK_MENU(this->menu));
 }

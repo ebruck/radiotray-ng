@@ -71,6 +71,7 @@ using playlist_t = std::vector<std::string>;
 #define FILE_MONITOR_KEY                  "file-monitor"
 #define FILE_MONITOR_INTERVAL_KEY         "file-monitor-interval"
 #define HTTP_TIMEOUT_KEY                  "http-timeout"
+#define INVERT_MENU_KEY                   "invert-menu"
 #define LAST_STATION_GROUP_KEY            "last-station-group"
 #define LAST_STATION_KEY                  "last-station"
 #define MEDIA_KEY_MAPPING_KEY             "media-key-mapping"
@@ -113,6 +114,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_FILE_MONITOR_VALUE               (true)
 #define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (30)
 #define DEFAULT_HTTP_TIMEOUT_VALUE               (15)
+#define DEFAULT_INVERT_MENU_VALUE                (false)
 #define DEFAULT_MEDIA_KEY_MAPPING_VALUE          (false)
 #define DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE     "Next"
 #define DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE "Previous"

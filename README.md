@@ -74,6 +74,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "debug-logging" : false,
    "file-monitor" : true,
    "file-monitor-interval" : 30,
+   "invert-menu" : false,
    "last-station" : "",
    "last-station-group" : "",
    "notification-verbose" : true,
@@ -100,6 +101,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
              debug-logging: enable/disable verbose debug logging
               file-monitor: enable/disable notifcation of bookmark file changes
      file-monitor-interval: time in seconds to poll for bookmark file changes
+              invert-menu : menu rendered in reverse order
       notification-verbose: more status information than normal
              notifications: turns on/off notification messages
                sleep-timer: value is in minutes
