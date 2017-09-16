@@ -36,7 +36,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 # search for libs
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(Boost     REQUIRED filesystem system log)
+find_package(Boost     REQUIRED filesystem system log program_options)
 find_package(GMock)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
@@ -47,7 +47,7 @@ if (NOT APPLE)
 endif(NOT APPLE)
 
 # flags
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
 set(warnings "-Wall -Wextra -Werror")
