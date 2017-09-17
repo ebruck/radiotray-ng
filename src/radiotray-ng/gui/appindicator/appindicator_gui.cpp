@@ -403,15 +403,16 @@ void AppindicatorGui::build_sleep_timer_menu_item()
 
 void AppindicatorGui::build_about_menu_item()
 {
-	// about etc.
-	this->add_separator(this->menu);
-
 	auto menu_items = gtk_menu_item_new_with_label("About");
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", G_CALLBACK(&AppindicatorGui::on_about_menu_item), this);
 	gtk_widget_show(menu_items);
+}
 
-	menu_items = gtk_menu_item_new_with_label("Quit");
+
+void AppindicatorGui::build_quit_menu_item()
+{
+	auto menu_items = gtk_menu_item_new_with_label("Quit");
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", GCallback(gtk_main_quit), nullptr);
 	gtk_widget_show(menu_items);
@@ -442,14 +443,17 @@ void AppindicatorGui::build_menu()
 		// sleep timer
 		this->build_sleep_timer_menu_item();
 
-		// about
-		this->build_about_menu_item();
-	}
-	else
-	{
+		// about etc.
+		this->add_separator(this->menu);
+
 		// about
 		this->build_about_menu_item();
 
+		// quit
+		this->build_quit_menu_item();
+	}
+	else
+	{
 		// sleep timer
 		this->build_sleep_timer_menu_item();
 
@@ -467,6 +471,15 @@ void AppindicatorGui::build_menu()
 
 		// action (play/stop)
 		this->build_action_menu_item();
+
+		// about etc.
+		this->add_separator(this->menu);
+
+		// about
+		this->build_about_menu_item();
+
+		// quit
+		this->build_quit_menu_item();
 	}
 
 	app_indicator_set_menu(appindicator, GTK_MENU(this->menu));
