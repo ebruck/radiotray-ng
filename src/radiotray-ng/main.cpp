@@ -20,7 +20,6 @@
 #include <radiotray-ng/pidfile.hpp>
 #include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
-#include <radiotray-ng/config/config.hpp>
 #include <radiotray-ng/player/player.hpp>
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
 #include <radiotray-ng/config/config.hpp>
@@ -212,7 +211,7 @@ int main(int argc, char* argv[])
 {
 	if (!process_command_line_args(argc, argv))
 	{
-		return 1;
+		return 0;
 	}
 
 	std::string config_path;

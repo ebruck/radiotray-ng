@@ -22,10 +22,6 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <rtng_user_agent.hpp>
 
-#include <boost/filesystem.hpp>
-
-namespace fs = boost::filesystem;
-
 
 AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_ptr<IRadioTrayNG> radiotray_ng,
 	                             std::shared_ptr<IBookmarks> bookmarks, std::shared_ptr<IEventBus> event_bus)
