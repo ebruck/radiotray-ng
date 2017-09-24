@@ -36,7 +36,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 # search for libs
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(Boost     REQUIRED filesystem system log program_options)
+find_package(Boost     REQUIRED filesystem system log program_options thread)
 find_package(GMock)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
