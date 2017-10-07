@@ -338,7 +338,6 @@ void AppindicatorGui::build_action_menu_item()
 
 	g_signal_connect(G_OBJECT(this->action_menu_item), "activate", G_CALLBACK(on_action_menu_item), gpointer(this));
 
-	// doesn't seem to work all the time?!
 	app_indicator_set_secondary_activate_target(this->appindicator, this->action_menu_item);
 
 	this->update_action_menu_item(STATE_STOPPED);
