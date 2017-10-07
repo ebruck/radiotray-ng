@@ -18,7 +18,6 @@
 #include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/helpers.hpp>
-#include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
@@ -335,7 +334,10 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			// way too many messages...
+
+			//this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+
 			return;
 		}
 

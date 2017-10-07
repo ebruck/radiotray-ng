@@ -22,10 +22,6 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <rtng_user_agent.hpp>
 
-#include <boost/filesystem.hpp>
-
-namespace fs = boost::filesystem;
-
 
 AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_ptr<IRadioTrayNG> radiotray_ng,
 	                             std::shared_ptr<IBookmarks> bookmarks, std::shared_ptr<IEventBus> event_bus)
@@ -225,9 +221,9 @@ void AppindicatorGui::add_separator(GtkWidget* menu)
 {
 	if (!this->config->get_bool(COMPACT_MENU_KEY, DEFAULT_COMPACT_MENU_VALUE))
 	{
-		GtkWidget* menu_items = gtk_menu_item_new();
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_items);
-		gtk_widget_show(menu_items);
+		GtkWidget* menu_item = gtk_separator_menu_item_new();
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+		gtk_widget_show(menu_item);
 	}
 }
 
@@ -342,6 +338,8 @@ void AppindicatorGui::build_action_menu_item()
 
 	g_signal_connect(G_OBJECT(this->action_menu_item), "activate", G_CALLBACK(on_action_menu_item), gpointer(this));
 
+	app_indicator_set_secondary_activate_target(this->appindicator, this->action_menu_item);
+
 	this->update_action_menu_item(STATE_STOPPED);
 }
 
@@ -384,47 +382,100 @@ void AppindicatorGui::build_preferences_menu()
 }
 
 
-void AppindicatorGui::build_menu()
+void AppindicatorGui::build_sleep_timer_menu_item()
 {
-	this->menu = gtk_menu_new();
-
-	// action (play/stop)
-	this->build_action_menu_item();
-
-	// status (tags)
-	this->build_status_menu_item();
-
-	// volume etc.
-	this->build_volume_menu_item();
-
-	// bookmarks
-	this->build_bookmarks_menu_item();
-
-	// preferences
-	this->build_preferences_menu();
-
 	// add sleep timer
 	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
 
 	// toggle before we hook up callback as a reload loses this state...
 	gtk_check_menu_item_set_active(this->sleep_timer_menu_item, this->sleep_timer_id);
 
-	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), (GtkWidget*)this->sleep_timer_menu_item);
-	g_signal_connect(G_OBJECT((GtkWidget*)this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
-	gtk_widget_show((GtkWidget*)this->sleep_timer_menu_item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), (GtkWidget *) this->sleep_timer_menu_item);
+	g_signal_connect(G_OBJECT((GtkWidget *) this->sleep_timer_menu_item), "activate", G_CALLBACK(on_sleep_timer_menu_item), gpointer(this));
+	gtk_widget_show((GtkWidget *) this->sleep_timer_menu_item);
+}
 
-	// about etc.
-	this->add_separator(this->menu);
 
+void AppindicatorGui::build_about_menu_item()
+{
 	auto menu_items = gtk_menu_item_new_with_label("About");
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", G_CALLBACK(&AppindicatorGui::on_about_menu_item), this);
 	gtk_widget_show(menu_items);
+}
 
-	menu_items = gtk_menu_item_new_with_label("Quit");
+
+void AppindicatorGui::build_quit_menu_item()
+{
+	auto menu_items = gtk_menu_item_new_with_label("Quit");
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", GCallback(gtk_main_quit), nullptr);
 	gtk_widget_show(menu_items);
+}
+
+
+void AppindicatorGui::build_menu()
+{
+	this->menu = gtk_menu_new();
+
+	if (!this->config->get_bool(INVERT_MENU_KEY, DEFAULT_INVERT_MENU_VALUE))
+	{
+		// action (play/stop)
+		this->build_action_menu_item();
+
+		// status (tags)
+		this->build_status_menu_item();
+
+		// volume etc.
+		this->build_volume_menu_item();
+
+		// bookmarks
+		this->build_bookmarks_menu_item();
+
+		// preferences
+		this->build_preferences_menu();
+
+		// sleep timer
+		this->build_sleep_timer_menu_item();
+
+		// about etc.
+		this->add_separator(this->menu);
+
+		// about
+		this->build_about_menu_item();
+
+		// quit
+		this->build_quit_menu_item();
+	}
+	else
+	{
+		// sleep timer
+		this->build_sleep_timer_menu_item();
+
+		// preferences
+		this->build_preferences_menu();
+
+		// bookmarks
+		this->build_bookmarks_menu_item();
+
+		// volume etc.
+		this->build_volume_menu_item();
+
+		// status (tags)
+		this->build_status_menu_item();
+
+		// action (play/stop)
+		this->build_action_menu_item();
+
+		// about etc.
+		this->add_separator(this->menu);
+
+		// about
+		this->build_about_menu_item();
+
+		// quit
+		this->build_quit_menu_item();
+	}
 
 	app_indicator_set_menu(appindicator, GTK_MENU(this->menu));
 }
@@ -597,10 +648,18 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer /*data*
 		NULL,
 	};
 
+	std::string version{"v" RTNG_VERSION};
+
+	// if git version differs, then append hash...
+	if (version != RTNG_GIT_VERSION)
+	{
+		version += "\n(" RTNG_GIT_VERSION ")";
+	}
+
 	auto dialog = g_object_new(GTK_TYPE_ABOUT_DIALOG
 		, "program-name", APP_NAME_DISPLAY
 		, "license-type", GTK_LICENSE_GPL_3_0
-		, "version", RTNG_GIT_VERSION
+		, "version", version.c_str()
 		, "copyright", APP_COPYRIGHT
 		, "website", APP_WEBSITE
 		, "authors", authors

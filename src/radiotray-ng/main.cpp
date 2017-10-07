@@ -20,7 +20,6 @@
 #include <radiotray-ng/pidfile.hpp>
 #include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
-#include <radiotray-ng/config/config.hpp>
 #include <radiotray-ng/player/player.hpp>
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
 #include <radiotray-ng/config/config.hpp>
@@ -42,6 +41,7 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/program_options.hpp>
 
 
 void init_logging()
@@ -146,8 +146,74 @@ bool create_data_dir(std::string& config_path)
 }
 
 
+bool process_command_line_args(int argc, char* argv[])
+{
+	try
+	{
+		namespace po = boost::program_options;
+
+		po::options_description desc("Options");
+
+		desc.add_options()
+			("help",    "Shows this information")
+			("version", "Show the application's version")
+			("play",    "Resume playback");
+
+		po::variables_map vm;
+
+		try
+		{
+			po::store(po::parse_command_line(argc, argv, desc), vm);
+
+			if (vm.count("help"))
+			{
+				std::cout << "Usage:" << std::endl
+					<< "  " << APP_NAME << " [OPTION]" << std::endl
+					<< std::endl << desc << std::endl;
+				return false;
+			}
+
+			if (vm.count("version"))
+			{
+				// same as about box...
+				std::string version{"v" RTNG_VERSION};
+
+				// if git version differs, then append hash...
+				if (version != RTNG_GIT_VERSION)
+				{
+					version += " (" RTNG_GIT_VERSION ")";
+				}
+
+				std::cout << APP_NAME_DISPLAY << ": " << version << std::endl;
+				return false;
+			}
+
+			po::notify(vm);
+		}
+		catch(po::error& e)
+		{
+			std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+			std::cerr << desc << std::endl;
+			return false;
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::cerr << "Unhandled Exception: " << e.what() << ", application will now exit" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+
 int main(int argc, char* argv[])
 {
+	if (!process_command_line_args(argc, argv))
+	{
+		return 0;
+	}
+
 	std::string config_path;
 	if (!create_data_dir(config_path))
 	{

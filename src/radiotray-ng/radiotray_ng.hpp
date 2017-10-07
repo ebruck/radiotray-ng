@@ -21,13 +21,15 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
-#include <condition_variable>
+
+#include <mutex>
 #include <memory>
 #include <string>
 #include <vector>
 
 class IConfig;
 class IPlayer;
+class IBookmarks;
 
 
 class RadiotrayNG final : public IRadioTrayNG

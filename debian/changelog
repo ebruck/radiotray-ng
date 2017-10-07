@@ -1,3 +1,16 @@
+radiotray-ng (0.1.8) unstable; urgency=low
+
+      * Added icon middle click support for starting/stopping playback
+      * Added command line help etc.
+      * Added invert-menu configuration option for bottom dock users
+      * Added Bluegrass station to default bookmark file
+      * Fixed wrong api used for menu separators
+      * Fixed output not using autoaudiosink
+      * Reduced notifications if player buffers
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 07 Oct 2017 11:00:07 -0700
+
+
 radiotray-ng (0.1.7) unstable; urgency=low
 
       * Added dbus interface
