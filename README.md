@@ -55,6 +55,7 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screenshot_4.png)
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
+![Screenshot](images/screenshot_7.png)
 
 
 ## Install ##
