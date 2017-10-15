@@ -27,12 +27,8 @@
 
 #include "editor_frame.hpp"
 
-#include <radiotray-ng/pidfile.hpp>
-
-
 #define	PROJECT_NAME			"Radiotray-NG"
 #define	APPLICATION_NAME		"Bookmark Editor"
-#define	APPLICATION_VERSION		"1.0"
 #define APPLICATION_PID_NAME	"rtng-bookmark-editor.pid"
 
 
@@ -55,7 +51,6 @@ private:
 	EditorFrame* frame;
 	std::string file_to_load;
 
-	std::unique_ptr<radiotray_ng::Pidfile> pid;
 	std::unique_ptr<wxSingleInstanceChecker> instance_checker;
 	std::shared_ptr<wxConfig> config;
 	std::string resource_path;

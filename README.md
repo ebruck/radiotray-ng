@@ -33,11 +33,10 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Future: ##
 
-* Cross platform bookmark editor application. (Work is underway. Thanks Mike!) 
+* ~~Cross platform bookmark editor application.~~
 * Finish ncurses interface
 * Mac support (icons, menu, media keys etc.) (I need help here.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
-* Better handling of any JSON parsing errors.
 
 **Icons:** [http://www.iconsplace.com/]
 **License:** Creative Commons Attribution-NoDerivs 3.0 Unported
@@ -53,9 +52,9 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screenshot_2.png)
 ![Screenshot](images/screenshot_3.png)
 ![Screenshot](images/screenshot_4.png)
+![Screenshot](images/screenshot_7.png)
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
-![Screenshot](images/screenshot_7.png)
 
 
 ## Install ##

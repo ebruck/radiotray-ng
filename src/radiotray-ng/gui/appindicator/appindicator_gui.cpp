@@ -701,7 +701,6 @@ void AppindicatorGui::run(int argc, char* argv[])
 
 	this->build_menu();
 
-	// todo: use boost's program options...
 	if (argc > 1)
 	{
 		if (std::string(argv[1]) == "--play")

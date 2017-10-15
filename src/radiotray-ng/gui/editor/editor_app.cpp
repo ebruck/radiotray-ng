@@ -35,11 +35,6 @@
 wxIMPLEMENT_APP(EditorApp);
 
 
-namespace
-{
-}
-
-
 EditorApp::EditorApp() :
 	frame(nullptr),
 	resource_path(RTNG_DEFAULT_INSTALL_DIR)
@@ -72,10 +67,10 @@ EditorApp::OnInit()
 {
 	this->instance_checker = std::make_unique<wxSingleInstanceChecker>(APPLICATION_PID_NAME, radiotray_ng::get_data_dir(APP_NAME));
 	if (this->instance_checker->IsAnotherRunning())
-    {
+	{
 		wxLogError(_("Another instance is already running, aborting."));
-        return false;
-    }
+		return false;
+	}
 
 	wxInitAllImageHandlers();
 
@@ -88,16 +83,14 @@ EditorApp::OnInit()
 	local_file += wxApp::GetAppName().ToStdString();
 	local_file += ".cfg";
 
-	config = std::make_unique<wxConfig>(wxApp::GetAppName(),
+	this->config = std::make_unique<wxConfig>(wxApp::GetAppName(),
 										APP_NAME,
 										local_file,
 										wxEmptyString,
 										wxCONFIG_USE_LOCAL_FILE);
-	config->SetRecordDefaults();
+	this->config->SetRecordDefaults();
 
-	std::string title = PROJECT_NAME;
-	title += " ";
-	title += APPLICATION_NAME;
+	std::string title = PROJECT_NAME " " APPLICATION_NAME;
 
     this->frame = new EditorFrame(nullptr, title, this->file_to_load);
 
