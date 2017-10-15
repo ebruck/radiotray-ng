@@ -71,6 +71,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
+   "bookmark-editor" : "rtng-bookmark-editor",
    "compact-menu" : false,
    "debug-logging" : false,
    "file-monitor" : true,
@@ -98,6 +99,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 ```
                  bookmarks: location of bookmarks file
+           bookmark-editor: bookmark editor to launch
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
               file-monitor: enable/disable notifcation of bookmark file changes
@@ -205,7 +207,7 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
 
 Install these packages:
 ```
-libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5-dbg cmake
 ```
 
 

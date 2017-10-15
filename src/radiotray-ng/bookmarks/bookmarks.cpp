@@ -63,22 +63,31 @@ bool Bookmarks::load()
 }
 
 
-bool Bookmarks::save()
+bool Bookmarks::save(const std::string& new_filename)
 {
-	LOG(info) << "saving: " << this->bookmarks_file;
+	std::string filename = this->bookmarks_file;
+
+	if (!new_filename.empty())
+	{
+		filename = radiotray_ng::word_expand(new_filename);
+	}
+
+	LOG(info) << "saving: " << filename;
 
 	try
 	{
-		std::ofstream ofile(this->bookmarks_file);
+		std::ofstream ofile(filename);
 		ofile.exceptions(std::ios::failbit);
 
 		ofile << Json::StyledWriter().write(this->bookmarks);
 	}
 	catch(std::exception& /*e*/)
 	{
-		LOG(error) << "Failed to save: " << this->bookmarks_file << " : "<< strerror(errno);
+		LOG(error) << "Failed to save: " << filename << " : "<< strerror(errno);
 		return false;
 	}
+
+	this->bookmarks_file = filename;
 
 	return true;
 }
@@ -446,3 +455,77 @@ std::string Bookmarks::dump()
 {
 	return this->bookmarks.toStyledString();
 }
+
+
+bool Bookmarks::get_group_as_json(const std::string& group_name, std::string& json)
+{
+	Json::ArrayIndex group_index;
+
+	if (this->find_group(group_name, group_index))
+	{
+		json = Json::StyledWriter().write(this->bookmarks[Json::ArrayIndex(group_index)]);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool Bookmarks::get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json)
+{
+	Json::ArrayIndex group_index;
+
+	if (this->find_group(group_name, group_index))
+	{
+		Json::ArrayIndex station_index;
+		if (this->find_station(group_index, station_name, station_index))
+		{
+			json = Json::StyledWriter().write(this->bookmarks[group_index][STATIONS_KEY][station_index]);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool Bookmarks::add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name)
+{
+	// first, validate the station
+	Json::Reader reader;
+	Json::Value station;
+
+	if (!reader.parse(json, station))
+	{
+		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << reader.getFormattedErrorMessages();
+		return false;
+	}
+
+	if (station.isMember(STATION_NAME_KEY) == false ||
+		station.isMember(STATION_URL_KEY) == false ||
+		station.isMember(STATION_IMAGE_KEY) == false)
+	{
+		LOG(warning) << "Insufficient station data ...\n<<" << json << "<<";
+		return false;
+	}
+
+	Json::ArrayIndex group_index;
+	if (this->find_group(group_name, group_index) == false)
+	{
+		LOG(error) << "Failed to find group: " << group_name;
+		return false;
+	}
+
+	Json::ArrayIndex station_index;
+	if (this->find_station(group_index, station[STATION_NAME_KEY].asString(), station_index))
+	{
+		LOG(warning) << "Station <<" << station[STATION_NAME_KEY].asString() << "already exists!";
+		return false;
+	}
+
+	this->bookmarks[group_index][STATIONS_KEY].append(station);
+	station_name = station[STATION_NAME_KEY].asString();
+
+	return true;
+}
+

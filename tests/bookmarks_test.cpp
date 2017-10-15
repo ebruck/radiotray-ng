@@ -70,6 +70,46 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 		ASSERT_TRUE(stations[0].name == "name");
 		ASSERT_TRUE(stations[0].url == "url");
 		ASSERT_TRUE(stations[0].image == "image");
+
+		// test json
+		std::string json_str;
+		{
+			EXPECT_TRUE(bm.get_group_as_json(GROUP_A, json_str));
+			Json::Value json;
+			Json::Reader reader;
+			reader.parse(json_str, json);
+
+			EXPECT_EQ(json["group"].asString(), GROUP_A);
+			EXPECT_EQ(json["image"].asString(), GROUP_IMAGE_A);
+			EXPECT_EQ(json["stations"].size(), size_t(1));
+			EXPECT_EQ(json["stations"][0]["image"].asString(), "image");
+			EXPECT_EQ(json["stations"][0]["name"].asString(), "name");
+			EXPECT_EQ(json["stations"][0]["url"].asString(), "url");
+		}
+		json_str.clear();
+
+		// json station
+		{
+			EXPECT_FALSE(bm.get_station_as_json(GROUP_A, "Name", json_str));
+
+			json_str =
+			"{"
+				"\"name\" : \"name_json\","
+				"\"image\" : \"image_json\","
+				"\"url\" : \"url_json\""
+			"}";
+
+			std::string station_name;
+			EXPECT_TRUE(bm.add_station_from_json(GROUP_A, json_str, station_name));
+			EXPECT_TRUE(bm.get_station_as_json(GROUP_A, station_name, json_str));
+			Json::Value json;
+			Json::Reader reader;
+			reader.parse(json_str, json);
+
+			EXPECT_EQ(json["image"].asString(), "image_json");
+			EXPECT_EQ(json["name"].asString(), "name_json");
+			EXPECT_EQ(json["url"].asString(), "url_json");
+		}
 	}
 
 	EXPECT_EQ(bm[0].group, GROUP_A);
@@ -81,6 +121,9 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 	EXPECT_EQ(bm[0].image, GROUP_IMAGE_B);
 	ASSERT_TRUE(bm.remove_group(GROUP_B));
 	ASSERT_TRUE(bm.remove_group(GROUP_C));
+	std::string tmp_json;
+	ASSERT_FALSE(bm.get_group_as_json(GROUP_C, tmp_json));
+	ASSERT_TRUE(tmp_json.empty());
 	EXPECT_EQ(bm.size(), size_t(0));
 	EXPECT_THROW(bm[100], std::out_of_range);
 }

@@ -31,7 +31,7 @@ public:
 
 	bool load();
 
-	bool save();
+	bool save(const std::string& new_filename = "");
 
 	bool add_group(const std::string& group_name, const std::string& image);
 
@@ -60,6 +60,12 @@ public:
 
 	bool get_group_stations(const std::string& group_name, std::vector<IBookmarks::station_data_t>& station_data);
 
+	bool get_group_as_json(const std::string& group_name, std::string& json);
+
+	bool get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json);
+
+	bool add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name);
+
 	IBookmarks::group_data_t operator[](const size_t index);
 
 	size_t size();
@@ -84,5 +90,5 @@ private:
 	bool array_search(Json::Value& array, const std::string& key, const std::string& value, Json::ArrayIndex& index);
 
 	Json::Value bookmarks;
-	const std::string bookmarks_file;
+	std::string bookmarks_file;
 };

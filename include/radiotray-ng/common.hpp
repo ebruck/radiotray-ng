@@ -65,6 +65,7 @@ using playlist_t = std::vector<std::string>;
 
 // config keys
 #define BOOKMARKS_KEY                     "bookmarks"
+#define BOOKMARK_EDITOR_KEY               "bookmark-editor"
 #define BUFFER_SIZE_KEY                   "buffer-size"
 #define COMPACT_MENU_KEY                  "compact-menu"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
@@ -109,10 +110,11 @@ using playlist_t = std::vector<std::string>;
 
 // defaults
 #define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(128000*10)
+#define DEFAULT_BOOKMARK_EDITOR                  "rtng-bookmark-editor"
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
 #define DEFAULT_FILE_MONITOR_VALUE               (true)
-#define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (30)
+#define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (10)
 #define DEFAULT_HTTP_TIMEOUT_VALUE               (15)
 #define DEFAULT_INVERT_MENU_VALUE                (false)
 #define DEFAULT_MEDIA_KEY_MAPPING_VALUE          (false)

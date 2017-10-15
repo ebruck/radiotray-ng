@@ -44,7 +44,7 @@ public:
 
 	virtual bool load() = 0;
 
-	virtual bool save() = 0;
+	virtual bool save(const std::string& new_filename) = 0;
 
 	virtual bool add_group(const std::string& group_name, const std::string& image) = 0;
 
@@ -72,9 +72,15 @@ public:
 
 	virtual bool get_group_stations(const std::string& group_name, std::vector<IBookmarks::station_data_t>& station_data) = 0;
 
+	bool get_group_as_json(const std::string& group_name, std::string& json);
+
+	bool get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json);
+
+	bool add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name);
+
 	virtual group_data_t operator[](const size_t index) = 0;
 
-	virtual std::string dump() = 0;
-
 	virtual size_t size() = 0;
+
+	virtual std::string dump() = 0;
 };

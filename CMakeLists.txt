@@ -6,7 +6,7 @@ endif(POLICY CMP0048)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
-	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++11"
+	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++14"
 		CACHE STRING "C++ version for Eclipse's indexer" FORCE)
 	set(CMAKE_ECLIPSE_VERSION "4.4"
 		CACHE STRING "Eclipse version" FORCE)
@@ -16,8 +16,8 @@ project(radiotray-ng CXX)
 
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 8)
+set(PROJECT_VERSION_MINOR 2)
+set(PROJECT_VERSION_PATCH 0-dev)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -37,6 +37,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Boost     REQUIRED filesystem system log program_options thread)
+find_package(wxWidgets REQUIRED core base adv)
 find_package(GMock)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
@@ -94,6 +95,7 @@ add_subdirectory(src/radiotray-ng/event_bus)
 add_subdirectory(src/radiotray-ng/player)
 add_subdirectory(src/radiotray-ng/notification)
 add_subdirectory(src/radiotray-ng/extras/media_keys)
+add_subdirectory(src/radiotray-ng/gui/editor)
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_subdirectory(src/radiotray-ng/extras/rtng_dbus)
     target_compile_definitions(radiotray-ng PRIVATE RTNG_DBUS)
