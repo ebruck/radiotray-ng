@@ -16,13 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
-#include <radiotray-ng/helpers.hpp>
-
-#include <system_error>
-#include <cstring>
-#include <fstream>
-#include <exception>
-#include <algorithm>
 #include <iostream>
 
 
@@ -63,7 +56,13 @@ bool Bookmarks::load()
 }
 
 
-bool Bookmarks::save(const std::string& new_filename)
+bool Bookmarks::save()
+{
+	return this->save_as("");
+}
+
+
+bool Bookmarks::save_as(const std::string& new_filename)
 {
 	std::string filename = this->bookmarks_file;
 
@@ -322,12 +321,12 @@ void Bookmarks::move_to_pos(Json::Value& array, const Json::ArrayIndex old_index
 
 bool Bookmarks::move_group_to_pos(const std::string& group_name, const size_t new_group_index)
 {
-	Json::ArrayIndex group_index;
-
 	if (new_group_index >= this->bookmarks.size())
 	{
 		return false;
 	}
+
+	Json::ArrayIndex group_index;
 
 	if (this->find_group(group_name, group_index))
 	{
@@ -357,6 +356,7 @@ bool Bookmarks::move_station_to_pos(const std::string& group_name, const std::st
 		}
 
 		Json::ArrayIndex station_index;
+
 		if (this->find_station(group_index, station_name, station_index))
 		{
 			if (station_index == new_station_index)
@@ -501,16 +501,14 @@ bool Bookmarks::add_station_from_json(const std::string& group_name, const std::
 		return false;
 	}
 
-	if (station.isMember(STATION_NAME_KEY) == false ||
-		station.isMember(STATION_URL_KEY) == false ||
-		station.isMember(STATION_IMAGE_KEY) == false)
+	if (!station.isMember(STATION_NAME_KEY)|| !station.isMember(STATION_URL_KEY) ||	!station.isMember(STATION_IMAGE_KEY))
 	{
 		LOG(warning) << "Insufficient station data ...\n<<" << json << "<<";
 		return false;
 	}
 
 	Json::ArrayIndex group_index;
-	if (this->find_group(group_name, group_index) == false)
+	if (!this->find_group(group_name, group_index))
 	{
 		LOG(error) << "Failed to find group: " << group_name;
 		return false;

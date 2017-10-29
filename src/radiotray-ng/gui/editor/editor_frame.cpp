@@ -550,7 +550,7 @@ EditorFrame::saveBookmarks(bool ask_to_save, const std::string& file_to_save)
 		}
 	}
 
-	if (this->editor_bookmarks->getBookmarks()->save(file_to_save) == false)
+	if (!this->editor_bookmarks->getBookmarks()->save_as(file_to_save))
 	{
 		wxMessageBox("Failed to save the bookmarks!", _("Error"));
 		return wxCANCEL;

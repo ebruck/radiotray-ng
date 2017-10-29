@@ -44,7 +44,9 @@ public:
 
 	virtual bool load() = 0;
 
-	virtual bool save(const std::string& new_filename) = 0;
+	virtual bool save() = 0;
+
+	virtual bool save_as(const std::string& new_filename) = 0;
 
 	virtual bool add_group(const std::string& group_name, const std::string& image) = 0;
 
@@ -64,21 +66,21 @@ public:
 
 	virtual bool station_exists(const std::string& group_name, const std::string& station_name) = 0;
 
-	virtual bool move_group_to_pos(const std::string& group_name, const size_t new_position) = 0;
+	virtual bool move_group_to_pos(const std::string& group_name, size_t new_position) = 0;
 
-	virtual bool move_station_to_pos(const std::string& group_name, const std::string& station_name, const size_t new_position) = 0;
+	virtual bool move_station_to_pos(const std::string& group_name, const std::string& station_name, size_t new_position) = 0;
 
 	virtual bool get_station(const std::string& group_name, const std::string& station_name, station_data_t& station_data) = 0;
 
 	virtual bool get_group_stations(const std::string& group_name, std::vector<IBookmarks::station_data_t>& station_data) = 0;
 
-	bool get_group_as_json(const std::string& group_name, std::string& json);
+	virtual bool get_group_as_json(const std::string& group_name, std::string& json) = 0;
 
-	bool get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json);
+	virtual bool get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json) = 0;
 
-	bool add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name);
+	virtual bool add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name) = 0;
 
-	virtual group_data_t operator[](const size_t index) = 0;
+	virtual group_data_t operator[](size_t index) = 0;
 
 	virtual size_t size() = 0;
 

@@ -27,11 +27,11 @@ class Bookmarks final : public IBookmarks
 public:
 	Bookmarks(const std::string& bookmarks_file);
 
-	virtual ~Bookmarks() = default;
-
 	bool load();
 
-	bool save(const std::string& new_filename = "");
+	bool save();
+
+	bool save_as(const std::string& new_filename);
 
 	bool add_group(const std::string& group_name, const std::string& image);
 
@@ -52,9 +52,9 @@ public:
 
 	bool station_exists(const std::string& group_name, const std::string& station_name);
 
-	bool move_group_to_pos(const std::string& group_name, const size_t new_position);
+	bool move_group_to_pos(const std::string& group_name, size_t new_position);
 
-	bool move_station_to_pos(const std::string& group_name, const std::string& station_name, const size_t new_position);
+	bool move_station_to_pos(const std::string& group_name, const std::string& station_name, size_t new_position);
 
 	bool get_station(const std::string& group_name, const std::string& station_name, station_data_t& station_data);
 
@@ -66,7 +66,7 @@ public:
 
 	bool add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name);
 
-	IBookmarks::group_data_t operator[](const size_t index);
+	IBookmarks::group_data_t operator[](size_t index);
 
 	size_t size();
 
@@ -83,9 +83,9 @@ private:
 
 	bool find_group(const std::string& group_name, Json::ArrayIndex& group_index);
 
-	bool find_station(const Json::ArrayIndex group_index, const std::string& station_name, Json::ArrayIndex& station_index);
+	bool find_station(Json::ArrayIndex group_index, const std::string& station_name, Json::ArrayIndex& station_index);
 
-	void move_to_pos(Json::Value& array, const Json::ArrayIndex old_index, const Json::ArrayIndex new_index);
+	void move_to_pos(Json::Value& array, Json::ArrayIndex old_index, Json::ArrayIndex new_index);
 
 	bool array_search(Json::Value& array, const std::string& key, const std::string& value, Json::ArrayIndex& index);
 
