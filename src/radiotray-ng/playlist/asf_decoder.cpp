@@ -16,9 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/asf_decoder.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <regex>
-#include <sstream>
 
 
 std::string AsfDecoder::get_name()
@@ -29,14 +27,9 @@ std::string AsfDecoder::get_name()
 
 bool AsfDecoder::is_decodable(const std::string& content_type, const std::string& content)
 {
-	if (content_type.find("video/x-ms-asf") != std::string::npos &&
-	   (content.find("[reference]")         != std::string::npos ||
-	    content.find("[Reference]")         != std::string::npos))
-	{
-		return true;
-	}
-
-	return false;
+	return (content_type.find("video/x-ms-asf") != std::string::npos &&
+	       (content.find("[reference]")         != std::string::npos ||
+	        content.find("[Reference]")         != std::string::npos));
 }
 
 
@@ -59,7 +52,7 @@ bool AsfDecoder::decode(const std::string& content, playlist_t& playlist)
 	{
 		if (line.compare(0, ref_entry.length(), ref_entry) == 0)
 		{
-			const auto equal_pos = line.find("=");
+			const auto equal_pos = line.find('=');
 
 			if (equal_pos != std::string::npos)
 			{

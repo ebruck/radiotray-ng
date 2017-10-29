@@ -16,7 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/xspf_decoder.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <regex>
 
 
@@ -28,12 +27,7 @@ std::string XspfDecoder::get_name()
 
 bool XspfDecoder::is_decodable(const std::string& content_type, const std::string& /*content*/)
 {
-	if (content_type.find("application/xspf+xml") != std::string::npos)
-	{
-		return true;
-	}
-
-	return false;
+	return (content_type.find("application/xspf+xml") != std::string::npos);
 }
 
 
@@ -52,7 +46,7 @@ bool XspfDecoder::decode(const std::string& content, playlist_t& playlist)
 
 	while (std::regex_search(search, match, regex))
 	{
-		std::string url{match[1]};
+		std::string url(match[1]);
 		playlist.push_back(radiotray_ng::trim(url));
 		search = match.suffix().str();
 	}

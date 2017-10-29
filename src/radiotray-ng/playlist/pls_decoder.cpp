@@ -16,8 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/pls_decoder.hpp>
-#include <radiotray-ng/helpers.hpp>
-#include <sstream>
 
 
 std::string PlsDecoder::get_name()
@@ -28,14 +26,9 @@ std::string PlsDecoder::get_name()
 
 bool PlsDecoder::is_decodable(const std::string& content_type, const std::string& content)
 {
-	if (content_type.find("audio/x-scpls"      ) != std::string::npos ||
-	    content_type.find("application/pls+xml") != std::string::npos ||
-	    content.find("[playlist]")               != std::string::npos)
-	{
-		return true;
-	}
-
-	return false;
+	return (content_type.find("audio/x-scpls"      ) != std::string::npos ||
+	        content_type.find("application/pls+xml") != std::string::npos ||
+	        content.find("[playlist]")               != std::string::npos);
 }
 
 
@@ -58,7 +51,7 @@ bool PlsDecoder::decode(const std::string& content, playlist_t& playlist)
 	{
 		if (line.compare(0, file_entry.length(), file_entry) == 0)
 		{
-			const auto equal_pos = line.find("=");
+			const auto equal_pos = line.find('=');
 
 			if (equal_pos != std::string::npos)
 			{

@@ -26,11 +26,6 @@ std::string RamDecoder::get_name()
 
 bool RamDecoder::is_decodable(const std::string& content_type, const std::string& /*content*/)
 {
-	if (content_type.find("audio/x-pn-realaudio"  ) != std::string::npos ||
-	    content_type.find("audio/vnd.rn-realaudio") != std::string::npos)
-	{
-		return true;
-	}
-
-	return false;
+	return (content_type.find("audio/x-pn-realaudio"  ) != std::string::npos ||
+	        content_type.find("audio/vnd.rn-realaudio") != std::string::npos);
 }
