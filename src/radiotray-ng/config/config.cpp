@@ -16,10 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/config/config.hpp>
-#include <radiotray-ng/helpers.hpp>
-
-#include <fstream>
-#include <cstring>
 
 
 Config::Config(const std::string& config_file)

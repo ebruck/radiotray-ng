@@ -28,23 +28,21 @@ class Config final : public IConfig
 public:
 	Config(const std::string& config_file);
 
-	virtual ~Config() = default;
-
 	bool save();
 
 	bool load();
 
 	void set_string(const std::string& key, const std::string& value);
 
-	void set_uint32(const std::string& key, const uint32_t value);
+	void set_uint32(const std::string& key, uint32_t value);
 
-	void set_bool(const std::string& key, const bool value);
+	void set_bool(const std::string& key, bool value);
 
 	std::string get_string(const std::string& key, const std::string& default_value);
 
-	uint32_t get_uint32(const std::string& key, const uint32_t default_value);
+	uint32_t get_uint32(const std::string& key, uint32_t default_value);
 
-	bool get_bool(const std::string& key, const bool default_value);
+	bool get_bool(const std::string& key, bool default_value);
 
 	bool exists(const std::string& key);
 
