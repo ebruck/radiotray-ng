@@ -82,7 +82,7 @@ namespace radiotray_ng
 					events.push_back(tmp);
 				}
 
-				for(auto event : events)
+				for (auto event : events)
 				{
 					if (event.mask & IN_MODIFY || event.mask & IN_ATTRIB)
 					{

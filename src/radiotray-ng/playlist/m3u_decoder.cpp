@@ -27,7 +27,7 @@ std::string M3uDecoder::get_name()
 bool M3uDecoder::is_decodable(const std::string& content_type, const std::string& /*content*/)
 {
 	return (content_type.find("audio/mpegurl"  ) != std::string::npos ||
-		    content_type.find("audio/x-mpegurl") != std::string::npos);
+	        content_type.find("audio/x-mpegurl") != std::string::npos);
 }
 
 

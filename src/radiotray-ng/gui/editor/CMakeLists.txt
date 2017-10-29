@@ -3,7 +3,7 @@ FILE(GLOB HDR_FILES "*.hpp")
 
 include(${wxWidgets_USE_FILE})
 add_executable(rtng-bookmark-editor ${SRC_FILES} ${HDR_FILES})
-add_dependencies(rtng-bookmark-editor bookmarks config)
+add_dependencies(rtng-bookmark-editor bookmarks config user-agent)
 
 target_link_libraries(rtng-bookmark-editor
 	bookmarks

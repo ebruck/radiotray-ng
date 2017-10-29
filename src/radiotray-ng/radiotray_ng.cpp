@@ -17,7 +17,6 @@
 
 #include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
