@@ -47,16 +47,16 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	}
 
 	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 }
 
 

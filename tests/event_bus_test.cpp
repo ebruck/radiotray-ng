@@ -93,9 +93,9 @@ TEST_F(EventBusTest, test_that_subscribers_are_called_in_order)
 	ASSERT_TRUE(this->evm.subscribe(IEventBus::event::state_changed,
 			std::bind(&EventBusTest::on_state_changed_last, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::last));
 	ASSERT_TRUE(this->evm.subscribe(IEventBus::event::state_changed,
-			std::bind(&EventBusTest::on_state_changed_default, this, std::placeholders::_1, std::placeholders::_2)));
+			std::bind(&EventBusTest::on_state_changed_default, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::any));
 	ASSERT_TRUE(this->evm.subscribe(IEventBus::event::state_changed,
-			std::bind(&EventBusTest::on_state_changed_default, this, std::placeholders::_1, std::placeholders::_2)));
+			std::bind(&EventBusTest::on_state_changed_default, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::any));
 
 	IEventBus::event_data_t data;
 

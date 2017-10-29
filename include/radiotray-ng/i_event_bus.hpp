@@ -44,13 +44,13 @@ public:
 
 	using event_data_t = std::map<std::string, std::string>;
 
-	using event_callback_t = std::function<void (const IEventBus::event&, IEventBus::event_data_t& data)>;
+	using event_callback_t = std::function<void(const IEventBus::event&, IEventBus::event_data_t& data)>;
 
 	virtual ~IEventBus() = default;
 
-	virtual bool subscribe(const IEventBus::event ev, IEventBus::event_callback_t cb, const IEventBus::event_pos req_pos = IEventBus::event_pos::any) = 0;
+	virtual bool subscribe(IEventBus::event ev, IEventBus::event_callback_t cb, IEventBus::event_pos req_pos) = 0;
 
-	virtual bool publish(const IEventBus::event ev, IEventBus::event_data_t& data) = 0;
+	virtual bool publish(IEventBus::event ev, IEventBus::event_data_t& data) = 0;
 
-	virtual bool publish_only(const IEventBus::event ev, const std::string& key, const std::string& value) = 0;
+	virtual bool publish_only(IEventBus::event ev, const std::string& key, const std::string& value) = 0;
 };

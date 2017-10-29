@@ -153,9 +153,9 @@ int main(int argc, char** argv)
 
 		std::shared_ptr<IEventBus> evm(new EventBus());
 
-		evm->subscribe(IEventBus::event::tags_changed,  on_tags_event_data);
-		evm->subscribe(IEventBus::event::state_changed, on_event_data);
-		evm->subscribe(IEventBus::event::station_error, on_event_data);
+		evm->subscribe(IEventBus::event::tags_changed,  on_tags_event_data, IEventBus::event_pos::any);
+		evm->subscribe(IEventBus::event::state_changed, on_event_data, IEventBus::event_pos::any);
+		evm->subscribe(IEventBus::event::station_error, on_event_data, IEventBus::event_pos::any);
 
 		std::shared_ptr<IConfig> cfg(new Config("~/.config/radiotray-ng/radiotray-ng.json"));
 		cfg->load();
