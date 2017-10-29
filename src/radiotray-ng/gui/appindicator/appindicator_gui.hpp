@@ -39,8 +39,6 @@ public:
 
 	AppindicatorGui() = delete;
 
-	virtual ~AppindicatorGui() = default;
-
 	void run(int argc, char* argv[]);
 
 	void stop();
