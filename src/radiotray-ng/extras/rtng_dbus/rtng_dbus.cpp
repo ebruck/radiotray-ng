@@ -22,7 +22,7 @@
 
 namespace
 {
-	const Glib::ustring INTROSPECTION_XML =
+	const char INTROSPECTION_XML[] =
 		"<node>"
 		"  <interface name='com.github.radiotray_ng'>"
 		"    <method name='volume_up'>"
@@ -50,8 +50,8 @@ namespace
 		"  </interface>"
 		"</node>";
 
-	const std::string RTNG_DBUS_NAME = "com.github.radiotray_ng";
-	const std::string RTNG_DBUS_OBJECT_PATH = "/com/github/radiotray_ng";
+	const char RTNG_DBUS_NAME[] = "com.github.radiotray_ng";
+	const char RTNG_DBUS_OBJECT_PATH[] = "/com/github/radiotray_ng";
 }
 
 
