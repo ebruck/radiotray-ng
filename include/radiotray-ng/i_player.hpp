@@ -28,5 +28,5 @@ public:
 
 	virtual void stop() = 0;
 
-	virtual void volume(const uint32_t percent) = 0;
+	virtual void volume(uint32_t percent) = 0;
 };

@@ -23,7 +23,7 @@ Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event
 	: pipeline(nullptr)
 	, souphttpsrc(nullptr)
 	, clock(nullptr)
-	, clock_id(0)
+	, clock_id(nullptr)
 	, buffering(false)
 	, event_bus(std::move(event_bus))
 	, config(std::move(config))
@@ -103,7 +103,7 @@ bool Player::play(const playlist_t& playlist)
 void Player::stop()
 {
 	GstState state;
-	gst_element_get_state(GST_ELEMENT(this->pipeline), &state, NULL, GST_CLOCK_TIME_NONE);
+	gst_element_get_state(GST_ELEMENT(this->pipeline), &state, nullptr, GST_CLOCK_TIME_NONE);
 
 	if (state != GST_STATE_NULL)
 	{
@@ -118,7 +118,8 @@ void Player::stop()
 		{
 			LOG(info) << "canceling outstanding clock request";
 			gst_clock_id_unschedule(this->clock_id);
-			this->clock_id = 0;
+			gst_clock_id_unref(this->clock_id);
+			this->clock_id = nullptr;
 		}
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
@@ -161,7 +162,8 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 {
 	Player* player{(Player*)user_data};
 
-	player->clock_id = 0;
+	gst_clock_id_unref(player->clock_id);
+	player->clock_id = nullptr;
 
 	if (player->buffering)
 	{
@@ -284,6 +286,8 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 						LOG(info) << "canceling outstanding clock request";
 
 						gst_clock_id_unschedule(player->clock_id);
+						gst_clock_id_unref(player->clock_id);
+						player->clock_id = nullptr;
 					}
 
 					if (!player->buffering)
@@ -295,7 +299,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 					// start timer to abort if buffering stalls...
 					player->clock_id = gst_clock_new_single_shot_id(player->clock, gst_clock_get_time(player->clock) + (10 * GST_SECOND));
-					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, NULL);
+					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, nullptr);
 				}
 			}
 		}
@@ -313,9 +317,9 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 {
 	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
 
-	gint count = gst_tag_list_get_tag_size(list, tag);
+	guint count = gst_tag_list_get_tag_size(list, tag);
 
-	for (gint i = 0; i < count; i++)
+	for (guint i = 0; i < count; i++)
 	{
 		gchar* str{nullptr};
 

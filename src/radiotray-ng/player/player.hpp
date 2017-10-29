@@ -35,7 +35,7 @@ public:
 
 	void stop();
 
-	void volume(const uint32_t percent);
+	void volume(uint32_t percent);
 
 private:
 	void gst_start();
