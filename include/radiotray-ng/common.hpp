@@ -88,6 +88,7 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_NOTIFICATION_KEY     "radiotray-ng-notification"
 #define SLEEP_TIMER_KEY                   "sleep-timer"
 #define SPLIT_TITLE_KEY                   "split-title"
+#define IHR_TITLE_KEY                     "ihr-title"
 #define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
 #define VOLUME_LEVEL_KEY                  "volume-level"
 #define VOLUME_MAX_LEVEL_KEY              "volume-max-level"
@@ -130,6 +131,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
 #define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)
 #define DEFAULT_SPLIT_TITLE_VALUE                (true)
+#define DEFAULT_IHR_TITLE_KEY_VALUE              (false)
 #define DEFAULT_STATION_IMAGE_VALUE              ""
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)

@@ -281,6 +281,43 @@ void RadiotrayNG::on_tags_changed_event_processing(const IEventBus::event& /*ev*
 			{
 				radiotray_ng::trim(data[TAG_ARTIST] = data[TAG_TITLE].substr(0, pos));
 				radiotray_ng::trim(data[TAG_TITLE]  = data[TAG_TITLE].substr(pos+3));
+
+				// protect against bad tagging...
+				if (data[TAG_ARTIST].empty())
+				{
+					data.erase(TAG_ARTIST);
+				}
+
+				if (data[TAG_TITLE].empty())
+				{
+					data.erase(TAG_TITLE);
+				}
+				else
+				{
+					// extra parsing for text="title"...
+					if (this->config->get_bool(IHR_TITLE_KEY, DEFAULT_IHR_TITLE_KEY_VALUE))
+					{
+						pos = data[TAG_TITLE].find(R"(text=")");
+
+						if (pos != std::string::npos)
+						{
+							auto end_pos = data[TAG_TITLE].find('"', pos+6);
+
+							if (end_pos != std::string::npos)
+							{
+								data[TAG_TITLE] = data[TAG_TITLE].substr(pos+6, end_pos - (pos+6));
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				// sometimes tags are empty, especially with IHR...
+				if (data[TAG_TITLE] == " -" || data[TAG_TITLE] == "- ")
+				{
+					data.erase(TAG_TITLE);
+				}
 			}
 		}
 	}

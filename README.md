@@ -82,6 +82,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "notifications" : true,
    "sleep-timer" : 30,
    "split-title" : true,
+   "ihr-title" : false,
    "tag-info-verbose" : true,
    "volume-level" : 100,
    "volume-step" : 1,
@@ -108,6 +109,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
              notifications: turns on/off notification messages
                sleep-timer: value is in minutes
                split-title: attempts to reformat the notification into title/artist
+                 ihr-title: extra parsing for iheartradio formatting (requires split-title)
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
                volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
