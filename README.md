@@ -123,6 +123,7 @@ media-key-previous-station: media key to use for previous station within current
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
+* Installed config will only include several commonly edited entries.
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
 
