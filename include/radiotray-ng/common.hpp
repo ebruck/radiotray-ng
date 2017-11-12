@@ -110,7 +110,7 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
 
 // defaults
-#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(128000*10)
+#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(160000)
 #define DEFAULT_BOOKMARK_EDITOR                  "rtng-bookmark-editor"
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
