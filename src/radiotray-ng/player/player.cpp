@@ -24,7 +24,6 @@ Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event
 	, souphttpsrc(nullptr)
 	, clock(nullptr)
 	, clock_id(nullptr)
-	, buffering(false)
 	, event_bus(std::move(event_bus))
 	, config(std::move(config))
 	, gst_bus(nullptr)
@@ -49,13 +48,13 @@ bool Player::play_next()
 
 	if (!this->current_playlist.empty())
 	{
+		LOG(debug) << "uri: " << this->current_playlist.front();
+
 		g_object_set(this->pipeline, "uri", this->current_playlist.front().c_str(), NULL);
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
 		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
-
-		this->buffering = true;
 
 		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
 		{
@@ -112,6 +111,8 @@ void Player::stop()
 		// Clear the flag just in case since stopping emits a pause which will register for a
 		// buffering timeout.
 		this->buffering = false;
+
+		this->state_playing_sent = false;
 
 		// abort outstanding callback...
 		if (this->clock_id)
@@ -232,7 +233,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			if (percent == 100)
 			{
 				player->buffering = false;
-				LOG(debug) << "setting state to: GST_STATE_PLAYING";
+				LOG(debug) << "stopped buffering, setting state to: GST_STATE_PLAYING";
 				gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PLAYING);
 			}
 			else
@@ -241,7 +242,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 				if (!player->buffering)
 				{
 					// we were not buffering but PLAYING, then pause the pipeline
-					LOG(debug) << "setting state to: GST_STATE_PAUSED";
+					LOG(debug) << "started buffering, setting state to: GST_STATE_PAUSED";
 					gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PAUSED);
 				}
 
@@ -276,7 +277,11 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			{
 				if (new_state == GST_STATE_PLAYING)
 				{
-					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+					if (!player->state_playing_sent)
+					{
+						player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+						player->state_playing_sent = true;
+					}
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{

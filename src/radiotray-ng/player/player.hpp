@@ -55,7 +55,8 @@ private:
 	GstElement* souphttpsrc;
 	GstClock*   clock;
 	GstClockID  clock_id;
-	bool        buffering;
+	bool        buffering = false;
+	bool        state_playing_sent = false;
 
 	playlist_t current_playlist;
 

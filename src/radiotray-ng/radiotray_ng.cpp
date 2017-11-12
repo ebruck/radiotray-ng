@@ -370,9 +370,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			// way too many messages...
-
-			//this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
 
 			return;
 		}
