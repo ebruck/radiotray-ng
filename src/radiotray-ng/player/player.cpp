@@ -54,6 +54,14 @@ bool Player::play_next()
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
+		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+		uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
+
+		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
+		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
+
+		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size*buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
+
 		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
@@ -382,18 +390,6 @@ void Player::gst_start()
 	}
 
 	g_object_set(this->pipeline, "audio-sink", audio_sink, NULL);
-
-	// set buffer size & volume
-	if (this->config)
-	{
-		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-
-		LOG(info) << BUFFER_SIZE_KEY << "=" << buffer_size;
-
-		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size, NULL);
-
-		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
-	}
 
 	// get clock for buffering timeouts...
 	this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));

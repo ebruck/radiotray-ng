@@ -67,6 +67,7 @@ using playlist_t = std::vector<std::string>;
 #define BOOKMARKS_KEY                     "bookmarks"
 #define BOOKMARK_EDITOR_KEY               "bookmark-editor"
 #define BUFFER_SIZE_KEY                   "buffer-size"
+#define BUFFER_DURATION_KEY               "buffer-duration"
 #define COMPACT_MENU_KEY                  "compact-menu"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
 #define FILE_MONITOR_KEY                  "file-monitor"
@@ -110,7 +111,8 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
 
 // defaults
-#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(160000)
+#define DEFAULT_BUFFER_DURATION_VALUE            (2)
+#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(320000)
 #define DEFAULT_BOOKMARK_EDITOR                  "rtng-bookmark-editor"
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
