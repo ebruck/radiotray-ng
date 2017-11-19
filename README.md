@@ -82,7 +82,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "notifications" : true,
    "sleep-timer" : 30,
    "split-title" : true,
-   "ihr-title" : false,
+   "ihr-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
    "volume-step" : 1,

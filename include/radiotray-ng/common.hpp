@@ -133,7 +133,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
 #define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)
 #define DEFAULT_SPLIT_TITLE_VALUE                (true)
-#define DEFAULT_IHR_TITLE_KEY_VALUE              (false)
+#define DEFAULT_IHR_TITLE_KEY_VALUE              (true)
 #define DEFAULT_STATION_IMAGE_VALUE              ""
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)
