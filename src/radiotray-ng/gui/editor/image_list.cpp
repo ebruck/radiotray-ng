@@ -69,12 +69,26 @@ ImageList::addImage(const std::string& filename, int default_index)
 		return default_index;
 	}
 
+	/// @todo The following is a "temporary" workaround for the
+	///       issue identified in 15331. This can be removed once
+	///       wxWidgets 3.1 is available.
+	///
+	///       http://trac.wxwidgets.org/ticket/15331
+	wxLogNull log_null;
+
 	return this->addImage(wxImage(image_file.GetFullPath()));
 }
 
 int
 ImageList::addImage(const wxImage& image)
 {
+	/// @todo The following is a "temporary" workaround for the
+	///       issue identified in 15331. This can be removed once
+	///       wxWidgets 3.1 is available.
+	///
+	///       http://trac.wxwidgets.org/ticket/15331
+	wxLogNull log_null;
+
 	return image_list->Add(wxBitmap(image.Scale(IMAGE_WIDTH_DEFAULT, IMAGE_HEIGHT_DEFAULT)));
 }
 
@@ -86,6 +100,13 @@ ImageList::replaceImage(int index, const std::string& filename)
 	{
 		return false;
 	}
+
+	/// @todo The following is a "temporary" workaround for the
+	///       issue identified in 15331. This can be removed once
+	///       wxWidgets 3.1 is available.
+	///
+	///       http://trac.wxwidgets.org/ticket/15331
+	wxLogNull log_null;
 
 	return image_list->Replace(index, wxBitmap(wxImage(radiotray_ng::word_expand(filename)).Scale(IMAGE_WIDTH_DEFAULT, IMAGE_HEIGHT_DEFAULT)));
 }

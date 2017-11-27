@@ -68,6 +68,8 @@ public:
 
 	IBookmarks::group_data_t operator[](size_t index);
 
+	const std::string& get_file_name() const;
+
 	size_t size();
 
 	std::string dump();

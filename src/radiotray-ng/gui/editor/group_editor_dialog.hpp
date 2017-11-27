@@ -21,30 +21,30 @@
     #include <wx/wx.h>
 #endif
 
+#include "editor_dialog_base.hpp"
 #include "editor_bookmarks.hpp"
 
 
-class GroupEditorDialog : public wxDialog
+class GroupEditorDialog : public EditorDialogBase
 {
-	DECLARE_DYNAMIC_CLASS(GroupEditorDialog)
+//	DECLARE_DYNAMIC_CLASS(GroupEditorDialog)
 
 public:
 	GroupEditorDialog();
 	GroupEditorDialog(wxWindow* parent);
-	virtual ~GroupEditorDialog() = default;
+	virtual ~GroupEditorDialog();
 
-	bool create(wxWindow* parent, wxWindowID id, const wxString& title);
-	bool createControls();
+	virtual bool createControls();
+	virtual std::string getImagePath();
+	virtual bool setImage(const std::string& path);
 
 	void setData(const std::string& name, const std::string& image);
 	void getData(std::string& name, std::string& image);
 
-	void onBrowseButton(wxCommandEvent& event);
 	DECLARE_EVENT_TABLE()
 
 private:
 	wxTextCtrl* name_control;
 	wxStaticBitmap* bitmap_control;
 	wxTextCtrl* image_control;
-	wxButton* image_button;
 };

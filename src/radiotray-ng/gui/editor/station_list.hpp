@@ -86,6 +86,7 @@ public:
 	void onBeginDrag(wxListEvent& event);
 	void onDeleteAllItems(wxListEvent& event);
 	void onContextMenu(wxContextMenuEvent& event);
+	void onItemRightClick(wxListEvent& event);
 	DECLARE_EVENT_TABLE()
 
 private:

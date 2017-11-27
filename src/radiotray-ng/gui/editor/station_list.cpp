@@ -39,23 +39,13 @@
 #include "images/move-icon.xpm"
 
 
-// The following is defined because the hit test
-// is failing when the right mouse button is clicked
-// on the last entry in the list. So, only the main
-// menu options - and accelerator keys - can be used
-// at this time for various operations.
-#define	ENABLE_CONTEXTMENU	0
-
-
 IMPLEMENT_DYNAMIC_CLASS(StationList, wxListCtrl)
 
 
 BEGIN_EVENT_TABLE(StationList, wxListCtrl)
 	EVT_LIST_DELETE_ALL_ITEMS(STATION_LIST_ID, StationList::onDeleteAllItems)
 	EVT_LIST_BEGIN_DRAG(STATION_LIST_ID, StationList::onBeginDrag)
-#if ENABLE_CONTEXTMENU
-	EVT_CONTEXT_MENU(StationList::onContextMenu)
-#endif
+	EVT_LIST_ITEM_RIGHT_CLICK(STATION_LIST_ID, StationList::onItemRightClick)
 END_EVENT_TABLE()
 
 
@@ -313,7 +303,7 @@ StationList::editStation()
 	}
 
 	wxFileName image_file(radiotray_ng::word_expand(image));
-	if (image_file.Exists() == false || image_file.IsFileReadable())
+	if (image_file.Exists() == false || image_file.IsFileReadable() == false)
 	{
 		image = original_image;
 	}
@@ -614,24 +604,29 @@ StationList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 	return true;
 }
 
-#if ENABLE_CONTEXTMENU
 void
-StationList::onContextMenu(wxContextMenuEvent& event)
+StationList::onItemRightClick(wxListEvent& event)
 {
-	int hit_test_flags = 0;
-	long item_id = this->HitTest(this->ScreenToClient(event.GetPosition()), hit_test_flags);
-	if (item_id != wxNOT_FOUND)
-	{
-		wxMenu menu(wxT("On Item"));
-		menu.Append(EditorFrame::idMenuAbout, wxT("&About"));
-		this->PopupMenu(&menu);
-	}
-	else
-	{
-		wxMenu menu(wxT("Not On Item"));
-		menu.Append(EditorFrame::idMenuAbout, wxT("&About"));
-		this->PopupMenu(&menu);
-	}
-}
-#endif
+	wxMenu menu;
 
+	if (this->editor_bookmarks.get())
+	{
+		menu.Append(EditorFrame::idMenuAddStation, wxT("&Add"));
+
+		long item = event.GetItem().GetId();
+		if (item != -1)
+		{
+			menu.SetTitle(this->GetItemText(item, NAME_COLUMN_INDEX));
+
+			menu.Append(EditorFrame::idMenuEditStation, wxT("&Edit"));
+			menu.Append(EditorFrame::idMenuCopyStation, wxT("&Copy"));
+			menu.Append(EditorFrame::idMenuDeleteStation, wxT("&Delete"));
+		}
+
+		menu.AppendSeparator();
+	}
+
+	menu.Append(EditorFrame::idMenuAbout, wxT("About"));
+
+	this->PopupMenu(&menu);
+}

@@ -47,6 +47,7 @@ public:
 
 	void clearGroups();
 	bool loadBookmarks(std::shared_ptr<EditorBookmarks> bkm);
+	bool doNew(std::shared_ptr<EditorBookmarks> bkm);
 	bool addGroup();
 	bool editGroup();
 	bool copyGroup();
@@ -81,6 +82,7 @@ private:
 	void onItemSelected(wxListEvent& event);
 	void onBeginDrag(wxListEvent& event);
 	void onDeleteAllItems(wxListEvent& event);
+	void onItemRightClick(wxListEvent& event);
 	DECLARE_EVENT_TABLE()
 
     void reindexGroups();
@@ -89,6 +91,7 @@ private:
     int folder_image_index;
 
     bool have_root;
+    std::string root_name;
 
     long last_selected_item_id;
     long drag_item_id;

@@ -5,6 +5,7 @@ include(${wxWidgets_USE_FILE})
 add_executable(rtng-bookmark-editor ${SRC_FILES} ${HDR_FILES})
 add_dependencies(rtng-bookmark-editor bookmarks config user-agent)
 
+include_directories(rtng-bookmark-editor ${wxWidgets_INCLUDE_DIRS})
 target_link_libraries(rtng-bookmark-editor
 	bookmarks
 	config

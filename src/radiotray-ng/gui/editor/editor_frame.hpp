@@ -47,6 +47,7 @@ public:
     enum
     {
         idMenuQuit = 1000,
+        idMenuNew,
         idMenuOpen,
         idMenuSave,
         idMenuSaveAs,
@@ -63,6 +64,7 @@ public:
     };
 
 private:
+	void onNew(wxCommandEvent& event);
     void onOpen(wxCommandEvent& event);
     void onSave(wxCommandEvent& event);
     void onSaveAs(wxCommandEvent& event);

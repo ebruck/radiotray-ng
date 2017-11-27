@@ -33,7 +33,7 @@
 #include "images/blank.xpm"
 
 
-IMPLEMENT_DYNAMIC_CLASS(StationEditorDialog, wxDialog)
+//IMPLEMENT_DYNAMIC_CLASS(StationEditorDialog, EditorDialogBase)
 
 namespace
 {
@@ -44,42 +44,46 @@ namespace
 	const wxWindowID URL_ID = 303;
 	const wxWindowID BITMAP_ID = 304;
 	const wxWindowID IMAGE_ID = 305;
-	const wxWindowID IMAGE_BUTTON_ID = 306;
 };
 
-BEGIN_EVENT_TABLE(StationEditorDialog, wxDialog)
-	EVT_COMMAND(IMAGE_BUTTON_ID, wxEVT_BUTTON, StationEditorDialog::onBrowseButton)
+BEGIN_EVENT_TABLE(StationEditorDialog, EditorDialogBase)
 END_EVENT_TABLE()
 
 
-StationEditorDialog::StationEditorDialog() :
+StationEditorDialog::StationEditorDialog() : EditorDialogBase(),
 	name_control(nullptr),
 	url_control(nullptr),
 	bitmap_control(nullptr),
-	image_control(nullptr),
-	image_button(nullptr)
+	image_control(nullptr)
 {
 }
 
-StationEditorDialog::StationEditorDialog(wxWindow* parent) :
-	name_control(nullptr),
-	url_control(nullptr),
-	bitmap_control(nullptr),
-	image_control(nullptr),
-	image_button(nullptr)
+StationEditorDialog::StationEditorDialog(wxWindow* parent) : StationEditorDialog()
 {
 	this->create(parent, STATION_DIALOG_ID, STATION_DIALOG_TITLE);
 }
 
-bool
-StationEditorDialog::create(wxWindow* parent, wxWindowID id, const wxString& title)
+StationEditorDialog::~StationEditorDialog()
 {
-    wxDialog::Create(parent, id, title);
+	if (image_control)
+	{
+		delete image_control;
+	}
 
-    this->createControls();
-    this->Center();
+	if (bitmap_control)
+	{
+		delete bitmap_control;
+	}
 
-    return true;
+	if (url_control)
+	{
+		delete url_control;
+	}
+
+	if (name_control)
+	{
+		delete name_control;
+	}
 }
 
 bool
@@ -91,11 +95,11 @@ StationEditorDialog::createControls()
 
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name")), 0, wxALIGN_LEFT);
 	this->name_control = new wxTextCtrl(this, NAME_ID, "", wxDefaultPosition, wxSize(140, -1));
-	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT);
+	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT | wxEXPAND);
 
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Url")), 0, wxALIGN_LEFT);
 	this->url_control = new wxTextCtrl(this, URL_ID, "", wxDefaultPosition, wxSize(270, -1));
-	grid_sizer->Add(this->url_control, 0, wxALIGN_LEFT);
+	grid_sizer->Add(this->url_control, 0, wxALIGN_LEFT | wxEXPAND);
 
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Image")), 0, wxALIGN_LEFT);
 
@@ -104,22 +108,17 @@ StationEditorDialog::createControls()
 	wxImage image = wxImage(blank_xpm).Scale(24, 24);
 	this->bitmap_control = new wxStaticBitmap(this, BITMAP_ID, wxBitmap(image));
 	image_sizer->Add(this->bitmap_control, 0, wxALIGN_LEFT);
-	this->image_control = new wxTextCtrl(this, IMAGE_ID, "", wxDefaultPosition, wxSize(180, -1));
-	image_sizer->Add(this->image_control, 0, wxALIGN_LEFT);
-	this->image_button = new wxButton(this, IMAGE_BUTTON_ID, "Browse ...");
-	image_sizer->Add(this->image_button, 0, wxALIGN_RIGHT);
+	this->image_control = new wxTextCtrl(this, IMAGE_ID, "", wxDefaultPosition, wxSize(270, -1));
+	image_sizer->Add(this->image_control, 0, wxALIGN_LEFT | wxEXPAND);
+
+	this->addImageButton(image_sizer);
 
 	grid_sizer->Add(image_sizer, 0, wxALL);
 
 	main_sizer->Add(grid_sizer, 0, wxALL, 10);
 
-	wxSizer* button_sizer = CreateSeparatedButtonSizer(wxOK | wxCANCEL);
-	if (button_sizer)
-	{
-		main_sizer->Add(button_sizer, 0, wxALL|wxGROW, 5);
-	}
+	this->finishDialog(main_sizer);
 
-	SetSizerAndFit(main_sizer);
 	this->name_control->SetFocus();
 
 	return true;
@@ -135,6 +134,13 @@ StationEditorDialog::setData(const std::string& name, const std::string& url, co
 
 	if (!image.empty())
 	{
+		/// @todo The following is a "temporary" workaround for the
+		///       issue identified in 15331. This can be removed once
+		///       wxWidgets 3.1 is available.
+		///
+		///       http://trac.wxwidgets.org/ticket/15331
+		wxLogNull log_null;
+
 		wxImage img = wxImage(radiotray_ng::word_expand(image)).Scale(24, 24);
 		this->bitmap_control->SetBitmap(wxBitmap(img));
 	}
@@ -150,28 +156,18 @@ StationEditorDialog::getData(std::string& name, std::string& url, std::string& i
 	image = this->image_control->GetValue().ToStdString();
 }
 
-void
-StationEditorDialog::onBrowseButton(wxCommandEvent& /* event */)
+std::string
+StationEditorDialog::getImagePath()
 {
-	std::string image = this->image_control->GetValue().ToStdString();
-	wxString path = wxEmptyString;
-	if (image.size())
-	{
-		wxFileName filename(image);
-		path = filename.GetFullPath();
-	}
-	wxFileDialog dialog(this,
-						("Select station image"),
-						path,
-						"",
-						"Image files (*.bmp;*.ico;*.xpm;*.png;*.jpg)|*.bmp;*.ico;*.xpm;*.png;*.jpg",
-						wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-    if (dialog.ShowModal() != wxID_OK)
-	{
-		return;
-	}
+	return this->image_control->GetValue().ToStdString();
+}
 
-	this->image_control->SetValue(dialog.GetPath().ToStdString());
-	wxImage img = wxImage(dialog.GetPath()).Scale(24, 24);
+bool
+StationEditorDialog::setImage(const std::string& path)
+{
+	this->image_control->SetValue(path);
+	wxImage img = wxImage(path).Scale(24, 24);
 	this->bitmap_control->SetBitmap(wxBitmap(img));
+
+	return true;
 }
