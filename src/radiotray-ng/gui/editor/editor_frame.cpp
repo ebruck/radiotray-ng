@@ -86,6 +86,7 @@ wxDEFINE_EVENT(SET_BOOKMARKS_DIRTY, wxCommandEvent);
 
 BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_CLOSE(EditorFrame::onClose)
+    EVT_MENU(idMenuNew, EditorFrame::onNew)
     EVT_MENU(idMenuOpen, EditorFrame::onOpen)
     EVT_MENU(idMenuSave, EditorFrame::onSave)
     EVT_MENU(idMenuSaveAs, EditorFrame::onSaveAs)
@@ -148,6 +149,7 @@ EditorFrame::createMenus()
 	wxMenuBar* mbar = new wxMenuBar();
 
 	wxMenu* fileMenu = new wxMenu(_T(""));
+	fileMenu->Append(idMenuNew, _("&New"), _("Create a new Bookmarks File"));
 	fileMenu->Append(idMenuOpen, _("&Open\tCtrl-O"), _("Open a Bookmarks File"));
 	fileMenu->Append(idMenuSave, _("&Save\tCtrl-S"), _("Save the Bookmarks File"));
 	fileMenu->Append(idMenuSaveAs, _("&Save As"), _("Save the Bookmarks to a new file"));
@@ -286,6 +288,38 @@ EditorFrame::saveConfiguration()
 }
 
 void
+EditorFrame::onNew(wxCommandEvent& /* event */)
+{
+	if (this->editor_bookmarks.get())
+	{
+		if (this->editor_bookmarks->isDirty())
+		{
+			if (this->saveBookmarks(true) == wxCANCEL)
+			{
+				return;
+			}
+		}
+
+		this->group_list->clearGroups();
+		this->editor_bookmarks.reset();
+	}
+
+	this->editor_bookmarks = std::make_shared<EditorBookmarks>("");
+	this->group_list->doNew(this->editor_bookmarks);
+
+	this->GetMenuBar()->Enable(idMenuSaveAs, true);
+	this->GetMenuBar()->Enable(idMenuAddGroup, true);
+	this->GetMenuBar()->Enable(idMenuEditGroup, true);
+	this->GetMenuBar()->Enable(idMenuCopyGroup, true);
+	this->GetMenuBar()->Enable(idMenuDeleteGroup, true);
+	this->GetMenuBar()->Enable(idMenuAddStation, true);
+	this->GetMenuBar()->Enable(idMenuEditStation, true);
+	this->GetMenuBar()->Enable(idMenuCopyStation, true);
+	this->GetMenuBar()->Enable(idMenuPasteStation, true);
+	this->GetMenuBar()->Enable(idMenuDeleteStation, true);
+}
+
+void
 EditorFrame::onOpen(wxCommandEvent& /* event */)
 {
 	wxFileDialog dialog(this,
@@ -304,8 +338,14 @@ EditorFrame::onOpen(wxCommandEvent& /* event */)
 }
 
 void
-EditorFrame::onSave(wxCommandEvent& /* event */)
+EditorFrame::onSave(wxCommandEvent& event)
 {
+	if (this->editor_bookmarks->getBookmarks()->get_file_name().empty())
+	{
+		this->onSaveAs(event);
+		return;
+	}
+
 	this->saveBookmarks();
 }
 
@@ -333,9 +373,15 @@ EditorFrame::onSaveAs(wxCommandEvent& /* event */)
 	}
 
 	std::string filename = dialog.GetPath().ToStdString();
+	if (filename.find(".json") == std::string::npos)
+	{
+		filename.append(".json");
+	}
+
 	this->saveBookmarks(false, filename);
 
 	this->GetMenuBar()->Enable(idMenuSave, false);
+	SetStatusText(filename, 1);
 }
 
 void

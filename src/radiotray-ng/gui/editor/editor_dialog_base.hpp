@@ -21,31 +21,29 @@
     #include <wx/wx.h>
 #endif
 
-#include "editor_dialog_base.hpp"
 #include "editor_bookmarks.hpp"
 
 
-class StationEditorDialog : public EditorDialogBase
+class EditorDialogBase : public wxDialog
 {
-//	DECLARE_DYNAMIC_CLASS(StationEditorDialog)
+//	DECLARE_DYNAMIC_CLASS(EditorDialogBase)
 
 public:
-	StationEditorDialog();
-	StationEditorDialog(wxWindow* parent);
-	virtual ~StationEditorDialog();
+	EditorDialogBase();
+	virtual ~EditorDialogBase();
 
-	virtual bool createControls();
-	virtual std::string getImagePath();
-	virtual bool setImage(const std::string& path);
+	bool create(wxWindow* parent, wxWindowID id, const wxString& title);
 
-	void setData(const std::string& name, const std::string& url, const std::string& image);
-	void getData(std::string& name, std::string& url, std::string& image);
+	virtual bool createControls() = 0;
+	bool addImageButton(wxSizer* image_sizer);
+	bool finishDialog(wxSizer* main_sizer);
 
+	virtual std::string getImagePath() = 0;
+	virtual bool setImage(const std::string& path) = 0;
+
+	void onBrowseButton(wxCommandEvent& event);
 	DECLARE_EVENT_TABLE()
 
 private:
-	wxTextCtrl* name_control;
-	wxTextCtrl* url_control;
-	wxStaticBitmap* bitmap_control;
-	wxTextCtrl* image_control;
+	wxButton* image_button;
 };

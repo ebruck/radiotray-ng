@@ -62,6 +62,7 @@ BEGIN_EVENT_TABLE(GroupList, wxListCtrl)
 	EVT_LIST_ITEM_SELECTED(GROUP_LIST_ID, GroupList::onItemSelected)
 	EVT_LIST_DELETE_ALL_ITEMS(GROUP_LIST_ID, GroupList::onDeleteAllItems)
 	EVT_LIST_BEGIN_DRAG(GROUP_LIST_ID, GroupList::onBeginDrag)
+	EVT_LIST_ITEM_RIGHT_CLICK(GROUP_LIST_ID, GroupList::onItemRightClick)
 END_EVENT_TABLE()
 
 
@@ -72,6 +73,7 @@ GroupList::GroupList() :
 	drag_item_id(0),
 	station_list(nullptr)
 {
+	this->root_name = "[" + ROOT_NAME + "]";
 }
 
 GroupList::GroupList(wxWindow* parent, StationList* list) :
@@ -81,6 +83,8 @@ GroupList::GroupList(wxWindow* parent, StationList* list) :
 	drag_item_id(0),
 	station_list(list)
 {
+	this->root_name = "[" + ROOT_NAME + "]";
+
 	long style = wxLC_REPORT | wxLC_SINGLE_SEL;
 	this->SetWindowStyle(style);
 
@@ -191,16 +195,23 @@ GroupList::populateList(size_t select_index)
 		IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[index];
 
 		std::string name = group.group;
+		bool is_root = false;
 		if (group.group.compare(ROOT_NAME) == 0)
 		{
 			this->have_root = true;
-			name = "[" + ROOT_NAME + "]";
+			name = this->root_name;
+			is_root = true;
 		}
 
 		int use_image_index = this->group_images.addImage(group.image, this->folder_image_index);
 
+		long item_index = this->GetItemCount();
+		if (this->have_root && !is_root)
+		{
+			--item_index;
+		}
 		wxString tmpstr(name.c_str(), wxConvUTF8);
-		long item_id = this->InsertItem(this->GetItemCount(), tmpstr, use_image_index);
+		long item_id = this->InsertItem(item_index, tmpstr, use_image_index);
 		this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new GroupList::ItemData(index, use_image_index)));
 
 		if (select_item == -1)
@@ -227,7 +238,8 @@ GroupList::populateList(size_t select_index)
 					break;
 				}
 			}
-			wxString tmpstr(ROOT_NAME.c_str(), wxConvUTF8);
+
+			wxString tmpstr(this->root_name.c_str(), wxConvUTF8);
 			long item_id = this->InsertItem(this->GetItemCount(), tmpstr, this->folder_image_index);
 			this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new GroupList::ItemData(index, this->folder_image_index)));
 		}
@@ -237,6 +249,34 @@ GroupList::populateList(size_t select_index)
 	{
 		this->SetItemState(select_item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 	}
+}
+
+bool
+GroupList::doNew(std::shared_ptr<EditorBookmarks> bkm)
+{
+	this->editor_bookmarks = bkm;
+	this->station_list->setBookmarks(this->editor_bookmarks);
+
+	if (this->editor_bookmarks->getBookmarks()->add_group(ROOT_NAME, "") == true)
+	{
+		this->have_root = true;
+
+		size_t index = 0;
+		for (index = 0; index < this->editor_bookmarks->getBookmarks()->size(); index++)
+		{
+			IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[index];
+			if (group.group.compare(ROOT_NAME) == 0)
+			{
+				break;
+			}
+		}
+
+		wxString tmpstr(this->root_name.c_str(), wxConvUTF8);
+		long item_id = this->InsertItem(this->GetItemCount(), tmpstr, this->folder_image_index);
+		this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new GroupList::ItemData(index, this->folder_image_index)));
+	}
+
+	return true;
 }
 
 bool
@@ -254,7 +294,7 @@ GroupList::addGroup()
 	dlg.Destroy();
 
 	// cannot add empty or "root"
-	if (name.size() == 0 || name.compare(ROOT_NAME))
+	if (name.size() == 0 || name.compare(this->root_name) == 0)
 	{
 		return false;
 	}
@@ -266,16 +306,19 @@ GroupList::addGroup()
 		image = "";
 	}
 
+	/// @note The assumption here is that we always keep "root" at the end of the list
 	size_t root_index = this->editor_bookmarks->getBookmarks()->size();
 	if (this->editor_bookmarks->getBookmarks()->add_group(name, image) == false)
 	{
 		wxMessageBox(wxT("Failed to add the new group!"), wxT("Error"));
 		return false;
 	}
+	this->editor_bookmarks->setDirty();
 
 	// always make sure root is at the end
 	if (this->have_root)
 	{
+		LOG(debug) << "moving new group to position " << root_index;
 		this->editor_bookmarks->getBookmarks()->move_group_to_pos(name, root_index);
 	}
 
@@ -299,7 +342,7 @@ GroupList::addGroup()
 	int use_image_index = this->group_images.addImage(image, this->folder_image_index);
 
 	wxString tmpstr(name.c_str(), wxConvUTF8);
-	long item_id = this->InsertItem(this->GetItemCount(), tmpstr, use_image_index);
+	long item_id = this->InsertItem(this->GetItemCount() - 1, tmpstr, use_image_index);
 	this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new GroupList::ItemData(index, use_image_index)));
 
 	this->reindexGroups();
@@ -745,4 +788,31 @@ GroupList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 	}
 
 	return true;
+}
+
+void
+GroupList::onItemRightClick(wxListEvent& event)
+{
+	wxMenu menu;
+
+	if (this->editor_bookmarks.get())
+	{
+		menu.Append(EditorFrame::idMenuAddGroup, wxT("&Add"));
+
+		long item_id = event.GetItem().GetId();
+		if (item_id != -1)
+		{
+			menu.SetTitle(this->GetItemText(item_id, NAME_COLUMN_INDEX));
+
+			menu.Append(EditorFrame::idMenuEditGroup, wxT("&Edit"));
+			menu.Append(EditorFrame::idMenuCopyGroup, wxT("&Copy"));
+			menu.Append(EditorFrame::idMenuDeleteGroup, wxT("&Delete"));
+		}
+
+		menu.AppendSeparator();
+	}
+
+	menu.Append(EditorFrame::idMenuAbout, wxT("About"));
+
+	this->PopupMenu(&menu);
 }

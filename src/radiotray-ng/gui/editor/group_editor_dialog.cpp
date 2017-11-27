@@ -33,7 +33,7 @@
 #include "images/folder.xpm"
 
 
-IMPLEMENT_DYNAMIC_CLASS(GroupEditorDialog, wxDialog)
+//IMPLEMENT_DYNAMIC_CLASS(GroupEditorDialog, EditorDialogBase)
 
 namespace
 {
@@ -43,40 +43,40 @@ namespace
 	const wxWindowID NAME_ID = 402;
 	const wxWindowID BITMAP_ID = 403;
 	const wxWindowID IMAGE_ID = 404;
-	const wxWindowID IMAGE_BUTTON_ID = 405;
 };
 
-BEGIN_EVENT_TABLE(GroupEditorDialog, wxDialog)
-	EVT_COMMAND(IMAGE_BUTTON_ID, wxEVT_BUTTON, GroupEditorDialog::onBrowseButton)
+BEGIN_EVENT_TABLE(GroupEditorDialog, EditorDialogBase)
 END_EVENT_TABLE()
 
 
-GroupEditorDialog::GroupEditorDialog() :
+GroupEditorDialog::GroupEditorDialog() : EditorDialogBase(),
 	name_control(nullptr),
 	bitmap_control(nullptr),
-	image_control(nullptr),
-	image_button(nullptr)
+	image_control(nullptr)
 {
 }
 
-GroupEditorDialog::GroupEditorDialog(wxWindow* parent) :
-	name_control(nullptr),
-	bitmap_control(nullptr),
-	image_control(nullptr),
-	image_button(nullptr)
+GroupEditorDialog::GroupEditorDialog(wxWindow* parent) : GroupEditorDialog()
 {
 	this->create(parent, GROUP_DIALOG_ID, GROUP_DIALOG_TITLE);
 }
 
-bool
-GroupEditorDialog::create(wxWindow* parent, wxWindowID id, const wxString& title)
+GroupEditorDialog::~GroupEditorDialog()
 {
-    wxDialog::Create(parent, id, title);
+	if (image_control)
+	{
+		delete image_control;
+	}
 
-    this->createControls();
-    this->Center();
+	if (bitmap_control)
+	{
+		delete bitmap_control;
+	}
 
-    return true;
+	if (name_control)
+	{
+		delete name_control;
+	}
 }
 
 bool
@@ -88,7 +88,7 @@ GroupEditorDialog::createControls()
 
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name")), 0, wxALIGN_LEFT);
 	this->name_control = new wxTextCtrl(this, NAME_ID, "", wxDefaultPosition, wxSize(140, -1));
-	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT);
+	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT | wxEXPAND);
 
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Image")), 0, wxALIGN_LEFT);
 
@@ -97,22 +97,17 @@ GroupEditorDialog::createControls()
 	wxImage image = wxImage(folder_xpm).Scale(24, 24);
 	this->bitmap_control = new wxStaticBitmap(this, BITMAP_ID, wxBitmap(image));
 	image_sizer->Add(this->bitmap_control, 0, wxALIGN_LEFT);
-	this->image_control = new wxTextCtrl(this, IMAGE_ID, "", wxDefaultPosition, wxSize(180, -1));
-	image_sizer->Add(this->image_control, 0, wxALIGN_LEFT);
-	this->image_button = new wxButton(this, IMAGE_BUTTON_ID, "Browse ...");
-	image_sizer->Add(this->image_button, 0, wxALIGN_RIGHT);
+	this->image_control = new wxTextCtrl(this, IMAGE_ID, "", wxDefaultPosition, wxSize(270, -1));
+	image_sizer->Add(this->image_control, 0, wxALIGN_LEFT | wxEXPAND);
+
+	this->addImageButton(image_sizer);
 
 	grid_sizer->Add(image_sizer, 0, wxALL);
 
 	main_sizer->Add(grid_sizer, 0, wxALL, 10);
 
-	wxSizer* button_sizer = CreateSeparatedButtonSizer(wxOK | wxCANCEL);
-	if (button_sizer)
-	{
-		main_sizer->Add(button_sizer, 0, wxALL|wxGROW, 5);
-	}
+	this->finishDialog(main_sizer);
 
-	SetSizerAndFit(main_sizer);
 	this->name_control->SetFocus();
 
 	return true;
@@ -127,6 +122,13 @@ GroupEditorDialog::setData(const std::string& name, const std::string& image)
 
 	if (!image.empty())
 	{
+		/// @todo The following is a "temporary" workaround for the
+		///       issue identified in 15331. This can be removed once
+		///       wxWidgets 3.1 is available.
+		///
+		///       http://trac.wxwidgets.org/ticket/15331
+		wxLogNull log_null;
+
 		wxImage img = wxImage(radiotray_ng::word_expand(image)).Scale(24, 24);
 		this->bitmap_control->SetBitmap(wxBitmap(img));
 	}
@@ -141,28 +143,18 @@ GroupEditorDialog::getData(std::string& name, std::string& image)
 	image = this->image_control->GetValue().ToStdString();
 }
 
-void
-GroupEditorDialog::onBrowseButton(wxCommandEvent& /* event */)
+std::string
+GroupEditorDialog::getImagePath()
 {
-	std::string image = this->image_control->GetValue().ToStdString();
-	wxString path = wxEmptyString;
-	if (image.size())
-	{
-		wxFileName filename(image);
-		path = filename.GetFullPath();
-	}
-	wxFileDialog dialog(this,
-						("Select station image"),
-						path,
-						"",
-						"Image files (*.bmp;*.ico;*.xpm;*.png;*.jpg)|*.bmp;*.ico;*.xpm;*.png;*.jpg",
-						wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-    if (dialog.ShowModal() != wxID_OK)
-	{
-		return;
-	}
+	return this->image_control->GetValue().ToStdString();
+}
 
-	this->image_control->SetValue(dialog.GetPath().ToStdString());
-	wxImage img = wxImage(dialog.GetPath()).Scale(24, 24);
+bool
+GroupEditorDialog::setImage(const std::string& path)
+{
+	this->image_control->SetValue(path);
+	wxImage img = wxImage(path).Scale(24, 24);
 	this->bitmap_control->SetBitmap(wxBitmap(img));
+
+	return true;
 }

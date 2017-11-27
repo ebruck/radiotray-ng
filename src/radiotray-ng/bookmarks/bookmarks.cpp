@@ -445,6 +445,12 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 }
 
 
+const std::string& Bookmarks::get_file_name() const
+{
+	return this->bookmarks_file;
+}
+
+
 size_t Bookmarks::size()
 {
 	return size_t(this->bookmarks.size());
