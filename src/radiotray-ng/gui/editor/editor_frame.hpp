@@ -58,6 +58,7 @@ public:
         idMenuAddStation,
         idMenuEditStation,
         idMenuCopyStation,
+        idMenuCutStation,
         idMenuPasteStation,
         idMenuDeleteStation,
         idMenuAbout
@@ -79,6 +80,7 @@ private:
     void onAddStation(wxCommandEvent& event);
     void onEditStation(wxCommandEvent& event);
     void onCopyStation(wxCommandEvent& event);
+    void onCutStation(wxCommandEvent& event);
     void onPasteStation(wxCommandEvent& event);
     void onDeleteStation(wxCommandEvent& event);
 

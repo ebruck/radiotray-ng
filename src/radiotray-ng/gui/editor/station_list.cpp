@@ -397,6 +397,18 @@ StationList::copyStation()
 }
 
 bool
+StationList::cutStation()
+{
+	bool status = this->copyStation();
+	if (status)
+	{
+		status = this->deleteStation();
+	}
+
+	return status;
+}
+
+bool
 StationList::pasteStation()
 {
 	if (wxTheClipboard->Open() == false)

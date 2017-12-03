@@ -77,6 +77,7 @@ public:
 	bool addStation();
 	bool editStation();
 	bool copyStation();
+	bool cutStation();
 	bool pasteStation();
 	bool deleteStation();
 
