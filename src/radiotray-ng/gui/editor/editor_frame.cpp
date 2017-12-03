@@ -98,6 +98,7 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_MENU(idMenuAddStation, EditorFrame::onAddStation)
     EVT_MENU(idMenuEditStation, EditorFrame::onEditStation)
     EVT_MENU(idMenuCopyStation, EditorFrame::onCopyStation)
+    EVT_MENU(idMenuCutStation, EditorFrame::onCutStation)
     EVT_MENU(idMenuPasteStation, EditorFrame::onPasteStation)
     EVT_MENU(idMenuDeleteStation, EditorFrame::onDeleteStation)
     EVT_MENU(idMenuAbout, EditorFrame::onAbout)
@@ -168,6 +169,7 @@ EditorFrame::createMenus()
 	stationMenu->Append(idMenuAddStation, _("&Add\tCtrl-A"));
 	stationMenu->Append(idMenuEditStation, _("&Edit\tCtrl-E"));
 	stationMenu->Append(idMenuCopyStation, _("&Copy\tCtrl-C"));
+	stationMenu->Append(idMenuCutStation, _("Cut\tCtrl-X"));
 	stationMenu->Append(idMenuPasteStation, _("&Paste\tCtrl-V"));
 	stationMenu->Append(idMenuDeleteStation, _("&Delete\tCtrl-D"));
 	mbar->Append(stationMenu, _("&Station"));
@@ -188,6 +190,7 @@ EditorFrame::createMenus()
 	this->GetMenuBar()->Enable(idMenuAddStation, false);
 	this->GetMenuBar()->Enable(idMenuEditStation, false);
 	this->GetMenuBar()->Enable(idMenuCopyStation, false);
+	this->GetMenuBar()->Enable(idMenuCutStation, false);
 	this->GetMenuBar()->Enable(idMenuPasteStation, false);
 	this->GetMenuBar()->Enable(idMenuDeleteStation, false);
 }
@@ -204,7 +207,7 @@ EditorFrame::createStatusBar()
 void
 EditorFrame::createAccelerators()
 {
-#define ACCELERATOR_COUNT	8
+#define ACCELERATOR_COUNT	9
 
 	// set up accelerator keys
 	wxAcceleratorEntry entries[ACCELERATOR_COUNT];
@@ -216,6 +219,7 @@ EditorFrame::createAccelerators()
 	entries[count++].Set(wxACCEL_CTRL, (int) 'A', idMenuAddStation);
 	entries[count++].Set(wxACCEL_CTRL, (int) 'E', idMenuEditStation);
 	entries[count++].Set(wxACCEL_CTRL, (int) 'C', idMenuCopyStation);
+	entries[count++].Set(wxACCEL_CTRL, (int) 'X', idMenuCutStation);
 	entries[count++].Set(wxACCEL_CTRL, (int) 'V', idMenuPasteStation);
 	entries[count++].Set(wxACCEL_CTRL, (int) 'D', idMenuDeleteStation);
 
@@ -315,6 +319,7 @@ EditorFrame::onNew(wxCommandEvent& /* event */)
 	this->GetMenuBar()->Enable(idMenuAddStation, true);
 	this->GetMenuBar()->Enable(idMenuEditStation, true);
 	this->GetMenuBar()->Enable(idMenuCopyStation, true);
+	this->GetMenuBar()->Enable(idMenuCutStation, true);
 	this->GetMenuBar()->Enable(idMenuPasteStation, true);
 	this->GetMenuBar()->Enable(idMenuDeleteStation, true);
 }
@@ -462,6 +467,12 @@ void
 EditorFrame::onCopyStation(wxCommandEvent& /* event */)
 {
 	this->station_list->copyStation();
+}
+
+void
+EditorFrame::onCutStation(wxCommandEvent& /* event */)
+{
+	this->station_list->cutStation();
 }
 
 void
