@@ -63,6 +63,10 @@ EditorDialogBase::create(wxWindow* parent, wxWindowID id, const wxString& title)
     this->Center();
     this->SetWindowStyle(wxCAPTION);
 
+    // Prevent resizing as seen on Ubuntu 17.10
+	this->SetMinSize(this->GetSize());
+	this->SetMaxSize(this->GetSize());
+
     return true;
 }
 
