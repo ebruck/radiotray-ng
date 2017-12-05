@@ -51,16 +51,11 @@ endif(NOT APPLE)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
-set(warnings "-Wall -Wextra -Werror")
+set(warnings "-Wno-deprecated-declarations -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS ${warnings})
+set(CMAKE_C_FLAGS   ${warnings})
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-
-if (NOT CONFIGURED_ONCE)
-    set(CMAKE_CXX_FLAGS "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
-    set(CMAKE_C_FLAGS   "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
-endif()
 
 # includes etc.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ ${JSONCPP_INCLUDE_DIRS})
@@ -127,5 +122,3 @@ add_custom_command(
 )
 
 add_custom_target(user-agent ALL DEPENDS rtng_user_agent)
-
-set(CONFIGURED_ONCE TRUE CACHE INTERNAL "A flag showing that CMake has configured at least once.")
