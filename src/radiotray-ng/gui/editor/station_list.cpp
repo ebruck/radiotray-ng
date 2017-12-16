@@ -409,15 +409,29 @@ StationList::cutStation()
 }
 
 bool
-StationList::pasteStation()
+StationList::isClipboardDataAvailable(bool close_when_done)
 {
 	if (wxTheClipboard->Open() == false)
 	{
 		return false;
 	}
 
-	if (wxTheClipboard->IsSupported(wxDF_TEXT) == false)
+	bool status = wxTheClipboard->IsSupported(wxDF_TEXT);
+
+	if (close_when_done)
 	{
+		wxTheClipboard->Close();
+	}
+
+	return status;
+}
+
+bool
+StationList::pasteStation()
+{
+	if (this->isClipboardDataAvailable(false) == false)
+	{
+		wxTheClipboard->Close();
 		return false;
 	}
 
@@ -625,6 +639,8 @@ StationList::onItemRightClick(wxListEvent& event)
 	{
 		menu.Append(EditorFrame::idMenuAddStation, wxT("&Add"));
 
+		bool paste_available = this->isClipboardDataAvailable();
+
 		long item = event.GetItem().GetId();
 		if (item != -1)
 		{
@@ -632,7 +648,19 @@ StationList::onItemRightClick(wxListEvent& event)
 
 			menu.Append(EditorFrame::idMenuEditStation, wxT("&Edit"));
 			menu.Append(EditorFrame::idMenuCopyStation, wxT("&Copy"));
+			menu.Append(EditorFrame::idMenuCutStation, wxT("Cu&t"));
+			if (paste_available)
+			{
+				menu.Append(EditorFrame::idMenuPasteStation, wxT("&Paste"));
+			}
 			menu.Append(EditorFrame::idMenuDeleteStation, wxT("&Delete"));
+		}
+		else
+		{
+			if (paste_available)
+			{
+				menu.Append(EditorFrame::idMenuPasteStation, wxT("&Paste"));
+			}
 		}
 
 		menu.AppendSeparator();
