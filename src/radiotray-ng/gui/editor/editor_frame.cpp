@@ -169,7 +169,7 @@ EditorFrame::createMenus()
 	stationMenu->Append(idMenuAddStation, _("&Add\tCtrl-A"));
 	stationMenu->Append(idMenuEditStation, _("&Edit\tCtrl-E"));
 	stationMenu->Append(idMenuCopyStation, _("&Copy\tCtrl-C"));
-	stationMenu->Append(idMenuCutStation, _("Cut\tCtrl-X"));
+	stationMenu->Append(idMenuCutStation, _("Cu&t\tCtrl-X"));
 	stationMenu->Append(idMenuPasteStation, _("&Paste\tCtrl-V"));
 	stationMenu->Append(idMenuDeleteStation, _("&Delete\tCtrl-D"));
 	mbar->Append(stationMenu, _("&Station"));

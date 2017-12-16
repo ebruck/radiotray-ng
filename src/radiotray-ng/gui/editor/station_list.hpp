@@ -91,6 +91,8 @@ public:
 	DECLARE_EVENT_TABLE()
 
 private:
+	bool isClipboardDataAvailable(bool close_when_done = true);
+
 	size_t group_index;
 
 	int blank_image_index;
