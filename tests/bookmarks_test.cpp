@@ -43,7 +43,9 @@ namespace
 
 TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 {
-	Bookmarks bm{RTNG_BOOKMARK_FILE};
+	Bookmarks bm(RTNG_BOOKMARK_FILE);
+
+	EXPECT_EQ(bm.get_file_name(), RTNG_BOOKMARK_FILE);
 
 	ASSERT_TRUE(bm.add_group(GROUP_A, GROUP_IMAGE_A));
 	ASSERT_FALSE(bm.add_group(GROUP_A, GROUP_IMAGE_A));
@@ -131,7 +133,7 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 
 TEST(Bookmarks, test_that_group_can_be_move_to_a_new_position)
 {
-	Bookmarks bm{RTNG_BOOKMARK_FILE};
+	Bookmarks bm(RTNG_BOOKMARK_FILE);
 
 	ASSERT_TRUE(bm.add_group(GROUP_B, GROUP_IMAGE_B));
 	ASSERT_TRUE(bm.add_group(GROUP_A,GROUP_IMAGE_A));
@@ -149,7 +151,7 @@ TEST(Bookmarks, test_that_group_can_be_move_to_a_new_position)
 
 TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 {
-	Bookmarks bm{RTNG_BOOKMARK_FILE};
+	Bookmarks bm(RTNG_BOOKMARK_FILE);
 
 	// station B
 	ASSERT_FALSE(bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B));
@@ -209,7 +211,7 @@ TEST(Bookmarks, test_that_bookmarks_can_be_loaded_and_saved)
 {
 	// create
 	{
-		Bookmarks bm{TEST_FILE};
+		Bookmarks bm(TEST_FILE);
 
 		ASSERT_TRUE(bm.add_group(GROUP_A, GROUP_IMAGE_A));
 		ASSERT_TRUE(bm.add_station(GROUP_A, STATION_NAME_A, STATION_URL_A, STATION_IMAGE_A));
@@ -219,7 +221,7 @@ TEST(Bookmarks, test_that_bookmarks_can_be_loaded_and_saved)
 
 	// load
 	{
-		Bookmarks bm{TEST_FILE};
+		Bookmarks bm(TEST_FILE);
 
 		ASSERT_TRUE(bm.load());
 

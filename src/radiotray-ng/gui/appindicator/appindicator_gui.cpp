@@ -366,21 +366,20 @@ void AppindicatorGui::build_preferences_menu()
 	GtkWidget* sub_menu_items = gtk_menu_new();
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
-	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
-	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
-	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
-	gtk_widget_show(sub_menu_item);
-
-	sub_menu_item = gtk_menu_item_new_with_label("Bookmark Editor...");
+	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Bookmark Editor...");
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
+	gtk_widget_show(sub_menu_item);
+
+	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
+	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
+	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 }
 
 
 void AppindicatorGui::build_sleep_timer_menu_item()
 {
-	// add sleep timer
 	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
 
 	// toggle before we hook up callback as a reload loses this state...
