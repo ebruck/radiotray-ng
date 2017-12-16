@@ -531,8 +531,8 @@ void RadiotrayNG::volume_up_msg()
 
 void RadiotrayNG::volume_down()
 {
-	const uint32_t volume_step{this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE)};
-	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t volume_step(this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE));
+	const uint32_t volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 	this->set_and_save_volume((volume > volume_step) ? (volume - volume_step) : 0);
 }
@@ -548,7 +548,7 @@ void RadiotrayNG::volume_down_msg()
 
 void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 {
-	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 	if (new_volume != volume)
 	{
