@@ -35,7 +35,7 @@ The version here is what "I" wanted out of RadioTray.
 
 * ~~Cross platform bookmark editor application.~~
 * Finish ncurses interface
-* Mac support (icons, menu, media keys etc.) (I need help here.)
+* Mac support (icons, menu, media keys etc.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
 **Icons:** [http://www.iconsplace.com/]
@@ -71,6 +71,8 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
    "bookmark-editor" : "rtng-bookmark-editor",
+   "buffer-duration: : 2,
+   "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
    "file-monitor" : true,
@@ -100,6 +102,8 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
                  bookmarks: location of bookmarks file
            bookmark-editor: bookmark editor to launch
+               buffer-size: size of buffer in bytes
+           buffer-duration: number of seconds to buffer
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
               file-monitor: enable/disable notifcation of bookmark file changes
@@ -126,7 +130,7 @@ media-key-previous-station: media key to use for previous station within current
 * Installed config will only include several commonly edited entries.
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
-
+* buffer-size should be large enough to hold the configured duration (More testing is required!)
 
 ## Bookmarks Format ##
 
@@ -172,6 +176,15 @@ The rt2rtng script will convert your RadioTray bookmarks.xml file. All groups wi
 ```
 $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
+
+
+## Bookmarks Editor ##
+
+The Bookmarks Editor is a simple editor that enables management of your bookmarks file eliminating the need for manually editing the file. The editor will attempt to open the default bookmarks file on startup, but you can select to open another bookmarks file if desired. This provides you with the ability to manage multiple bookmark files.
+
+The editor supports all of the typical editor operations including adding, editing and deleting of both groups and stations. Images are easily selected via standard browsing functionality. You can also arrange the groups and stations using simple drag-n-drop actions.
+
+* Use Radiotray-NG's reload bookmarks after saving your changes.
 
 ## DBus Interface ##
 
