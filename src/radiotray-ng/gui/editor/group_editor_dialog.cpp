@@ -153,6 +153,14 @@ bool
 GroupEditorDialog::setImage(const std::string& path)
 {
 	this->image_control->SetValue(path);
+
+	/// @todo The following is a "temporary" workaround for the
+	///       issue identified in 15331. This can be removed once
+	///       wxWidgets 3.1 is available.
+	///
+	///       http://trac.wxwidgets.org/ticket/15331
+	wxLogNull log_null;
+
 	wxImage img = wxImage(path).Scale(24, 24);
 	this->bitmap_control->SetBitmap(wxBitmap(img));
 

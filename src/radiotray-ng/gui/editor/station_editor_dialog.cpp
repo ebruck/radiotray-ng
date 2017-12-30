@@ -97,7 +97,7 @@ StationEditorDialog::createControls()
 	this->name_control = new wxTextCtrl(this, NAME_ID, "", wxDefaultPosition, wxSize(140, -1));
 	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT | wxEXPAND);
 
-	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Url")), 0, wxALIGN_LEFT);
+	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("URL")), 0, wxALIGN_LEFT);
 	this->url_control = new wxTextCtrl(this, URL_ID, "", wxDefaultPosition, wxSize(270, -1));
 	grid_sizer->Add(this->url_control, 0, wxALIGN_LEFT | wxEXPAND);
 
@@ -166,6 +166,14 @@ bool
 StationEditorDialog::setImage(const std::string& path)
 {
 	this->image_control->SetValue(path);
+
+	/// @todo The following is a "temporary" workaround for the
+	///       issue identified in 15331. This can be removed once
+	///       wxWidgets 3.1 is available.
+	///
+	///       http://trac.wxwidgets.org/ticket/15331
+	wxLogNull log_null;
+
 	wxImage img = wxImage(path).Scale(24, 24);
 	this->bitmap_control->SetBitmap(wxBitmap(img));
 
