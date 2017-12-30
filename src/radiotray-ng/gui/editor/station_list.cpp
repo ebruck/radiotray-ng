@@ -55,7 +55,7 @@ namespace
 	const long NAME_COLUMN_INDEX = 0;
 	const int NAME_COLUMN_WIDTH = 160;
 
-	const wxString URL_COLUMN_TEXT(wxT("Url"));
+	const wxString URL_COLUMN_TEXT(wxT("URL"));
 	const long URL_COLUMN_INDEX = 1;
 	const int URL_COLUMN_WIDTH = 340;
 

@@ -107,16 +107,20 @@ void
 EditorDialogBase::onBrowseButton(wxCommandEvent& /* event */)
 {
 	std::string image = this->getImagePath();
+
 	wxString path = wxEmptyString;
+	wxString file = wxEmptyString;
 	if (image.size())
 	{
-		wxFileName filename(image);
-		path = filename.GetFullPath();
+		wxFileName filename(radiotray_ng::word_expand(image));
+
+		path = filename.GetPath();
+		file = filename.GetFullName();
 	}
 	wxFileDialog dialog(this,
 						("Select station image"),
 						path,
-						"",
+						file,
 						"Image files (*.bmp;*.ico;*.xpm;*.png;*.jpg)|*.bmp;*.ico;*.xpm;*.png;*.jpg",
 						wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if (dialog.ShowModal() != wxID_OK)
