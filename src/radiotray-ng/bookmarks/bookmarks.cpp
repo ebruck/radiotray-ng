@@ -16,13 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
-#include <radiotray-ng/helpers.hpp>
-
-#include <system_error>
-#include <cstring>
-#include <fstream>
-#include <exception>
-#include <algorithm>
 #include <iostream>
 
 
@@ -65,20 +58,35 @@ bool Bookmarks::load()
 
 bool Bookmarks::save()
 {
-	LOG(info) << "saving: " << this->bookmarks_file;
+	return this->save_as("");
+}
+
+
+bool Bookmarks::save_as(const std::string& new_filename)
+{
+	std::string filename = this->bookmarks_file;
+
+	if (!new_filename.empty())
+	{
+		filename = radiotray_ng::word_expand(new_filename);
+	}
+
+	LOG(info) << "saving: " << filename;
 
 	try
 	{
-		std::ofstream ofile(this->bookmarks_file);
+		std::ofstream ofile(filename);
 		ofile.exceptions(std::ios::failbit);
 
 		ofile << Json::StyledWriter().write(this->bookmarks);
 	}
 	catch(std::exception& /*e*/)
 	{
-		LOG(error) << "Failed to save: " << this->bookmarks_file << " : "<< strerror(errno);
+		LOG(error) << "Failed to save: " << filename << " : "<< strerror(errno);
 		return false;
 	}
+
+	this->bookmarks_file = filename;
 
 	return true;
 }
@@ -313,12 +321,12 @@ void Bookmarks::move_to_pos(Json::Value& array, const Json::ArrayIndex old_index
 
 bool Bookmarks::move_group_to_pos(const std::string& group_name, const size_t new_group_index)
 {
-	Json::ArrayIndex group_index;
-
 	if (new_group_index >= this->bookmarks.size())
 	{
 		return false;
 	}
+
+	Json::ArrayIndex group_index;
 
 	if (this->find_group(group_name, group_index))
 	{
@@ -348,6 +356,7 @@ bool Bookmarks::move_station_to_pos(const std::string& group_name, const std::st
 		}
 
 		Json::ArrayIndex station_index;
+
 		if (this->find_station(group_index, station_name, station_index))
 		{
 			if (station_index == new_station_index)
@@ -436,6 +445,12 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 }
 
 
+const std::string& Bookmarks::get_file_name() const
+{
+	return this->bookmarks_file;
+}
+
+
 size_t Bookmarks::size()
 {
 	return size_t(this->bookmarks.size());
@@ -446,3 +461,75 @@ std::string Bookmarks::dump()
 {
 	return this->bookmarks.toStyledString();
 }
+
+
+bool Bookmarks::get_group_as_json(const std::string& group_name, std::string& json)
+{
+	Json::ArrayIndex group_index;
+
+	if (this->find_group(group_name, group_index))
+	{
+		json = Json::StyledWriter().write(this->bookmarks[Json::ArrayIndex(group_index)]);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool Bookmarks::get_station_as_json(const std::string& group_name, const std::string& station_name, std::string& json)
+{
+	Json::ArrayIndex group_index;
+
+	if (this->find_group(group_name, group_index))
+	{
+		Json::ArrayIndex station_index;
+		if (this->find_station(group_index, station_name, station_index))
+		{
+			json = Json::StyledWriter().write(this->bookmarks[group_index][STATIONS_KEY][station_index]);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool Bookmarks::add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name)
+{
+	// first, validate the station
+	Json::Reader reader;
+	Json::Value station;
+
+	if (!reader.parse(json, station))
+	{
+		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << reader.getFormattedErrorMessages();
+		return false;
+	}
+
+	if (!station.isMember(STATION_NAME_KEY)|| !station.isMember(STATION_URL_KEY) ||	!station.isMember(STATION_IMAGE_KEY))
+	{
+		LOG(warning) << "Insufficient station data ...\n<<" << json << "<<";
+		return false;
+	}
+
+	Json::ArrayIndex group_index;
+	if (!this->find_group(group_name, group_index))
+	{
+		LOG(error) << "Failed to find group: " << group_name;
+		return false;
+	}
+
+	Json::ArrayIndex station_index;
+	if (this->find_station(group_index, station[STATION_NAME_KEY].asString(), station_index))
+	{
+		LOG(warning) << "Station <<" << station[STATION_NAME_KEY].asString() << "already exists!";
+		return false;
+	}
+
+	this->bookmarks[group_index][STATIONS_KEY].append(station);
+	station_name = station[STATION_NAME_KEY].asString();
+
+	return true;
+}
+

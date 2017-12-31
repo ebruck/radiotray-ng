@@ -16,7 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "appindicator_gui.hpp"
-#include <radiotray-ng/common.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
@@ -41,22 +40,22 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	// monitor bookmark changes?
 	if (this->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
 	{
-		this->bookmarks_monitor.reset(new radiotray_ng::FileMonitor(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
+		this->bookmarks_monitor = std::make_unique<radiotray_ng::FileMonitor>(this->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE));
 		this->file_monitor_timer_id = g_timeout_add(this->config->get_uint32(FILE_MONITOR_INTERVAL_KEY, DEFAULT_FILE_MONITOR_INTERVAL_VALUE) * 1000,
 			on_file_monitor_timer_event, this);
 	}
 
 	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&AppindicatorGui::on_tags_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&AppindicatorGui::on_state_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&AppindicatorGui::on_volume_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	this->event_bus->subscribe(IEventBus::event::station_error, std::bind(&AppindicatorGui::on_station_error_event, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 }
 
 
@@ -116,7 +115,7 @@ void AppindicatorGui::on_station_menu_item(GtkWidget* /*widget*/, gpointer data)
 
 void AppindicatorGui::on_indicator_scrolled(GtkWidget* /*widget*/, gint /*delta*/, GdkScrollDirection direction, gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	switch(direction)
 	{
@@ -138,7 +137,7 @@ void AppindicatorGui::on_indicator_scrolled(GtkWidget* /*widget*/, gint /*delta*
 
 void AppindicatorGui::on_action_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	std::string state{app->radiotray_ng->get_state()};
 
@@ -372,9 +371,6 @@ void AppindicatorGui::build_preferences_menu()
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 
-	// bookmark editor coming soon...
-	gtk_widget_set_sensitive(sub_menu_item, FALSE);
-
 	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
@@ -384,7 +380,6 @@ void AppindicatorGui::build_preferences_menu()
 
 void AppindicatorGui::build_sleep_timer_menu_item()
 {
-	// add sleep timer
 	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
 
 	// toggle before we hook up callback as a reload loses this state...
@@ -483,7 +478,7 @@ void AppindicatorGui::build_menu()
 
 gboolean AppindicatorGui::on_timer_event(gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	if (app->radiotray_ng->get_state() == STATE_PLAYING)
 	{
@@ -502,7 +497,7 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 
 gboolean AppindicatorGui::on_file_monitor_timer_event(gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	if (app->bookmarks_monitor->changed())
 	{
@@ -549,7 +544,7 @@ bool AppindicatorGui::sleep_timer_dialog()
 		{
 			try
 			{
-				this->config->set_uint32(SLEEP_TIMER_KEY, std::stol(timeout));
+				this->config->set_uint32(SLEEP_TIMER_KEY, std::stoul(timeout));
 			}
 			catch(std::invalid_argument& ex)
 			{
@@ -568,7 +563,7 @@ bool AppindicatorGui::sleep_timer_dialog()
 
 void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	// Must be a way to toggle without triggering another event?
 	if (app->ignore_sleep_timer_toggle)
@@ -606,26 +601,32 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 
 void AppindicatorGui::on_bookmark_editor_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
-	std::string cmd("gedit ");
+	std::string cmd(radiotray_ng::word_expand(app->config->get_string(BOOKMARK_EDITOR_KEY, DEFAULT_BOOKMARK_EDITOR)));
 
-	cmd += radiotray_ng::word_expand(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE));
+	cmd += " \"" + radiotray_ng::word_expand(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)) + "\"";
 
-	g_spawn_command_line_async(cmd.c_str(), nullptr);
+	LOG(debug) << "launching: " << cmd;
+
+	g_autoptr(GError) error(nullptr);
+	if (!g_spawn_command_line_async(cmd.c_str(), &error))
+	{
+		LOG(error) << error->message;
+	}
 }
 
 
 void AppindicatorGui::on_reload_bookmarks_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
-	AppindicatorGui* app = static_cast<AppindicatorGui*>(data);
+	auto app = static_cast<AppindicatorGui*>(data);
 
 	if (app->radiotray_ng->reload_bookmarks())
 	{
 		// reset file monitor...
 		if (app->config->get_bool(FILE_MONITOR_KEY, DEFAULT_FILE_MONITOR_VALUE))
 		{
-			app->bookmarks_monitor.reset(new radiotray_ng::FileMonitor(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE)));
+			app->bookmarks_monitor = std::make_unique<radiotray_ng::FileMonitor>(app->config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE));
 		}
 
 		gtk_widget_destroy(app->menu);
@@ -645,7 +646,7 @@ void AppindicatorGui::on_about_menu_item(GtkWidget* /*widget*/, gpointer /*data*
 	const gchar* authors[sizeof(APP_AUTHOR)] =
 	{
 		APP_AUTHOR,
-		NULL,
+		nullptr,
 	};
 
 	std::string version{"v" RTNG_VERSION};
@@ -698,7 +699,6 @@ void AppindicatorGui::run(int argc, char* argv[])
 
 	this->build_menu();
 
-	// todo: use boost's program options...
 	if (argc > 1)
 	{
 		if (std::string(argv[1]) == "--play")

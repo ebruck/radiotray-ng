@@ -28,11 +28,9 @@
 #include "ram_decoder.hpp"
 #include "xspf_decoder.hpp"
 
-#include <algorithm>
-
 
 PlaylistDownloader::PlaylistDownloader(std::shared_ptr<IConfig> config)
-	: PlaylistDownloader(config, std::make_shared<Curl>())
+	: PlaylistDownloader(std::move(config), std::make_shared<Curl>())
 {
 }
 

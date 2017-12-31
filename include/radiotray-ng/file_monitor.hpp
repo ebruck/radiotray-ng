@@ -33,31 +33,7 @@ namespace radiotray_ng
 		FileMonitor(const std::string& file)
 			: file_to_watch(radiotray_ng::word_expand(file))
 		{
-			this->inotify_fd = inotify_init();
-
-			if (this->inotify_fd < 0)
-			{
-				LOG(error) << "could not initialize inotify, monitoring disabled: " << errno;
-				return;
-			}
-
-			if (fcntl(this->inotify_fd, F_SETFL, fcntl(this->inotify_fd, F_GETFL) | O_NONBLOCK) < 0)
-			{
-				LOG(error) << "could not set notify descriptor to non-blocking, monitoring disabled: " << errno;
-				close(this->inotify_fd);
-				return;
-			}
-
-			if (!this->add_watch())
-			{
-				LOG(error) << "could not add inotify watch, monitoring disabled: " << errno;
-				close(this->inotify_fd);
-				return;
-			}
-
-			LOG(debug) << "monitoring: " << file;
-
-			this->setup = true;
+			this->setup = this->add_watch();
 		}
 
 		~FileMonitor()
@@ -82,7 +58,7 @@ namespace radiotray_ng
 					events.push_back(tmp);
 				}
 
-				for(auto event : events)
+				for (auto event : events)
 				{
 					if (event.mask & IN_MODIFY || event.mask & IN_ATTRIB)
 					{
@@ -91,15 +67,11 @@ namespace radiotray_ng
 
 					if (event.mask & IN_DELETE_SELF || event.mask & IN_MOVE_SELF || event.mask & IN_IGNORED)
 					{
-						inotify_rm_watch(this->inotify_fd, this->watch_fd);
+						this->setup = this->add_watch();
 
-						if (!this->add_watch())
+						if (!this->setup)
 						{
 							LOG(error) << "could not add inotify watch, monitoring disabled: " << errno;
-
-							close(this->inotify_fd);
-
-							this->setup = false;
 						}
 
 						modified = true;
@@ -116,16 +88,44 @@ namespace radiotray_ng
 
 		bool add_watch()
 		{
+			this->cleanup();
+
+			this->inotify_fd = inotify_init();
+
+			if (this->inotify_fd < 0)
+			{
+				LOG(error) << "could not initialize inotify, monitoring disabled: " << errno;
+				return false;
+			}
+
+			if (fcntl(this->inotify_fd, F_SETFL, fcntl(this->inotify_fd, F_GETFL) | O_NONBLOCK) < 0)
+			{
+				LOG(error) << "could not set notify descriptor to non-blocking, monitoring disabled: " << errno;
+				close(this->inotify_fd);
+				return false;
+			}
+
+			LOG(debug) << "monitoring: " << this->file_to_watch;
+
 			this->watch_fd = inotify_add_watch(this->inotify_fd, file_to_watch.c_str(),
 				IN_MODIFY | IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF | IN_IGNORED);
 
-			return (this->watch_fd != -1);
+			if (this->watch_fd == -1)
+			{
+				close(this->inotify_fd);
+				return false;
+			}
+
+			return true;
 		}
 
 		void cleanup()
 		{
-			inotify_rm_watch(this->inotify_fd, this->watch_fd);
-			close(this->inotify_fd);
+			if (this->setup)
+			{
+				inotify_rm_watch(this->inotify_fd, this->watch_fd);
+				close(this->inotify_fd);
+			}
 		}
 
 		int inotify_fd;

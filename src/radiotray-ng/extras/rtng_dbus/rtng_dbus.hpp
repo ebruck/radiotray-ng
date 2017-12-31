@@ -28,6 +28,7 @@ class RtngDbus
 {
 public:
 	RtngDbus(std::shared_ptr<IRadioTrayNG> radiotray_ng);
+
 	~RtngDbus();
 
 private:

@@ -90,11 +90,8 @@ namespace radiotray_ng
 	            }
 	        }
 
-	        if (spacePos != std::string::npos)
-	        {
-	            str[spacePos] = '\n';
-	            curWidth = spacePos + width + 1;
-	        }
+	        str[spacePos] = '\n';
+	        curWidth = spacePos + width + 1;
 	    }
 
 	    return str;

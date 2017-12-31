@@ -16,8 +16,6 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/m3u_decoder.hpp>
-#include <radiotray-ng/helpers.hpp>
-#include <sstream>
 
 
 std::string M3uDecoder::get_name()
@@ -28,13 +26,9 @@ std::string M3uDecoder::get_name()
 
 bool M3uDecoder::is_decodable(const std::string& content_type, const std::string& /*content*/)
 {
-	if (content_type.find("audio/mpegurl"  ) != std::string::npos ||
-	    content_type.find("audio/x-mpegurl") != std::string::npos)
-	{
-		return true;
-	}
-
-	return false;
+	return (content_type.find("audio/mpegurl"  ) != std::string::npos ||
+	        content_type.find("audio/x-mpegurl") != std::string::npos ||
+	        content_type.find("application/vnd.apple.mpegurl") != std::string::npos);
 }
 
 

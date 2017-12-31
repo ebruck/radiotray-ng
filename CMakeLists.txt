@@ -6,7 +6,7 @@ endif(POLICY CMP0048)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
-	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++11"
+	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++14"
 		CACHE STRING "C++ version for Eclipse's indexer" FORCE)
 	set(CMAKE_ECLIPSE_VERSION "4.4"
 		CACHE STRING "Eclipse version" FORCE)
@@ -16,8 +16,8 @@ project(radiotray-ng CXX)
 
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 8)
+set(PROJECT_VERSION_MINOR 2)
+set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -37,6 +37,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Boost     REQUIRED filesystem system log program_options thread)
+find_package(wxWidgets REQUIRED core base adv)
 find_package(GMock)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
@@ -50,16 +51,11 @@ endif(NOT APPLE)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
-set(warnings "-Wall -Wextra -Werror")
+set(warnings "-Wno-deprecated-declarations -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS ${warnings})
+set(CMAKE_C_FLAGS   ${warnings})
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-
-if (NOT CONFIGURED_ONCE)
-    set(CMAKE_CXX_FLAGS "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
-    set(CMAKE_C_FLAGS   "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
-endif()
 
 # includes etc.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src/ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ ${JSONCPP_INCLUDE_DIRS})
@@ -94,6 +90,7 @@ add_subdirectory(src/radiotray-ng/event_bus)
 add_subdirectory(src/radiotray-ng/player)
 add_subdirectory(src/radiotray-ng/notification)
 add_subdirectory(src/radiotray-ng/extras/media_keys)
+add_subdirectory(src/radiotray-ng/gui/editor)
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_subdirectory(src/radiotray-ng/extras/rtng_dbus)
     target_compile_definitions(radiotray-ng PRIVATE RTNG_DBUS)
@@ -125,5 +122,3 @@ add_custom_command(
 )
 
 add_custom_target(user-agent ALL DEPENDS rtng_user_agent)
-
-set(CONFIGURED_ONCE TRUE CACHE INTERNAL "A flag showing that CMake has configured at least once.")

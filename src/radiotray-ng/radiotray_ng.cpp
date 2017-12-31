@@ -17,7 +17,6 @@
 
 #include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
@@ -282,6 +281,43 @@ void RadiotrayNG::on_tags_changed_event_processing(const IEventBus::event& /*ev*
 			{
 				radiotray_ng::trim(data[TAG_ARTIST] = data[TAG_TITLE].substr(0, pos));
 				radiotray_ng::trim(data[TAG_TITLE]  = data[TAG_TITLE].substr(pos+3));
+
+				// protect against bad tagging...
+				if (data[TAG_ARTIST].empty())
+				{
+					data.erase(TAG_ARTIST);
+				}
+
+				if (data[TAG_TITLE].empty())
+				{
+					data.erase(TAG_TITLE);
+				}
+				else
+				{
+					// extra parsing for text="title"...
+					if (this->config->get_bool(IHR_TITLE_KEY, DEFAULT_IHR_TITLE_KEY_VALUE))
+					{
+						pos = data[TAG_TITLE].find(R"(text=")");
+
+						if (pos != std::string::npos)
+						{
+							auto end_pos = data[TAG_TITLE].find('"', pos+6);
+
+							if (end_pos != std::string::npos)
+							{
+								data[TAG_TITLE] = data[TAG_TITLE].substr(pos+6, end_pos - (pos+6));
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				// sometimes tags are empty, especially with IHR...
+				if (data[TAG_TITLE] == " -" || data[TAG_TITLE] == "- ")
+				{
+					data.erase(TAG_TITLE);
+				}
 			}
 		}
 	}
@@ -334,9 +370,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			// way too many messages...
-
-			//this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
 
 			return;
 		}
@@ -497,8 +531,8 @@ void RadiotrayNG::volume_up_msg()
 
 void RadiotrayNG::volume_down()
 {
-	const uint32_t volume_step{this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE)};
-	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t volume_step(this->config->get_uint32(VOLUME_STEP_KEY, DEFAULT_VOLUME_STEP_VALUE));
+	const uint32_t volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 	this->set_and_save_volume((volume > volume_step) ? (volume - volume_step) : 0);
 }
@@ -514,7 +548,7 @@ void RadiotrayNG::volume_down_msg()
 
 void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 {
-	const uint32_t volume{this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)};
+	const uint32_t volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 	if (new_volume != volume)
 	{

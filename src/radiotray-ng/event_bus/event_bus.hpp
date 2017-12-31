@@ -26,14 +26,11 @@
 class EventBus final : public IEventBus
 {
 public:
-	virtual ~EventBus() = default;
+	bool subscribe(IEventBus::event, IEventBus::event_callback_t cb, IEventBus::event_pos req_pos);
 
-	bool subscribe(const IEventBus::event, IEventBus::event_callback_t cb,
-		const IEventBus::event_pos req_pos = IEventBus::event_pos::any);
+	bool publish(IEventBus::event ev, event_data_t& data);
 
-	bool publish(const IEventBus::event ev, event_data_t& data);
-
-	bool publish_only(const IEventBus::event ev, const std::string& key, const std::string& value);
+	bool publish_only(IEventBus::event ev, const std::string& key, const std::string& value);
 
 private:
 

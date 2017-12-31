@@ -65,7 +65,9 @@ using playlist_t = std::vector<std::string>;
 
 // config keys
 #define BOOKMARKS_KEY                     "bookmarks"
+#define BOOKMARK_EDITOR_KEY               "bookmark-editor"
 #define BUFFER_SIZE_KEY                   "buffer-size"
+#define BUFFER_DURATION_KEY               "buffer-duration"
 #define COMPACT_MENU_KEY                  "compact-menu"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
 #define FILE_MONITOR_KEY                  "file-monitor"
@@ -87,6 +89,7 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_NOTIFICATION_KEY     "radiotray-ng-notification"
 #define SLEEP_TIMER_KEY                   "sleep-timer"
 #define SPLIT_TITLE_KEY                   "split-title"
+#define IHR_TITLE_KEY                     "ihr-title"
 #define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
 #define VOLUME_LEVEL_KEY                  "volume-level"
 #define VOLUME_MAX_LEVEL_KEY              "volume-max-level"
@@ -108,11 +111,13 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
 
 // defaults
-#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(128000*10)
+#define DEFAULT_BUFFER_DURATION_VALUE            (2)
+#define DEFAULT_BUFFER_SIZE_VALUE                uint32_t(320000)
+#define DEFAULT_BOOKMARK_EDITOR                  "rtng-bookmark-editor"
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
 #define DEFAULT_FILE_MONITOR_VALUE               (true)
-#define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (30)
+#define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (10)
 #define DEFAULT_HTTP_TIMEOUT_VALUE               (15)
 #define DEFAULT_INVERT_MENU_VALUE                (false)
 #define DEFAULT_MEDIA_KEY_MAPPING_VALUE          (false)
@@ -128,6 +133,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
 #define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)
 #define DEFAULT_SPLIT_TITLE_VALUE                (true)
+#define DEFAULT_IHR_TITLE_KEY_VALUE              (true)
 #define DEFAULT_STATION_IMAGE_VALUE              ""
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)

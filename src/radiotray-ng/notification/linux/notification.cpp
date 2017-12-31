@@ -17,7 +17,6 @@
 
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/notification/notification.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <libnotify/notify.h>
 
 // lazy pimpl...
@@ -25,8 +24,11 @@ struct notify_t
 {
 	notify_t()
 	{
-		notify_init("radiotray-ng");
+		notify_init(APP_NAME);
 		this->nn = notify_notification_new(nullptr, nullptr, nullptr);
+
+		notify_notification_set_urgency(this->nn, NOTIFY_URGENCY_LOW);
+		notify_notification_set_timeout(this->nn, NOTIFY_EXPIRES_DEFAULT);
 	}
 
 	~notify_t()

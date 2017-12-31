@@ -31,7 +31,7 @@ public:
 
 	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, const std::string& param);
 
-	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, const long param);
+	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, long param);
 
 	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, void* param);
 

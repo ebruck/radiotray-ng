@@ -18,7 +18,6 @@
 #include "radiotray_ng.hpp"
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/pidfile.hpp>
-#include <radiotray-ng/helpers.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
 #include <radiotray-ng/player/player.hpp>
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
@@ -36,7 +35,6 @@
 #include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
 #endif
 
-#include <boost/filesystem.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/expressions.hpp>
@@ -79,7 +77,7 @@ void init_logging()
 }
 
 
-void set_logging_level(std::shared_ptr<IConfig> config)
+void set_logging_level(std::shared_ptr<IConfig>& config)
 {
 	if (config->get_bool(DEBUG_LOGGING_KEY, DEFAULT_DEBUG_LOGGING_VALUE))
 	{
@@ -96,7 +94,7 @@ void set_logging_level(std::shared_ptr<IConfig> config)
 }
 
 
-void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& config_path)
+void set_config_defaults(std::shared_ptr<IConfig>& config, const std::string& config_path)
 {
 	namespace fs = boost::filesystem;
 
@@ -119,7 +117,7 @@ void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& con
 }
 
 
-void set_bookmark_defaults(std::shared_ptr<IBookmarks> bookmarks)
+void set_bookmark_defaults(std::shared_ptr<IBookmarks>& bookmarks)
 {
 	bookmarks->add_group(ROOT_BOOKMARK_GROUP, DEFAULT_STATION_IMAGE_VALUE);
 }
@@ -176,7 +174,7 @@ bool process_command_line_args(int argc, char* argv[])
 			if (vm.count("version"))
 			{
 				// same as about box...
-				std::string version{"v" RTNG_VERSION};
+				std::string version("v" RTNG_VERSION);
 
 				// if git version differs, then append hash...
 				if (version != RTNG_GIT_VERSION)
@@ -231,7 +229,7 @@ int main(int argc, char* argv[])
 
 	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
 
-	std::shared_ptr<IConfig> config{std::make_shared<Config>(config_path + RTNG_CONFIG_FILE)};
+	std::shared_ptr<IConfig> config = std::make_shared<Config>(config_path + RTNG_CONFIG_FILE);
 
 	// load config or create a new one
 	if (!config->load())
@@ -243,9 +241,9 @@ int main(int argc, char* argv[])
 	// adjust logging level...
 	set_logging_level(config);
 
-	auto bookmarks{std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE))};
-	auto event_bus{std::make_shared<EventBus>()};
-	auto player{std::make_shared<Player>(config, event_bus)};
+	std::shared_ptr<IBookmarks> bookmarks = std::make_shared<Bookmarks>(config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE));
+	std::shared_ptr<IEventBus> event_bus = std::make_shared<EventBus>();
+	std::shared_ptr<IPlayer> player = std::make_shared<Player>(config, event_bus);
 
 	if (!bookmarks->load())
 	{
@@ -253,12 +251,12 @@ int main(int argc, char* argv[])
 		set_bookmark_defaults(bookmarks);
 	}
 
-	auto radiotray_ng{std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus)};
+	auto radiotray_ng = std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus);
 
 #ifdef APPINDICATOR_GUI
-	auto gui(std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus));
+	auto gui = std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus);
 #else
-	auto gui(std::make_shared<NCursesGui>(radiotray_ng, event_bus));
+	auto gui = std::make_shared<NCursesGui>(radiotray_ng, event_bus);
 #endif
 
 #ifdef RTNG_DBUS

@@ -35,7 +35,7 @@ public:
 
 	void stop();
 
-	void volume(const uint32_t percent);
+	void volume(uint32_t percent);
 
 private:
 	void gst_start();
@@ -55,7 +55,8 @@ private:
 	GstElement* souphttpsrc;
 	GstClock*   clock;
 	GstClockID  clock_id;
-	bool        buffering;
+	bool        buffering = false;
+	bool        state_playing_sent = false;
 
 	playlist_t current_playlist;
 

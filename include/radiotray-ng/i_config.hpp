@@ -31,15 +31,15 @@ public:
 
 	virtual void set_string(const std::string& key, const std::string& value) = 0;
 
-	virtual void set_uint32(const std::string& key, const uint32_t value) = 0;
+	virtual void set_uint32(const std::string& key, uint32_t value) = 0;
 
-	virtual void set_bool(const std::string& key, const bool value) = 0;
+	virtual void set_bool(const std::string& key, bool value) = 0;
 
 	virtual std::string get_string(const std::string& key, const std::string& default_value) = 0;
 
-	virtual uint32_t get_uint32(const std::string& key, const uint32_t default_value) = 0;
+	virtual uint32_t get_uint32(const std::string& key, uint32_t default_value) = 0;
 
-	virtual bool get_bool(const std::string& key, const bool default_value) = 0;
+	virtual bool get_bool(const std::string& key, bool default_value) = 0;
 
 	virtual bool exists(const std::string& key) = 0;
 };

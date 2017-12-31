@@ -23,8 +23,7 @@ Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event
 	: pipeline(nullptr)
 	, souphttpsrc(nullptr)
 	, clock(nullptr)
-	, clock_id(0)
-	, buffering(false)
+	, clock_id(nullptr)
 	, event_bus(std::move(event_bus))
 	, config(std::move(config))
 	, gst_bus(nullptr)
@@ -49,13 +48,21 @@ bool Player::play_next()
 
 	if (!this->current_playlist.empty())
 	{
+		LOG(debug) << "uri: " << this->current_playlist.front();
+
 		g_object_set(this->pipeline, "uri", this->current_playlist.front().c_str(), NULL);
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
-		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+		uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
 
-		this->buffering = true;
+		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
+		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
+
+		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size*buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
+
+		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
 		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
 		{
@@ -103,7 +110,7 @@ bool Player::play(const playlist_t& playlist)
 void Player::stop()
 {
 	GstState state;
-	gst_element_get_state(GST_ELEMENT(this->pipeline), &state, NULL, GST_CLOCK_TIME_NONE);
+	gst_element_get_state(GST_ELEMENT(this->pipeline), &state, nullptr, GST_CLOCK_TIME_NONE);
 
 	if (state != GST_STATE_NULL)
 	{
@@ -113,12 +120,15 @@ void Player::stop()
 		// buffering timeout.
 		this->buffering = false;
 
+		this->state_playing_sent = false;
+
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
 			LOG(info) << "canceling outstanding clock request";
 			gst_clock_id_unschedule(this->clock_id);
-			this->clock_id = 0;
+			gst_clock_id_unref(this->clock_id);
+			this->clock_id = nullptr;
 		}
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
@@ -161,7 +171,8 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 {
 	Player* player{(Player*)user_data};
 
-	player->clock_id = 0;
+	gst_clock_id_unref(player->clock_id);
+	player->clock_id = nullptr;
 
 	if (player->buffering)
 	{
@@ -230,7 +241,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			if (percent == 100)
 			{
 				player->buffering = false;
-				LOG(debug) << "setting state to: GST_STATE_PLAYING";
+				LOG(debug) << "stopped buffering, setting state to: GST_STATE_PLAYING";
 				gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PLAYING);
 			}
 			else
@@ -239,7 +250,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 				if (!player->buffering)
 				{
 					// we were not buffering but PLAYING, then pause the pipeline
-					LOG(debug) << "setting state to: GST_STATE_PAUSED";
+					LOG(debug) << "started buffering, setting state to: GST_STATE_PAUSED";
 					gst_element_set_state(GST_ELEMENT(player->pipeline), GST_STATE_PAUSED);
 				}
 
@@ -274,7 +285,11 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			{
 				if (new_state == GST_STATE_PLAYING)
 				{
-					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+					if (!player->state_playing_sent)
+					{
+						player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+						player->state_playing_sent = true;
+					}
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{
@@ -284,6 +299,8 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 						LOG(info) << "canceling outstanding clock request";
 
 						gst_clock_id_unschedule(player->clock_id);
+						gst_clock_id_unref(player->clock_id);
+						player->clock_id = nullptr;
 					}
 
 					if (!player->buffering)
@@ -295,7 +312,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 					// start timer to abort if buffering stalls...
 					player->clock_id = gst_clock_new_single_shot_id(player->clock, gst_clock_get_time(player->clock) + (10 * GST_SECOND));
-					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, NULL);
+					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, nullptr);
 				}
 			}
 		}
@@ -313,9 +330,9 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 {
 	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
 
-	gint count = gst_tag_list_get_tag_size(list, tag);
+	guint count = gst_tag_list_get_tag_size(list, tag);
 
-	for (gint i = 0; i < count; i++)
+	for (guint i = 0; i < count; i++)
 	{
 		gchar* str{nullptr};
 
@@ -373,18 +390,6 @@ void Player::gst_start()
 	}
 
 	g_object_set(this->pipeline, "audio-sink", audio_sink, NULL);
-
-	// set buffer size & volume
-	if (this->config)
-	{
-		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-
-		LOG(info) << BUFFER_SIZE_KEY << "=" << buffer_size;
-
-		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size, NULL);
-
-		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
-	}
 
 	// get clock for buffering timeouts...
 	this->clock = gst_pipeline_get_clock(GST_PIPELINE(this->pipeline));

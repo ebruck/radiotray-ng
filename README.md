@@ -33,11 +33,10 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Future: ##
 
-* Cross platform bookmark editor application. (Work is underway. Thanks Mike!) 
+* ~~Cross platform bookmark editor application.~~
 * Finish ncurses interface
-* Mac support (icons, menu, media keys etc.) (I need help here.)
+* Mac support (icons, menu, media keys etc.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
-* Better handling of any JSON parsing errors.
 
 **Icons:** [http://www.iconsplace.com/]
 **License:** Creative Commons Attribution-NoDerivs 3.0 Unported
@@ -53,6 +52,7 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screenshot_2.png)
 ![Screenshot](images/screenshot_3.png)
 ![Screenshot](images/screenshot_4.png)
+![Screenshot](images/screenshot_7.png)
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
 
@@ -70,6 +70,9 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
+   "bookmark-editor" : "rtng-bookmark-editor",
+   "buffer-duration: : 2,
+   "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
    "file-monitor" : true,
@@ -81,6 +84,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "notifications" : true,
    "sleep-timer" : 30,
    "split-title" : true,
+   "ihr-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
    "volume-step" : 1,
@@ -97,6 +101,9 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
 ```
 ```
                  bookmarks: location of bookmarks file
+           bookmark-editor: bookmark editor to launch
+               buffer-size: size of buffer in bytes
+           buffer-duration: number of seconds to buffer
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
               file-monitor: enable/disable notifcation of bookmark file changes
@@ -106,6 +113,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
              notifications: turns on/off notification messages
                sleep-timer: value is in minutes
                split-title: attempts to reformat the notification into title/artist
+                 ihr-title: extra parsing for iheartradio formatting (requires split-title)
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
                volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
@@ -119,9 +127,10 @@ media-key-previous-station: media key to use for previous station within current
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
+* Installed config will only include several commonly edited entries.
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
-
+* buffer-size should be large enough to hold the configured duration (More testing is required!)
 
 ## Bookmarks Format ##
 
@@ -168,6 +177,15 @@ The rt2rtng script will convert your RadioTray bookmarks.xml file. All groups wi
 $ rt2rtng ~/.local/share/radiotray/bookmarks.xml > bookmarks.json
 ```
 
+
+## Bookmarks Editor ##
+
+The Bookmarks Editor is a simple editor that enables management of your bookmarks file eliminating the need for manually editing the file. The editor will attempt to open the default bookmarks file on startup, but you can select to open another bookmarks file if desired. This provides you with the ability to manage multiple bookmark files.
+
+The editor supports all of the typical editor operations including adding, editing and deleting of both groups and stations. Images are easily selected via standard browsing functionality. You can also arrange the groups and stations using simple drag-n-drop actions.
+
+* Use Radiotray-NG's reload bookmarks after saving your changes.
+
 ## DBus Interface ##
 
 ```
@@ -204,7 +222,7 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
 
 Install these packages:
 ```
-libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5 cmake
 ```
 
 

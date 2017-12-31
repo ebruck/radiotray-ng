@@ -21,7 +21,6 @@
 #include <radiotray-ng/i_config.hpp>
 
 #include <giomm.h>
-#include <map>
 
 
 class media_keys_t
@@ -126,7 +125,7 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 	std::string key_pressed;
 
 	GVariant* tmp = g_variant_get_child_value(parameters, 1);
-	const gchar* key = g_variant_get_string(tmp, NULL);
+	const gchar* key = g_variant_get_string(tmp, nullptr);
 
 	if (key != nullptr)
 	{
