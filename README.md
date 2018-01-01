@@ -130,7 +130,6 @@ media-key-previous-station: media key to use for previous station within current
 * Installed config will only include several commonly edited entries.
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
-* buffer-size should be large enough to hold the configured duration (More testing is required!)
 
 ## Bookmarks Format ##
 
