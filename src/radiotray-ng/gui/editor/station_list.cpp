@@ -521,7 +521,10 @@ StationList::onBeginDrag(wxListEvent& event)
 		return;
 	}
 
-	wxTextDataObject drag_data(text);
+	this->SetDropTarget(new StationDropTarget(this));
+
+	wxString tmpstr(text.c_str(), wxConvUTF8);
+	wxTextDataObject drag_data(tmpstr);
 
 	wxVisualAttributes attrs = this->GetDefaultAttributes();
 	wxBitmap drag_image = this->makeDragImage(this->stations[data->getStationIndex()].name, &attrs.colBg, &attrs.colFg);
@@ -600,10 +603,12 @@ StationList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 	long item_id = this->HitTest(wxPoint(x, y), hit_test_flags);
 	if (item_id != wxNOT_FOUND)
 	{
+		std::string tmp_data = std::string(data.mb_str(wxConvUTF8));
+
 		std::string group;
 		std::string station;
 		long original_item_id;
-		if (this->extractText(data.ToStdString(), group, station, original_item_id) == false)
+		if (this->extractText(tmp_data, group, station, original_item_id) == false)
 		{
 			return false;
 		}
