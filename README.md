@@ -76,7 +76,7 @@ A config is created in your ~/.config/radiotray-ng directory with the following 
    "compact-menu" : false,
    "debug-logging" : false,
    "file-monitor" : true,
-   "file-monitor-interval" : 30,
+   "file-monitor-interval" : 10,
    "invert-menu" : false,
    "last-station" : "",
    "last-station-group" : "",
