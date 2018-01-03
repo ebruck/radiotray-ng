@@ -562,7 +562,8 @@ GroupList::onBeginDrag(wxListEvent& event)
 
 	this->SetDropTarget(new GroupDropTarget(this));
 
-	wxTextDataObject drag_data(text);
+	wxString tmpstr(text.c_str(), wxConvUTF8);
+	wxTextDataObject drag_data(tmpstr);
 
 	wxVisualAttributes attrs = this->GetDefaultAttributes();
 	wxBitmap drag_image = this->makeDragImage(group.group, &attrs.colBg, &attrs.colFg);
@@ -643,9 +644,11 @@ GroupList::onGroupDrop(wxCoord x, wxCoord y, const wxString& data)
 	long item_id = this->HitTest(wxPoint(x, y), hit_test_flags);
 	if (item_id != wxNOT_FOUND)
 	{
+		std::string tmp_data = std::string(data.mb_str(wxConvUTF8));
+
 		std::string group;
 		long original_item_id;
-		if (GroupDragAndDrop::extractText(data.ToStdString(), group, original_item_id) == false)
+		if (GroupDragAndDrop::extractText(tmp_data, group, original_item_id) == false)
 		{
 			return false;
 		}
@@ -748,10 +751,12 @@ GroupList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 	long item_id = this->HitTest(wxPoint(x, y), hit_test_flags);
 	if (item_id != wxNOT_FOUND)
 	{
+		std::string tmp_data = std::string(data.mb_str(wxConvUTF8));
+
 		std::string original_group;
 		std::string station;
 		long original_item_id;
-		if (StationDragAndDrop::extractText(data.ToStdString(), original_group, station, original_item_id) == false)
+		if (StationDragAndDrop::extractText(tmp_data, original_group, station, original_item_id) == false)
 		{
 			return false;
 		}
