@@ -66,7 +66,7 @@ https://github.com/ebruck/radiotray-ng/releases
 
 ## Config File ##
 
-A config is created in your ~/.config/radiotray-ng directory with the following defaults:
+A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory with the following defaults:
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
