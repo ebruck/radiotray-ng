@@ -77,7 +77,7 @@ else()
 endif()
 
 # gmock available?
-if (GMOCK_FOUND)
+if (GMOCK_FOUND AND BUILD_TESTS)
 	enable_testing()
 	add_subdirectory(tests)
 endif()
