@@ -22,7 +22,6 @@ The version here is what "I" wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Some unit tests, but needs more!
 * Cross compile on Mac (via brew packages) using a very simple ncurses interface.
 * Full AppIndicator support
 * No groups within groups by design to keep the interface clean.
@@ -71,7 +70,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
    "bookmark-editor" : "rtng-bookmark-editor",
-   "buffer-duration: : 2,
+   "buffer-duration" : 2,
    "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
