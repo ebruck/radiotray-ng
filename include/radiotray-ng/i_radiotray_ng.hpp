@@ -78,4 +78,6 @@ public:
 	virtual std::string get_player_state() = 0;
 
 	virtual std::string get_bookmarks() = 0;
+
+	virtual std::string get_config() = 0;
 };

@@ -168,6 +168,11 @@ std::string RadiotrayNG::get_player_state()
 }
 
 
+std::string RadiotrayNG::get_config()
+{
+	return this->config->dump();
+}
+
 
 void RadiotrayNG::set_title(const std::string& title)
 {

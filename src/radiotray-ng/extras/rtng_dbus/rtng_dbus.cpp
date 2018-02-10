@@ -40,6 +40,9 @@ namespace
 		"    <method name='get_bookmarks'>"
 		"      <arg type='s' direction='out'/>"
 		"    </method>"
+		"    <method name='get_config'>"
+		"      <arg type='s' direction='out'/>"
+		"    </method>"
 		"    <method name='get_player_state'>"
 		"      <arg type='s' direction='out'/>"
 		"    </method>"
@@ -153,6 +156,14 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 	if (method_name == "get_bookmarks")
 	{
 		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_bookmarks());
+		Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(var);
+		invocation->return_value(response);
+		return;
+	}
+
+	if (method_name == "get_config")
+	{
+		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_config());
 		Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(var);
 		invocation->return_value(response);
 		return;
