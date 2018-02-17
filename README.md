@@ -22,7 +22,6 @@ The version here is what "I" wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Some unit tests, but needs more!
 * Cross compile on Mac (via brew packages) using a very simple ncurses interface.
 * Full AppIndicator support
 * No groups within groups by design to keep the interface clean.
@@ -34,7 +33,6 @@ The version here is what "I" wanted out of RadioTray.
 ## Future: ##
 
 * ~~Cross platform bookmark editor application.~~
-* Finish ncurses interface
 * Mac support (icons, menu, media keys etc.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
@@ -66,17 +64,17 @@ https://github.com/ebruck/radiotray-ng/releases
 
 ## Config File ##
 
-A config is created in your ~/.config/radiotray-ng directory with the following defaults:
+A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory with the following defaults:
 ```
 {
    "bookmarks" : "~/.config/radiotray-ng/bookmarks.json",
    "bookmark-editor" : "rtng-bookmark-editor",
-   "buffer-duration: : 2,
+   "buffer-duration" : 2,
    "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
    "file-monitor" : true,
-   "file-monitor-interval" : 30,
+   "file-monitor-interval" : 10,
    "invert-menu" : false,
    "last-station" : "",
    "last-station-group" : "",
@@ -197,6 +195,7 @@ Available commands:
     previous_station
     next_station
     get_bookmarks
+    get_config
     get_player_state
     play_station 'group' 'station'
 ```

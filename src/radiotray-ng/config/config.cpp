@@ -147,3 +147,9 @@ bool Config::exists(const std::string& key)
 
 	return this->config.isMember(key);
 }
+
+
+std::string Config::dump()
+{
+	return this->config.toStyledString();
+}

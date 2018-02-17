@@ -17,7 +17,7 @@ project(radiotray-ng CXX)
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 0)
+set(PROJECT_VERSION_PATCH 1)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -77,7 +77,7 @@ else()
 endif()
 
 # gmock available?
-if (GMOCK_FOUND)
+if (GMOCK_FOUND AND BUILD_TESTS)
 	enable_testing()
 	add_subdirectory(tests)
 endif()

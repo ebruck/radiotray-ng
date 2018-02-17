@@ -97,6 +97,8 @@ public:
 
 	std::string get_player_state();
 
+	std::string get_config();
+
 private:
 	std::shared_ptr<IConfig>    config;
 	std::shared_ptr<IBookmarks> bookmarks;

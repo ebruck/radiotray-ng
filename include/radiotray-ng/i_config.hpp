@@ -42,4 +42,6 @@ public:
 	virtual bool get_bool(const std::string& key, bool default_value) = 0;
 
 	virtual bool exists(const std::string& key) = 0;
+
+	virtual std::string dump() = 0;
 };

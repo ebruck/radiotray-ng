@@ -16,6 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/pls_decoder.hpp>
+#include <sstream>
 
 
 std::string PlsDecoder::get_name()
