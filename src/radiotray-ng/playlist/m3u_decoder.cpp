@@ -16,6 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/playlist/m3u_decoder.hpp>
+#include <sstream>
 
 
 std::string M3uDecoder::get_name()

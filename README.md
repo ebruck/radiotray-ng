@@ -196,6 +196,7 @@ Available commands:
     previous_station
     next_station
     get_bookmarks
+    get_config
     get_player_state
     play_station 'group' 'station'
 ```
