@@ -33,7 +33,6 @@ The version here is what "I" wanted out of RadioTray.
 ## Future: ##
 
 * ~~Cross platform bookmark editor application.~~
-* Finish ncurses interface
 * Mac support (icons, menu, media keys etc.)
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
