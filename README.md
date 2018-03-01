@@ -193,6 +193,7 @@ Available commands:
     play
     stop
     previous_station
+    reload_bookmarks
     next_station
     get_bookmarks
     get_config
@@ -228,6 +229,7 @@ libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-fi
 ```
 $ git clone git@github.com:google/googletest.git
 $ cd googletest
+$ git checkout release-1.8.0
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -241,12 +243,4 @@ $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
-```
-
-
-## To Build on Fedora: ##
-
-Install these packages:
-```
-gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator3-devel gstreamer-devel boost-devel gstreamer1-devel
 ```
