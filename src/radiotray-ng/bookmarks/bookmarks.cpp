@@ -265,7 +265,7 @@ bool Bookmarks::update_station(const std::string& group_name, const std::string&
 		{
 			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY]   = new_station_url;
 			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_notifications;
+			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NOTIFICATIONS_KEY] = new_notifications;
 
 			return true;
 		}
