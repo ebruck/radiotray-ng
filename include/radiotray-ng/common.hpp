@@ -76,6 +76,7 @@ using playlist_t = std::vector<std::string>;
 #define INVERT_MENU_KEY                   "invert-menu"
 #define LAST_STATION_GROUP_KEY            "last-station-group"
 #define LAST_STATION_KEY                  "last-station"
+#define LAST_STATION_NOTIFICATION_KEY     "last-station-notifications"
 #define MEDIA_KEY_MAPPING_KEY             "media-key-mapping"
 #define MEDIA_KEY_NEXT_STAITON_KEY        "media-key-next-station"
 #define MEDIA_KEY_PREVIOUS_STATION_KEY    "media-key-previous-station"
@@ -105,7 +106,7 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright © 2017 - The Radiotray-NG Authors"
+#define APP_COPYRIGHT                     "Copyright © 2017-2018 - The Radiotray-NG Authors"
 #define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
@@ -135,6 +136,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_SPLIT_TITLE_VALUE                (true)
 #define DEFAULT_IHR_TITLE_KEY_VALUE              (true)
 #define DEFAULT_STATION_IMAGE_VALUE              ""
+#define DEFAULT_STATION_NOTIFICATION_VALUE       (true)
 #define DEFAULT_VOLUME_LEVEL_MAX_VALUE           uint32_t(200)
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)
 #define DEFAULT_VOLUME_STEP_VALUE                uint32_t(1)

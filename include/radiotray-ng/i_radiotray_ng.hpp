@@ -59,7 +59,7 @@ public:
 
 	virtual void set_artist(const std::string& artist) = 0;
 
-	virtual void set_station(const std::string& group, const std::string& station) = 0;
+	virtual void set_station(const std::string& group, const std::string& station, bool notifications) = 0;
 
 	virtual void set_state(const std::string& state) = 0 ;
 

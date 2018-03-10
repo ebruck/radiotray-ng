@@ -183,7 +183,7 @@ bool Bookmarks::rename_group(const std::string& group_name, const std::string& n
 }
 
 
-bool Bookmarks::add_station(const std::string& group_name, const std::string& station_name, const std::string& station_url, const std::string& station_image)
+bool Bookmarks::add_station(const std::string& group_name, const std::string& station_name, const std::string& station_url, const std::string& station_image, bool notifications)
 {
 	Json::ArrayIndex group_index;
 
@@ -198,6 +198,7 @@ bool Bookmarks::add_station(const std::string& group_name, const std::string& st
 			value[STATION_NAME_KEY]  = station_name;
 			value[STATION_URL_KEY]   = station_url;
 			value[STATION_IMAGE_KEY] = station_image;
+			value[STATION_NOTIFICATIONS_KEY] = notifications;
 
 			this->bookmarks[group_index][STATIONS_KEY].append(value);
 
@@ -252,7 +253,7 @@ bool Bookmarks::rename_station(const std::string& group_name, const std::string&
 }
 
 
-bool Bookmarks::update_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_url, const std::string& new_station_image)
+bool Bookmarks::update_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_url, const std::string& new_station_image, bool new_notifications)
 {
 	Json::ArrayIndex group_index;
 
@@ -264,6 +265,7 @@ bool Bookmarks::update_station(const std::string& group_name, const std::string&
 		{
 			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY]   = new_station_url;
 			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
+			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_notifications;
 
 			return true;
 		}
@@ -388,7 +390,8 @@ IBookmarks::group_data_t Bookmarks::operator[](const size_t group_index)
 
 	for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 	{
-		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString()});
+		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
+			this->get_station_notifications(station)});
 	}
 
 	return stations;
@@ -405,7 +408,8 @@ bool Bookmarks::get_group_stations(const std::string& group_name, std::vector<IB
 
 		for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 		{
-			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString()});
+			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
+				this->get_station_notifications(station)});
 		}
 
 		return true;
@@ -427,6 +431,7 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 			station_data.name  = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NAME_KEY].asString();
 			station_data.url   = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY].asString();
 			station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
+			station_data.notifications = this->get_station_notifications(this->bookmarks[group_index][STATIONS_KEY][station_index]);
 
 			// use group image if not overridden
 			if (station_data.image.empty())
@@ -486,7 +491,12 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 		Json::ArrayIndex station_index;
 		if (this->find_station(group_index, station_name, station_index))
 		{
-			json = Json::StyledWriter().write(this->bookmarks[group_index][STATIONS_KEY][station_index]);
+			auto station = this->bookmarks[group_index][STATIONS_KEY][station_index];
+
+			// may not be there...
+			station[NOTIFICATION_KEY] = this->get_station_notifications(station);
+
+			json = Json::StyledWriter().write(station);
 			return true;
 		}
 	}
@@ -533,3 +543,14 @@ bool Bookmarks::add_station_from_json(const std::string& group_name, const std::
 	return true;
 }
 
+
+bool Bookmarks::get_station_notifications(const Json::Value& station)
+{
+	// asBool() returns false for a missing entry...
+	if (station.isMember(STATION_NOTIFICATIONS_KEY))
+	{
+		return station[STATION_NOTIFICATIONS_KEY].asBool();
+	}
+
+	return true;
+}

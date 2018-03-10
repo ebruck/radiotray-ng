@@ -37,7 +37,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 
 	this->set_volume(this->config->get_string(VOLUME_LEVEL_KEY, std::to_string(DEFAULT_VOLUME_LEVEL_VALUE)));
 
-	this->set_station(this->config->get_string(LAST_STATION_GROUP_KEY, ""), this->config->get_string(LAST_STATION_KEY, ""));
+	this->set_station(this->config->get_string(LAST_STATION_GROUP_KEY, ""), this->config->get_string(LAST_STATION_KEY, ""), this->config->get_bool(LAST_STATION_NOTIFICATION_KEY, true));
 
 	this->register_handlers();
 }
@@ -190,12 +190,13 @@ void RadiotrayNG::set_artist(const std::string& artist)
 }
 
 
-void RadiotrayNG::set_station(const std::string& group, const std::string& station)
+void RadiotrayNG::set_station(const std::string& group, const std::string& station, bool notifications)
 {
 	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
 
 	this->group = group;
 	this->station = station;
+	this->station_notifications = notifications;
 
 	// This allows us to start playing the first station in a group if we've reloaded
 	// the bookmarks file and it's no longer within it.
@@ -207,6 +208,7 @@ void RadiotrayNG::set_station(const std::string& group, const std::string& stati
 		{
 			if (this->current_group_stations[i].name == station)
 			{
+				this->station_notifications = this->current_group_stations[i].notifications;
 				this->current_station_index = i;
 				break;
 			}
@@ -432,7 +434,11 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 				{
 					if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 					{
-						this->notification.notify(this->last_notification.first, this->last_notification.second, this->notification_image);
+						if (this->station_notifications)
+						{
+							this->notification.notify(this->last_notification.first, this->last_notification.second,
+								this->notification_image);
+						}
 					}
 				}
 			}
@@ -447,7 +453,11 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 
 				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
 				{
-					this->notification.notify(this->last_notification.first, this->last_notification.second, this->notification_image);
+					if (this->station_notifications)
+					{
+						this->notification.notify(this->last_notification.first, this->last_notification.second,
+							this->notification_image);
+					}
 				}
 			}
 		}
@@ -487,8 +497,9 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 		{
 			this->config->set_string(LAST_STATION_GROUP_KEY, group);
 			this->config->set_string(LAST_STATION_KEY, std.name);
+			this->config->set_bool(LAST_STATION_NOTIFICATION_KEY, std.notifications);
 
-			this->set_station(group, std.name);
+			this->set_station(group, std.name, std.notifications);
 
 			if (this->player->play(pls))
 			{
@@ -587,7 +598,7 @@ bool RadiotrayNG::reload_bookmarks()
 			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 
 		// force reloading of current groups station list...
-		this->set_station(this->group, this->station);
+		this->set_station(this->group, this->station, this->station_notifications);
 	}
 	else
 	{

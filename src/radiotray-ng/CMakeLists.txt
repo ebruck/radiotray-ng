@@ -1,4 +1,4 @@
-add_executable(radiotray-ng main.cpp radiotray_ng.cpp)
+add_executable(radiotray-ng main.cpp radiotray_ng.cpp radiotray_ng.hpp)
 
 if (APPINDICATOR_FOUND)
     target_link_libraries(

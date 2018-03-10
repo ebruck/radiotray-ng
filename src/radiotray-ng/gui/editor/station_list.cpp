@@ -231,7 +231,7 @@ StationList::addStation()
 	}
 
 	IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[this->group_index];
-	if (this->editor_bookmarks->getBookmarks()->add_station(group.group, name, url, image) == false)
+	if (this->editor_bookmarks->getBookmarks()->add_station(group.group, name, url, image, true /* todo: get value from editor? */) == false)
 	{
 		wxMessageBox(wxT("Failed to add the station."), wxT("Error"));
 		return false;
@@ -320,7 +320,7 @@ StationList::editStation()
 	}
 	if (url.compare(original_url) != 0 || image.compare(original_image) != 0)
 	{
-		if (this->editor_bookmarks->getBookmarks()->update_station(group.group, name, url, image))
+		if (this->editor_bookmarks->getBookmarks()->update_station(group.group, name, url, image, true /* todo: get value from editor? */))
 		{
 			this->editor_bookmarks->setDirty();
 		}

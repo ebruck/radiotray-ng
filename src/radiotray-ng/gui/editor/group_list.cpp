@@ -781,7 +781,7 @@ GroupList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 			return false;
 		}
 
-		if (this->editor_bookmarks->getBookmarks()->add_station(group.group, station_data.name, station_data.url, station_data.image) == false)
+		if (this->editor_bookmarks->getBookmarks()->add_station(group.group, station_data.name, station_data.url, station_data.image, station_data.notifications) == false)
 		{
 			return false;
 		}
