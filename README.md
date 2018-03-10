@@ -153,7 +153,8 @@ Bookmarks are defined in the following JSON format:
          {
             "image" : null,
             "name" : "station name",
-            "url" : "http://station/station.pls"
+            "url" : "http://station/station.pls",
+            "notifications" : false
          },
          ...
         ]
