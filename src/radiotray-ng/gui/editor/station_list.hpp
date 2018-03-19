@@ -92,10 +92,13 @@ public:
 
 private:
 	bool isClipboardDataAvailable(bool close_when_done = true);
+	void setNotify(long item_id, bool checked);
 
 	size_t group_index;
 
 	int blank_image_index;
+	int checked_image_index;
+	int unchecked_image_index;
 	ImageList station_images;
 
 	long last_selected_item_id;

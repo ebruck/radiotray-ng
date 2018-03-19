@@ -59,11 +59,16 @@ namespace
 	const long URL_COLUMN_INDEX = 1;
 	const int URL_COLUMN_WIDTH = 340;
 
+	const wxString NOTIFICATION_COLUMN_TEXT(wxT("Notify"));
+	const long NOTIFICATION_COLUMN_INDEX = 2;
+	const int NOTIFICATION_COLUMN_WIDTH = 60;
+
 	const int SCROLL_POSITION_DIVISOR = 3;
 
 	const wxString CONFIG_PATH(wxT("/station"));
 	const wxString CONFIG_COLUMN_1(wxT("col1"));
 	const wxString CONFIG_COLUMN_2(wxT("col2"));
+	const wxString CONFIG_COLUMN_3(wxT("col3"));
 }
 
 
@@ -86,6 +91,7 @@ StationList::StationList(wxWindow* parent) : wxListCtrl(parent, STATION_LIST_ID)
 	// create headers
 	this->InsertColumn(NAME_COLUMN_INDEX, NAME_COLUMN_TEXT);
 	this->InsertColumn(URL_COLUMN_INDEX, URL_COLUMN_TEXT);
+	this->InsertColumn(NOTIFICATION_COLUMN_INDEX, NOTIFICATION_COLUMN_TEXT);
 
 	this->blank_image_index = this->station_images.addImage(wxImage(blank_xpm));
 	this->SetImageList(this->station_images.getList().get(), wxIMAGE_LIST_SMALL);
@@ -105,6 +111,7 @@ StationList::saveConfiguration()
 	config->SetPath(CONFIG_PATH);
 	config->Write(CONFIG_COLUMN_1, this->GetColumnWidth(0));
 	config->Write(CONFIG_COLUMN_2, this->GetColumnWidth(1));
+	config->Write(CONFIG_COLUMN_3, this->GetColumnWidth(2));
 
 	return true;
 }
@@ -121,6 +128,9 @@ StationList::restoreConfiguration()
 
     int col2 = config->Read(CONFIG_COLUMN_2, URL_COLUMN_WIDTH);
     this->SetColumnWidth(URL_COLUMN_INDEX, col2);
+
+    int col3 = config->Read(CONFIG_COLUMN_3, NOTIFICATION_COLUMN_WIDTH);
+    this->SetColumnWidth(NOTIFICATION_COLUMN_INDEX, col3);
 
 	return true;
 }
@@ -196,6 +206,7 @@ StationList::loadStations(size_t index, const std::string& station_to_select)
 
 		long item_id = this->InsertItem(this->GetItemCount(), tmpstr, use_image_index);
 		this->SetItem(item_id, URL_COLUMN_INDEX, this->stations[station_index].url);
+		this->setNotify(item_id, this->stations[station_index].notifications);
 		this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new StationList::ItemData(item_id, this->group_index, station_index, use_image_index)));
 
 		if (station_to_select.compare(this->stations[station_index].name) == 0)
@@ -222,7 +233,8 @@ StationList::addStation()
 	}
 
 	std::string name, url, image;
-	dlg.getData(name, url, image);
+	bool notifications;
+	dlg.getData(name, url, image, notifications);
 	dlg.Destroy();
 
 	if (name.size() == 0 || url.size() == 0)
@@ -242,6 +254,7 @@ StationList::addStation()
 	IBookmarks::station_data_t station_data;
 	station_data.name = name;
 	station_data.url = url;
+	station_data.notifications = notifications;
 	wxFileName image_file(radiotray_ng::word_expand(image));
 	if (image_file.Exists() && image_file.IsFileReadable())
 	{
@@ -260,7 +273,8 @@ StationList::addStation()
 	// add item
 	wxString tmpstr(name.c_str(), wxConvUTF8);
 	long item_id = this->InsertItem(this->GetItemCount(), tmpstr, image_index);
-	this->SetItem(item_id, 1, url);
+	this->SetItem(item_id, URL_COLUMN_INDEX, url);
+	this->setNotify(item_id, notifications);
 	this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new StationList::ItemData(item_id, this->group_index, station_index, image_index)));
 	this->SetItemState(item_id, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
@@ -281,9 +295,10 @@ StationList::editStation()
 	std::string original_name = std::string(tmpstr.mb_str(wxConvUTF8));
 	std::string original_url = this->GetItemText(item, URL_COLUMN_INDEX).ToStdString();
 	std::string original_image = this->stations[data->getStationIndex()].image;
+	bool original_notifications = this->stations[data->getStationIndex()].notifications;
 
 	StationEditorDialog dlg(this->GetParent());
-	dlg.setData(original_name, original_url, original_image);
+	dlg.setData(original_name, original_url, original_image, original_notifications);
 	if (dlg.ShowModal() != wxID_OK)
 	{
 		dlg.Destroy();
@@ -291,12 +306,14 @@ StationList::editStation()
 	}
 
 	std::string name, url, image;
-	dlg.getData(name, url, image);
+	bool notifications;
+	dlg.getData(name, url, image, notifications);
 	dlg.Destroy();
 
 	if (name.compare(original_name) == 0 &&
 		url.compare(original_url) == 0 &&
-		image.compare(original_image) == 0)
+		image.compare(original_image) == 0 &&
+		notifications == original_notifications)
 	{
 		// no changes, so bail
 		return true;
@@ -318,9 +335,9 @@ StationList::editStation()
 			this->editor_bookmarks->setDirty();
 		}
 	}
-	if (url.compare(original_url) != 0 || image.compare(original_image) != 0)
+	if (url.compare(original_url) != 0 || image.compare(original_image) != 0 || notifications != original_notifications)
 	{
-		if (this->editor_bookmarks->getBookmarks()->update_station(group.group, name, url, image, true /* todo: get value from editor? */))
+		if (this->editor_bookmarks->getBookmarks()->update_station(group.group, name, url, image, notifications))
 		{
 			this->editor_bookmarks->setDirty();
 		}
@@ -330,11 +347,13 @@ StationList::editStation()
 	this->stations[data->getStationIndex()].name = name;
 	this->stations[data->getStationIndex()].url = url;
 	this->stations[data->getStationIndex()].image = image;
+	this->stations[data->getStationIndex()].notifications = notifications;
 
 	// update list data
 	tmpstr = wxString(name.c_str(), wxConvUTF8);
-	this->SetItem(item, 0, tmpstr);
-	this->SetItem(item, 1, wxString(url));
+	this->SetItem(item, NAME_COLUMN_INDEX, tmpstr);
+	this->SetItem(item, URL_COLUMN_INDEX, wxString(url));
+	this->setNotify(item, notifications);
 
 	if (image.compare(original_image) != 0)
 	{
@@ -468,7 +487,8 @@ StationList::pasteStation()
 	// add item
 	wxString tmpstr(station_name.c_str(), wxConvUTF8);
 	long item_id = this->InsertItem(this->GetItemCount(), tmpstr, image_index);
-	this->SetItem(item_id, 1, station_data.url);
+	this->SetItem(item_id, URL_COLUMN_INDEX, station_data.url);
+	this->setNotify(item_id, station_data.notifications);
 	this->SetItemPtrData(item_id, reinterpret_cast<wxUIntPtr>(new StationList::ItemData(item_id, this->group_index, station_index, image_index)));
 	this->SetItemState(item_id, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
@@ -605,6 +625,7 @@ StationList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 	{
 		std::string tmp_data = std::string(data.mb_str(wxConvUTF8));
 
+		/// @todo add notifications value to drop object and handle accordingly
 		std::string group;
 		std::string station;
 		long original_item_id;
@@ -674,4 +695,11 @@ StationList::onItemRightClick(wxListEvent& event)
 	menu.Append(EditorFrame::idMenuAbout, wxT("About"));
 
 	this->PopupMenu(&menu);
+}
+
+void
+StationList::setNotify(long item_id, bool checked)
+{
+	wxString text((checked ? wxT("Yes") : wxT("No")));
+	this->SetItem(item_id, NOTIFICATION_COLUMN_INDEX, text);
 }

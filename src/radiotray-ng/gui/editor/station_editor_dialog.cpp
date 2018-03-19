@@ -44,6 +44,7 @@ namespace
 	const wxWindowID URL_ID = 303;
 	const wxWindowID BITMAP_ID = 304;
 	const wxWindowID IMAGE_ID = 305;
+	const wxWindowID NOTIFY_ID = 306;
 };
 
 BEGIN_EVENT_TABLE(StationEditorDialog, EditorDialogBase)
@@ -65,24 +66,29 @@ StationEditorDialog::StationEditorDialog(wxWindow* parent) : StationEditorDialog
 
 StationEditorDialog::~StationEditorDialog()
 {
-	if (image_control)
+	if (this->image_control)
 	{
-		delete image_control;
+		delete this->image_control;
 	}
 
-	if (bitmap_control)
+	if (this->bitmap_control)
 	{
-		delete bitmap_control;
+		delete this->bitmap_control;
 	}
 
-	if (url_control)
+	if (this->url_control)
 	{
-		delete url_control;
+		delete this->url_control;
 	}
 
-	if (name_control)
+	if (this->name_control)
 	{
-		delete name_control;
+		delete this->name_control;
+	}
+
+	if (this->notify_control)
+	{
+		delete this->notify_control;
 	}
 }
 
@@ -93,14 +99,17 @@ StationEditorDialog::createControls()
 
 	wxFlexGridSizer* grid_sizer = new wxFlexGridSizer(2, 5, 5);
 
+	// name
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Name")), 0, wxALIGN_LEFT);
 	this->name_control = new wxTextCtrl(this, NAME_ID, "", wxDefaultPosition, wxSize(140, -1));
 	grid_sizer->Add(this->name_control, 0, wxALIGN_LEFT | wxEXPAND);
 
+	// url
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("URL")), 0, wxALIGN_LEFT);
 	this->url_control = new wxTextCtrl(this, URL_ID, "", wxDefaultPosition, wxSize(270, -1));
 	grid_sizer->Add(this->url_control, 0, wxALIGN_LEFT | wxEXPAND);
 
+	// image
 	grid_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Image")), 0, wxALIGN_LEFT);
 
 	wxFlexGridSizer* image_sizer = new wxFlexGridSizer(3, 5, 5);
@@ -115,6 +124,12 @@ StationEditorDialog::createControls()
 
 	grid_sizer->Add(image_sizer, 0, wxALL);
 
+	// notify
+	grid_sizer->AddStretchSpacer();
+	this->notify_control = new wxCheckBox(this, NOTIFY_ID, wxT("Notify"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+	grid_sizer->Add(this->notify_control, 0, wxALIGN_RIGHT);
+
+	// finish
 	main_sizer->Add(grid_sizer, 0, wxALL, 10);
 
 	this->finishDialog(main_sizer);
@@ -125,12 +140,16 @@ StationEditorDialog::createControls()
 }
 
 void
-StationEditorDialog::setData(const std::string& name, const std::string& url, const std::string& image)
+StationEditorDialog::setData(const std::string& name, const std::string& url, const std::string& image, const bool notifications)
 {
 	wxString tmpstr(name.c_str(), wxConvUTF8);
 	this->name_control->SetValue(tmpstr);
 	this->url_control->SetValue(wxString(url));
 	this->image_control->SetValue(wxString(image));
+	this->notify_control->SetValue(notifications);
+
+	/// @todo set value in notify control to notifications
+	if(notifications) {}
 
 	if (!image.empty())
 	{
@@ -147,13 +166,14 @@ StationEditorDialog::setData(const std::string& name, const std::string& url, co
 }
 
 void
-StationEditorDialog::getData(std::string& name, std::string& url, std::string& image)
+StationEditorDialog::getData(std::string& name, std::string& url, std::string& image, bool& notifications)
 {
 	wxString tmpstr = this->name_control->GetValue();
 	name = std::string(tmpstr.mb_str(wxConvUTF8));
 	name = radiotray_ng::trim(name);
 	url = this->url_control->GetValue().ToStdString();
 	image = this->image_control->GetValue().ToStdString();
+	notifications = this->notify_control->GetValue();
 }
 
 std::string
