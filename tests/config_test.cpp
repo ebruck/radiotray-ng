@@ -47,7 +47,7 @@ TEST(Config, test_that_key_value_are_saved_and_retrieved)
 		EXPECT_EQ(cfg.get_uint32("u_key", 0), uint32_t(123));
 
 		cfg.set_uint32("u_key", 456);
-		EXPECT_EQ(cfg.get_uint32("u_key", 0), 456);
+		EXPECT_EQ(cfg.get_uint32("u_key", 0), uint32_t(456));
 		ASSERT_TRUE(cfg.exists("u_key"));
 	}
 

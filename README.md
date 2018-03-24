@@ -225,22 +225,17 @@ Install these packages:
 libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5 cmake
 ```
 
-
-## GoogleTest (optional) ##
-```
-$ git clone git@github.com:google/googletest.git
-$ cd googletest
-$ git checkout release-1.8.0
-$ mkdir build
-$ cd build
-$ cmake ..
-$ sudo make install
-```
-
-
 ## Build Radiotray-NG & Debian Package ##
 ```
 $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
+$ make package
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo apt-get install -f
+```
+
+## Build Radiotray-NG + Tests & Debian Package ##
+```
+$ cmake <path-to-source>/radiotray-ng -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
