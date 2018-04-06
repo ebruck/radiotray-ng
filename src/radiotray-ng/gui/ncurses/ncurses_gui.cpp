@@ -25,13 +25,13 @@ NCursesGui::NCursesGui(std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_p
 	: radiotray_ng(std::move(radiotray_ng))
 {
 	event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&NCursesGui::on_tags_event_data, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	event_bus->subscribe(IEventBus::event::state_changed, std::bind(&NCursesGui::on_state_event_data, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&NCursesGui::on_volume_event_data, this, std::placeholders::_1,
-		std::placeholders::_2));
+		std::placeholders::_2), IEventBus::event_pos::any);
 
 	initscr();
 	noecho();

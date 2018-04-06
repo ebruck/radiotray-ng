@@ -226,6 +226,8 @@ bool
 StationList::addStation()
 {
 	StationEditorDialog dlg(this->GetParent());
+	dlg.setData("", "", "", true); // set default notify to "on"
+
 	if (dlg.ShowModal() != wxID_OK)
 	{
 		dlg.Destroy();
