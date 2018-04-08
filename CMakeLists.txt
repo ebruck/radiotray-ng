@@ -73,6 +73,7 @@ endif()
 if (BUILD_TESTS)
     include(ExternalProject)
 
+    # Include subproject (or any other CMake code) with "disabled" install().
     ExternalProject_Add(googletest
             PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
             GIT_REPOSITORY https://github.com/google/googletest.git
@@ -85,8 +86,11 @@ if (BUILD_TESTS)
     link_directories(${CMAKE_BINARY_DIR}/lib)
     set(GMOCK_BOTH_LIBRARIES gmock_main gmock)
 	enable_testing()
-	add_subdirectory(tests)
+    add_subdirectory(tests)
     add_subdirectory(tests/runners/)
+else()
+    # only create packages when there are no tests
+    add_subdirectory(debian)
 endif()
 
 add_subdirectory(src/radiotray-ng)
@@ -107,7 +111,6 @@ endif()
 if (APPINDICATOR_FOUND)
     target_compile_definitions(radiotray-ng PRIVATE APPINDICATOR_GUI)
     add_subdirectory(src/radiotray-ng/gui/appindicator)
-    add_subdirectory(debian)
 else()
     add_subdirectory(src/radiotray-ng/gui/ncurses)
 endif()

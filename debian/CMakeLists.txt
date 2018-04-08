@@ -27,8 +27,8 @@ set(CPACK_GENERATOR                   "DEB")
 set(CPACK_PACKAGE_FILE_NAME            ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/debian/postinst;${PROJECT_SOURCE_DIR}/debian/postrm)
 
-INCLUDE(CPack)
- 
+include(CPack)
+
 set(DESTINATION_DIR /usr/share/radiotray-ng)
 
 execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/debian/changelog" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
@@ -48,5 +48,6 @@ install(PROGRAMS  "${PROJECT_BINARY_DIR}/radiotray-ng"                      DEST
 install(PROGRAMS  "${PROJECT_BINARY_DIR}/rtng-bookmark-editor"              DESTINATION "/usr/bin/")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"         DESTINATION "/usr/share/applications/")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/rtng-bookmark-editor.desktop" DESTINATION "/usr/share/applications/")
+install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.appdata.xml"     DESTINATION "/usr/share/metainfo/")
 install(FILES     "${PROJECT_SOURCE_DIR}/debian/copyright"                  DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
 install(FILES     "${PROJECT_BINARY_DIR}/changelog.Debian.gz"               DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
