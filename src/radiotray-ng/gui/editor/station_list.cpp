@@ -239,6 +239,11 @@ StationList::addStation()
 	dlg.getData(name, url, image, notifications);
 	dlg.Destroy();
 
+	// trim data
+	name = radiotray_ng::trim(name);
+	url = radiotray_ng::trim(url);
+	image = radiotray_ng::trim(image);
+
 	if (name.size() == 0 || url.size() == 0)
 	{
 		return false;
@@ -311,6 +316,11 @@ StationList::editStation()
 	bool notifications;
 	dlg.getData(name, url, image, notifications);
 	dlg.Destroy();
+
+	// trim data
+	name = radiotray_ng::trim(name);
+	url = radiotray_ng::trim(url);
+	image = radiotray_ng::trim(image);
 
 	if (name.compare(original_name) == 0 &&
 		url.compare(original_url) == 0 &&
