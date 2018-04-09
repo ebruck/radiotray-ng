@@ -394,10 +394,13 @@ GroupList::editGroup()
 	}
 
 	// verify image exists, clear if not
-	wxFileName image_file(radiotray_ng::word_expand(image));
-	if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+	if (!image.empty())
 	{
-		image = original_image;
+		wxFileName image_file(radiotray_ng::word_expand(image));
+		if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+		{
+			image = original_image;
+		}
 	}
 
 	// update data
@@ -489,7 +492,8 @@ GroupList::deleteGroup()
 		return false;
 	}
 
-	std::string msg = "Delete \"" + group.group + "\"\nAre you sure?";
+	wxString tmpstr(group.group.c_str(), wxConvUTF8);
+	wxString msg("Delete \"" + tmpstr + "\"\nAre you sure?");
 	int status = wxMessageBox(wxString(msg), wxT("Confirm"), wxYES_NO);
 	if (status == wxYES)
 	{
