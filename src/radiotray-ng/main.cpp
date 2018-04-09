@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef RTNG_DBUS
-	RtngDbus dbus(radiotray_ng);
+	RtngDbus dbus(gui, radiotray_ng);
 #endif
 
 	// addons etc.

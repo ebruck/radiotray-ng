@@ -17,6 +17,7 @@
 
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
+#include <radiotray-ng/i_gui.hpp>
 #include "rtng_dbus.hpp"
 
 
@@ -32,6 +33,8 @@ namespace
 		"    <method name='play'>"
 		"    </method>"
 		"    <method name='stop'>"
+		"    </method>"
+		"    <method name='quit'>"
 		"    </method>"
 		"    <method name='reload_bookmarks'>"
 		"    </method>"
@@ -60,9 +63,10 @@ namespace
 }
 
 
-RtngDbus::RtngDbus(std::shared_ptr<IRadioTrayNG> radiotray_ng)
+RtngDbus::RtngDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng)
 	: interface_vtable(sigc::mem_fun(*this, &RtngDbus::on_method_call))
 	, radiotray_ng(std::move(radiotray_ng))
+	, gui(gui)
 {
 	this->dbus_setup();
 }
@@ -100,6 +104,14 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 		{
 			this->radiotray_ng->stop();
 		}
+		invocation->return_value(Glib::VariantContainerBase());
+		return;
+	}
+
+	if (method_name == "quit")
+	{
+		this->gui->stop();
+
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}
