@@ -293,6 +293,10 @@ GroupList::addGroup()
 	dlg.getData(name, image);
 	dlg.Destroy();
 
+	// trim data
+	name = radiotray_ng::trim(name);
+	image = radiotray_ng::trim(image);
+
 	// cannot add empty or "root"
 	if (name.size() == 0 || name.compare(this->root_name) == 0)
 	{
@@ -385,6 +389,10 @@ GroupList::editGroup()
 	std::string name, image;
 	dlg.getData(name, image);
 	dlg.Destroy();
+
+	// trim data
+	name = radiotray_ng::trim(name);
+	image = radiotray_ng::trim(image);
 
 	if (name.compare(original_name) == 0 &&
 		image.compare(original_image) == 0)
