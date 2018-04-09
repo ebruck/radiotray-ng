@@ -321,10 +321,13 @@ StationList::editStation()
 		return true;
 	}
 
-	wxFileName image_file(radiotray_ng::word_expand(image));
-	if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+	if (!image.empty())
 	{
-		image = original_image;
+		wxFileName image_file(radiotray_ng::word_expand(image));
+		if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+		{
+			image = original_image;
+		}
 	}
 
 	// verify image file
@@ -509,18 +512,26 @@ StationList::deleteStation()
 	StationList::ItemData* data = reinterpret_cast<StationList::ItemData*>(this->GetItemData(item));
 	if (data)
 	{
-		IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[this->group_index];
-		if (this->editor_bookmarks->getBookmarks()->remove_station(group.group, this->stations[data->getStationIndex()].name) == false)
+		wxString tmpstr(this->stations[data->getStationIndex()].name.c_str(), wxConvUTF8);
+		wxString msg("Delete \"" + tmpstr + "\"\nAre you sure?");
+		int status = wxMessageBox(wxString(msg), wxT("Confirm"), wxYES_NO);
+		if (status == wxYES)
 		{
-			wxMessageBox(wxT("Failed to remove the station, reload the bookmarks."), wxT("Warning"));
+			IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[this->group_index];
+			if (this->editor_bookmarks->getBookmarks()->remove_station(group.group, this->stations[data->getStationIndex()].name) == false)
+			{
+				wxMessageBox(wxT("Failed to remove the station, reload the bookmarks."), wxT("Warning"));
+				return false;
+			}
+
+			this->editor_bookmarks->setDirty();
+			this->stations.erase(this->stations.begin() + data->getStationIndex());
+
+			delete data;
+
+			this->DeleteItem(item);
 		}
-		this->editor_bookmarks->setDirty();
-		this->stations.erase(this->stations.begin() + data->getStationIndex());
-
-		delete data;
 	}
-
-	this->DeleteItem(item);
 
 	return true;
 }
