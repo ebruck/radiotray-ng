@@ -82,6 +82,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "notifications" : true,
    "sleep-timer" : 30,
    "split-title" : true,
+   "track-info-copy" : false,
    "ihr-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
@@ -113,6 +114,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
                split-title: attempts to reformat the notification into title/artist
                  ihr-title: extra parsing for iheartradio formatting (requires split-title)
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
+           track-info-copy: enable/disable track clicking to copy into clipboard 
                volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
@@ -125,7 +127,7 @@ media-key-previous-station: media key to use for previous station within current
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
-* Installed config will only include several commonly edited entries.
+* **Installed config will only include several commonly edited entries, all others are using default values shown above.**
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
 
@@ -193,6 +195,7 @@ Available commands:
     volume_down
     play
     stop
+    quit
     previous_station
     reload_bookmarks
     next_station
