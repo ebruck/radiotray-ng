@@ -45,7 +45,7 @@ namespace
 	const wxWindowID BITMAP_ID = 304;
 	const wxWindowID IMAGE_ID = 305;
 	const wxWindowID NOTIFY_ID = 306;
-};
+}
 
 BEGIN_EVENT_TABLE(StationEditorDialog, EditorDialogBase)
 END_EVENT_TABLE()

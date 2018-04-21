@@ -36,7 +36,7 @@ namespace
 	const int MAX_DRAG_TEXT = 20;
 	const int DRAG_FONT_POINT = 12;
 	const std::string DRAG_TAIL(" ...");
-};
+}
 
 StationDropTarget::StationDropTarget(StationDragAndDrop* object) :
 	drag_object(object)

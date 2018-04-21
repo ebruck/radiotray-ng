@@ -55,7 +55,7 @@ namespace
 	const wxString CONFIG_COLUMN_1(wxT("col1"));
 
 	const std::string ROOT_NAME("root");
-};
+}
 
 
 BEGIN_EVENT_TABLE(GroupList, wxListCtrl)

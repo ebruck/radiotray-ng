@@ -43,7 +43,7 @@ namespace
 	const wxWindowID NAME_ID = 402;
 	const wxWindowID BITMAP_ID = 403;
 	const wxWindowID IMAGE_ID = 404;
-};
+}
 
 BEGIN_EVENT_TABLE(GroupEditorDialog, EditorDialogBase)
 END_EVENT_TABLE()
