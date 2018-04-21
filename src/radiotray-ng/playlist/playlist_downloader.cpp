@@ -45,12 +45,12 @@ PlaylistDownloader::PlaylistDownloader(std::shared_ptr<IConfig> config, std::sha
 
 void PlaylistDownloader::install_decoders()
 {
-	this->decoders.emplace_back(new PlsDecoder());
-	this->decoders.emplace_back(new M3uDecoder());
-	this->decoders.emplace_back(new AsxDecoder());
-	this->decoders.emplace_back(new RamDecoder());
-	this->decoders.emplace_back(new AsfDecoder());
-	this->decoders.emplace_back(new XspfDecoder());
+	this->decoders.emplace_back(std::make_shared<PlsDecoder>());
+	this->decoders.emplace_back(std::make_shared<M3uDecoder>());
+	this->decoders.emplace_back(std::make_shared<AsxDecoder>());
+	this->decoders.emplace_back(std::make_shared<RamDecoder>());
+	this->decoders.emplace_back(std::make_shared<AsfDecoder>());
+	this->decoders.emplace_back(std::make_shared<XspfDecoder>());
 }
 
 

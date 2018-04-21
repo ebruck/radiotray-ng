@@ -30,7 +30,6 @@ public:
 	virtual ~ImageList();
 
 	int addImage(const std::string& filename, int default_index);
-	int addImage(const wxIcon& icon);
 	int addImage(const wxImage& image);
 
 	bool replaceImage(int index, const std::string& filename);
