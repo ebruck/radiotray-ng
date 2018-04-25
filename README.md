@@ -42,7 +42,6 @@ The version here is what "I" wanted out of RadioTray.
 ## Bugs: ##
 
 * Radiotray-NG's user-agent is created at compile time. Which means a binary created on 16.10 will report that even when run on 16.04.
-* Plenty, I'm sure.
 
 ## Screenshots: ##
 
