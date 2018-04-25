@@ -1,6 +1,6 @@
 [Desktop Entry]
 Categories=AudioVideo;Audio;Player;GTK;
-Comment=Interent Radio Player for Linux
+Comment=Internet Radio Player for Linux
 Exec=/usr/bin/radiotray-ng
 Hidden=false
 Icon=radiotray-ng-notification

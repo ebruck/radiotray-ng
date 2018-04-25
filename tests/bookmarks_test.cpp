@@ -18,6 +18,7 @@
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
 #include "mocks/mock_i_curl.hpp"
 #include <unistd.h>
+#include <radiotray-ng/i_bookmarks.hpp>
 
 
 namespace
@@ -53,7 +54,7 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 
 	{
 		ASSERT_FALSE(bm.station_exists(GROUP_A, "name"));
-		bm.add_station(GROUP_A, "name", "url", "image");
+		bm.add_station(GROUP_A, "name", "url", "image", true);
 		ASSERT_FALSE(bm.station_exists(GROUP_A, "bad_name"));
 		ASSERT_TRUE(bm.station_exists(GROUP_A, "name"));
 		std::vector<IBookmarks::station_data_t> stations;
@@ -62,16 +63,18 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 		ASSERT_TRUE(stations[0].name == "name");
 		ASSERT_TRUE(stations[0].url == "url");
 		ASSERT_TRUE(stations[0].image == "image");
+		ASSERT_TRUE(stations[0].notifications);
 
 		ASSERT_TRUE(bm.add_group(GROUP_C, GROUP_IMAGE_C));
 		ASSERT_TRUE(bm.get_group_stations(GROUP_C, stations));
 		EXPECT_EQ(stations.size(), size_t(0));
-		bm.add_station(GROUP_C, "name", "url", "image");
+		bm.add_station(GROUP_C, "name", "url", "image", false);
 		ASSERT_TRUE(bm.get_group_stations(GROUP_C, stations));
 		EXPECT_EQ(stations.size(), size_t(1));
 		ASSERT_TRUE(stations[0].name == "name");
 		ASSERT_TRUE(stations[0].url == "url");
 		ASSERT_TRUE(stations[0].image == "image");
+		ASSERT_FALSE(stations[0].notifications);
 
 		// test json
 		std::string json_str;
@@ -87,6 +90,7 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 			EXPECT_EQ(json["stations"][0]["image"].asString(), "image");
 			EXPECT_EQ(json["stations"][0]["name"].asString(), "name");
 			EXPECT_EQ(json["stations"][0]["url"].asString(), "url");
+			EXPECT_EQ(json["stations"][0]["notifications"].asBool(), true);
 		}
 		json_str.clear();
 
@@ -111,6 +115,7 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 			EXPECT_EQ(json["image"].asString(), "image_json");
 			EXPECT_EQ(json["name"].asString(), "name_json");
 			EXPECT_EQ(json["url"].asString(), "url_json");
+			EXPECT_EQ(json["notifications"].asBool(), true);
 		}
 	}
 
@@ -154,9 +159,9 @@ TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 	Bookmarks bm(RTNG_BOOKMARK_FILE);
 
 	// station B
-	ASSERT_FALSE(bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B));
+	ASSERT_FALSE(bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B, false));
 	ASSERT_TRUE (bm.add_group(GROUP_A, GROUP_IMAGE_A));
-	ASSERT_TRUE (bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B));
+	ASSERT_TRUE (bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B, false));
 	EXPECT_EQ   (bm[0].stations.size(), size_t(1));
 
 	IBookmarks::station_data_t std;
@@ -166,18 +171,20 @@ TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 	EXPECT_EQ(std.image, STATION_IMAGE_B);
 
 	// station A
-	ASSERT_FALSE(bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B));
-	ASSERT_TRUE (bm.add_station(GROUP_A, STATION_NAME_A, STATION_URL_A, STATION_IMAGE_A));
+	ASSERT_FALSE(bm.add_station(GROUP_A, STATION_NAME_B, STATION_URL_B, STATION_IMAGE_B, true));
+	ASSERT_TRUE (bm.add_station(GROUP_A, STATION_NAME_A, STATION_URL_A, STATION_IMAGE_A, true));
 	EXPECT_EQ   (bm[0].stations.size(), size_t(2));
 
 	// check values
 	EXPECT_EQ(bm[0].stations[0].name,  STATION_NAME_B);
 	EXPECT_EQ(bm[0].stations[0].url,   STATION_URL_B);
 	EXPECT_EQ(bm[0].stations[0].image, STATION_IMAGE_B);
+	ASSERT_FALSE(bm[0].stations[0].notifications);
 
 	EXPECT_EQ(bm[0].stations[1].name,  STATION_NAME_A);
 	EXPECT_EQ(bm[0].stations[1].url,   STATION_URL_A);
 	EXPECT_EQ(bm[0].stations[1].image, STATION_IMAGE_A);
+	ASSERT_TRUE(bm[0].stations[1].notifications);
 
 	// Move station
 	ASSERT_FALSE(bm.move_station_to_pos(GROUP_A, STATION_NAME_A, 10));
@@ -187,10 +194,12 @@ TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 	EXPECT_EQ(bm[0].stations[0].name,  STATION_NAME_A);
 	EXPECT_EQ(bm[0].stations[0].url,   STATION_URL_A);
 	EXPECT_EQ(bm[0].stations[0].image, STATION_IMAGE_A);
+	ASSERT_TRUE(bm[0].stations[0].notifications);
 
 	EXPECT_EQ(bm[0].stations[1].name,  STATION_NAME_B);
 	EXPECT_EQ(bm[0].stations[1].url,   STATION_URL_B);
 	EXPECT_EQ(bm[0].stations[1].image, STATION_IMAGE_B);
+	ASSERT_FALSE(bm[0].stations[1].notifications);
 
 	// remove station
 	ASSERT_FALSE(bm.remove_station(GROUP_A, "lsdkfalsdfk"));
@@ -200,6 +209,7 @@ TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 	EXPECT_EQ(bm[0].stations[0].name,  STATION_NAME_B);
 	EXPECT_EQ(bm[0].stations[0].url,   STATION_URL_B);
 	EXPECT_EQ(bm[0].stations[0].image, STATION_IMAGE_B);
+	ASSERT_FALSE(bm[0].stations[0].notifications);
 
 	// vector only throws when using at()
 	EXPECT_THROW(bm[0].stations.at(100), std::out_of_range);
@@ -214,7 +224,7 @@ TEST(Bookmarks, test_that_bookmarks_can_be_loaded_and_saved)
 		Bookmarks bm(TEST_FILE);
 
 		ASSERT_TRUE(bm.add_group(GROUP_A, GROUP_IMAGE_A));
-		ASSERT_TRUE(bm.add_station(GROUP_A, STATION_NAME_A, STATION_URL_A, STATION_IMAGE_A));
+		ASSERT_TRUE(bm.add_station(GROUP_A, STATION_NAME_A, STATION_URL_A, STATION_IMAGE_A, true));
 
 		ASSERT_TRUE(bm.save());
 	}
@@ -229,6 +239,7 @@ TEST(Bookmarks, test_that_bookmarks_can_be_loaded_and_saved)
 		EXPECT_EQ(bm[0].stations[0].name,  STATION_NAME_A);
 		EXPECT_EQ(bm[0].stations[0].url,   STATION_URL_A);
 		EXPECT_EQ(bm[0].stations[0].image, STATION_IMAGE_A);
+		ASSERT_TRUE(bm[0].stations[0].notifications);
 
 		EXPECT_EQ(bm[0].stations.size(), size_t(1));
 		EXPECT_EQ(bm.size(), size_t(1));

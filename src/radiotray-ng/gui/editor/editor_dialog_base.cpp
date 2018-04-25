@@ -34,7 +34,7 @@
 namespace
 {
 	const wxWindowID IMAGE_BUTTON_ID = 375;
-};
+}
 
 BEGIN_EVENT_TABLE(EditorDialogBase, wxDialog)
 	EVT_COMMAND(IMAGE_BUTTON_ID, wxEVT_BUTTON, EditorDialogBase::onBrowseButton)

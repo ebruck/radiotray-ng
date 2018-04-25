@@ -54,6 +54,7 @@ private:
 	static void on_about_menu_item(GtkWidget* widget, gpointer data);
 	static void on_station_menu_item(GtkWidget* widget, gpointer data);
 	static void on_action_menu_item(GtkWidget* widget, gpointer data);
+	static void on_status_menu_item(GtkWidget* widget, gpointer data);
 	static void on_reload_bookmarks_menu_item(GtkWidget* widget, gpointer data);
 	static void on_bookmark_editor_menu_item(GtkWidget* widget, gpointer data);
 	static void on_sleep_timer_menu_item(GtkWidget* widget, gpointer data);
@@ -106,6 +107,8 @@ private:
 	guint             sleep_timer_id;
 	guint             file_monitor_timer_id;
 	std::string       resource_path;
-	bool              ignore_sleep_timer_toggle{false};
+	bool              ignore_sleep_timer_toggle = false;
+	GtkClipboard*     clipboard = nullptr;
+
 
 };

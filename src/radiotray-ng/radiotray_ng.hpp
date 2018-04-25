@@ -77,7 +77,7 @@ public:
 
 	void set_artist(const std::string& artist);
 
-	void set_station(const std::string& group, const std::string& station);
+	void set_station(const std::string& group, const std::string& station, bool notifications);
 
 	void set_state(const std::string& state);
 
@@ -114,6 +114,7 @@ private:
 	std::string bitrate;
 	std::string codec;
 	std::string volume;
+	bool station_notifications;
 
 	std::mutex tag_update_mutex;
 

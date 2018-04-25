@@ -30,6 +30,7 @@ public:
 		std::string name;
 		std::string url;
 		std::string image;
+		bool notifications;
 	};
 
 	using group_data_t = struct
@@ -56,13 +57,13 @@ public:
 
 	virtual bool rename_group(const std::string& group_name, const std::string& new_group_name) = 0;
 
-	virtual bool add_station(const std::string& group_name, const std::string& station_name, const std::string& url, const std::string& image) = 0;
+	virtual bool add_station(const std::string& group_name, const std::string& station_name, const std::string& url, const std::string& image, bool notifications) = 0;
 
 	virtual bool remove_station(const std::string& group_name, const std::string& station_name) = 0;
 
 	virtual bool rename_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_name) = 0;
 
-	virtual bool update_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_url, const std::string& new_station_image) = 0;
+	virtual bool update_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_url, const std::string& new_station_image, bool new_notifications) = 0;
 
 	virtual bool station_exists(const std::string& group_name, const std::string& station_name) = 0;
 

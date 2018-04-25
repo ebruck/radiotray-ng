@@ -41,14 +41,14 @@ public:
 
 	bool update_group(const std::string& group_name, const std::string& new_group_image);
 
-	bool add_station(const std::string& group_name, const std::string& station_name, const std::string& url, const std::string& image);
+	bool add_station(const std::string& group_name, const std::string& station_name, const std::string& url, const std::string& image, bool notifications);
 
 	bool remove_station(const std::string& group_name, const std::string& station_name);
 
 	bool rename_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_name);
 
 	bool update_station(const std::string& group_name, const std::string& station_name, const std::string& new_station_url,
-		const std::string& new_station_image);
+		const std::string& new_station_image, bool new_notifications);
 
 	bool station_exists(const std::string& group_name, const std::string& station_name);
 
@@ -82,6 +82,7 @@ private:
 	const std::string STATION_NAME_KEY{"name"};
 	const std::string STATION_URL_KEY{"url"};
 	const std::string STATION_IMAGE_KEY{"image"};
+	const std::string STATION_NOTIFICATIONS_KEY{"notifications"};
 
 	bool find_group(const std::string& group_name, Json::ArrayIndex& group_index);
 
@@ -90,6 +91,8 @@ private:
 	void move_to_pos(Json::Value& array, Json::ArrayIndex old_index, Json::ArrayIndex new_index);
 
 	bool array_search(Json::Value& array, const std::string& key, const std::string& value, Json::ArrayIndex& index);
+
+	bool get_station_notifications(const Json::Value& station);
 
 	Json::Value bookmarks;
 	std::string bookmarks_file;

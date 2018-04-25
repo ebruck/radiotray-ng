@@ -55,7 +55,7 @@ namespace
 	const wxString CONFIG_COLUMN_1(wxT("col1"));
 
 	const std::string ROOT_NAME("root");
-};
+}
 
 
 BEGIN_EVENT_TABLE(GroupList, wxListCtrl)
@@ -293,6 +293,10 @@ GroupList::addGroup()
 	dlg.getData(name, image);
 	dlg.Destroy();
 
+	// trim data
+	name = radiotray_ng::trim(name);
+	image = radiotray_ng::trim(image);
+
 	// cannot add empty or "root"
 	if (name.size() == 0 || name.compare(this->root_name) == 0)
 	{
@@ -386,6 +390,10 @@ GroupList::editGroup()
 	dlg.getData(name, image);
 	dlg.Destroy();
 
+	// trim data
+	name = radiotray_ng::trim(name);
+	image = radiotray_ng::trim(image);
+
 	if (name.compare(original_name) == 0 &&
 		image.compare(original_image) == 0)
 	{
@@ -394,10 +402,13 @@ GroupList::editGroup()
 	}
 
 	// verify image exists, clear if not
-	wxFileName image_file(radiotray_ng::word_expand(image));
-	if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+	if (!image.empty())
 	{
-		image = original_image;
+		wxFileName image_file(radiotray_ng::word_expand(image));
+		if (image_file.Exists() == false || image_file.IsFileReadable() == false)
+		{
+			image = original_image;
+		}
 	}
 
 	// update data
@@ -489,7 +500,8 @@ GroupList::deleteGroup()
 		return false;
 	}
 
-	std::string msg = "Delete \"" + group.group + "\"\nAre you sure?";
+	wxString tmpstr(group.group.c_str(), wxConvUTF8);
+	wxString msg("Delete \"" + tmpstr + "\"\nAre you sure?");
 	int status = wxMessageBox(wxString(msg), wxT("Confirm"), wxYES_NO);
 	if (status == wxYES)
 	{
@@ -781,7 +793,7 @@ GroupList::onStationDrop(wxCoord x, wxCoord y, const wxString& data)
 			return false;
 		}
 
-		if (this->editor_bookmarks->getBookmarks()->add_station(group.group, station_data.name, station_data.url, station_data.image) == false)
+		if (this->editor_bookmarks->getBookmarks()->add_station(group.group, station_data.name, station_data.url, station_data.image, station_data.notifications) == false)
 		{
 			return false;
 		}

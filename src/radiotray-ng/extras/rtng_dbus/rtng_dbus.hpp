@@ -22,12 +22,13 @@
 #include <memory>
 
 class IRadioTrayNG;
+class IGui;
 
 
 class RtngDbus
 {
 public:
-	RtngDbus(std::shared_ptr<IRadioTrayNG> radiotray_ng);
+	RtngDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng);
 
 	~RtngDbus();
 
@@ -51,4 +52,5 @@ private:
 	const Gio::DBus::InterfaceVTable  interface_vtable;
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
+	std::shared_ptr<IGui> gui;
 };

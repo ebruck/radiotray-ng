@@ -82,4 +82,5 @@ namespace radiotray_ng
 		bool is_running(){ return false; }
 	};
 #endif
-};
+}
+

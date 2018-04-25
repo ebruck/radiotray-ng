@@ -135,6 +135,23 @@ void AppindicatorGui::on_indicator_scrolled(GtkWidget* /*widget*/, gint /*delta*
 }
 
 
+void AppindicatorGui::on_status_menu_item(GtkWidget* /*widget*/, gpointer data)
+{
+	auto app = static_cast<AppindicatorGui*>(data);
+
+	if (app->clipboard)
+	{
+		std::string clipboard_text = app->radiotray_ng->get_title() + "\n" + app->radiotray_ng->get_artist();
+
+		gtk_clipboard_set_text(app->clipboard, clipboard_text.c_str(), -1);
+	}
+	else
+	{
+		LOG(error) << "clipboard unavailable!";
+	}
+}
+
+
 void AppindicatorGui::on_action_menu_item(GtkWidget* /*widget*/, gpointer data)
 {
 	auto app = static_cast<AppindicatorGui*>(data);
@@ -231,7 +248,7 @@ void AppindicatorGui::update_volume_menu_item()
 {
 	std::string volume_info{std::string("Volume: ") + this->radiotray_ng->get_volume() + std::string("%")};
 
-	if (this->config->get_bool(TAG_INFO_VERBOSE_KEY, false))
+	if (this->config->get_bool(TAG_INFO_VERBOSE_KEY, DEFAULT_TAG_INFO_VERBOSE_VALUE))
 	{
 		std::string bitrate = this->radiotray_ng->get_bitrate();
 		if (!bitrate.empty())
@@ -283,6 +300,8 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 void AppindicatorGui::update_status_menu_item(const std::string& state)
 {
+	bool copy_enabled = this->config->get_bool(TRACK_INFO_COPY_KEY, DEFAULT_TRACK_INFO_COPY_VALUE);
+
 	if (state == STATE_PLAYING)
 	{
 		std::string title{this->radiotray_ng->get_title()};
@@ -293,6 +312,11 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 		if (title.empty())
 		{
 			status_text = std::string("Playing");
+
+			if (copy_enabled)
+			{
+				gtk_widget_set_sensitive(this->status_menu_item, FALSE);
+			}
 		}
 		else
 		{
@@ -301,6 +325,11 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 			if (!artist.empty())
 			{
 				status_text += "\n" + radiotray_ng::word_wrap(artist, 40);
+			}
+
+			if (copy_enabled)
+			{
+				gtk_widget_set_sensitive(this->status_menu_item, TRUE);
 			}
 		}
 
@@ -311,6 +340,11 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 	if (state == STATE_STOPPED)
 	{
 		gtk_menu_item_set_label(GTK_MENU_ITEM(this->status_menu_item), std::string("Stopped").c_str());
+
+		if (copy_enabled)
+		{
+			gtk_widget_set_sensitive(this->status_menu_item, FALSE);
+		}
 		return;
 	}
 }
@@ -323,6 +357,17 @@ void AppindicatorGui::build_status_menu_item()
 	this->status_menu_item = gtk_menu_item_new_with_label("status");
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->status_menu_item);
 	gtk_widget_set_sensitive(this->status_menu_item, FALSE);
+
+	if (this->config->get_bool(TRACK_INFO_COPY_KEY, DEFAULT_TRACK_INFO_COPY_VALUE))
+	{
+		if (this->clipboard == nullptr)
+		{
+			this->clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+		}
+
+		g_signal_connect(G_OBJECT(this->status_menu_item), "activate", G_CALLBACK(on_status_menu_item), gpointer(this));
+	}
+
 	gtk_widget_show(this->status_menu_item);
 
 	this->update_status_menu_item(STATE_STOPPED);

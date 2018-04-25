@@ -38,8 +38,8 @@ public:
 	virtual std::string getImagePath();
 	virtual bool setImage(const std::string& path);
 
-	void setData(const std::string& name, const std::string& url, const std::string& image);
-	void getData(std::string& name, std::string& url, std::string& image);
+	void setData(const std::string& name, const std::string& url, const std::string& image, const bool notifications);
+	void getData(std::string& name, std::string& url, std::string& image, bool& notifications);
 
 	DECLARE_EVENT_TABLE()
 
@@ -48,4 +48,5 @@ private:
 	wxTextCtrl* url_control;
 	wxStaticBitmap* bitmap_control;
 	wxTextCtrl* image_control;
+	wxCheckBox* notify_control;
 };

@@ -42,15 +42,14 @@ The version here is what "I" wanted out of RadioTray.
 ## Bugs: ##
 
 * Radiotray-NG's user-agent is created at compile time. Which means a binary created on 16.10 will report that even when run on 16.04.
-* Plenty, I'm sure.
 
 ## Screenshots: ##
 
 ![Screenshot](images/screenshot_1.png)
+![Screenshot](images/screenshot_7.png)
 ![Screenshot](images/screenshot_2.png)
 ![Screenshot](images/screenshot_3.png)
 ![Screenshot](images/screenshot_4.png)
-![Screenshot](images/screenshot_7.png)
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
 
@@ -82,6 +81,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "notifications" : true,
    "sleep-timer" : 30,
    "split-title" : true,
+   "track-info-copy" : false,
    "ihr-title" : true,
    "tag-info-verbose" : true,
    "volume-level" : 100,
@@ -113,6 +113,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
                split-title: attempts to reformat the notification into title/artist
                  ihr-title: extra parsing for iheartradio formatting (requires split-title)
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
+           track-info-copy: enable/disable track clicking to copy into clipboard 
                volume-step: value used to increment/decrement the volume level
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
@@ -125,7 +126,7 @@ media-key-previous-station: media key to use for previous station within current
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
-* Installed config will only include several commonly edited entries.
+* **Installed config will only include several commonly edited entries, all others are using default values shown above.**
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
 
@@ -153,7 +154,8 @@ Bookmarks are defined in the following JSON format:
          {
             "image" : null,
             "name" : "station name",
-            "url" : "http://station/station.pls"
+            "url" : "http://station/station.pls",
+            "notifications" : false
          },
          ...
         ]
@@ -192,7 +194,9 @@ Available commands:
     volume_down
     play
     stop
+    quit
     previous_station
+    reload_bookmarks
     next_station
     get_bookmarks
     get_config
@@ -223,18 +227,6 @@ Install these packages:
 libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5 cmake
 ```
 
-
-## GoogleTest (optional) ##
-```
-$ git clone git@github.com:google/googletest.git
-$ cd googletest
-$ mkdir build
-$ cd build
-$ cmake ..
-$ sudo make install
-```
-
-
 ## Build Radiotray-NG & Debian Package ##
 ```
 $ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
@@ -243,10 +235,10 @@ $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
 ```
 
-
-## To Build on Fedora: ##
-
-Install these packages:
+## Build Radiotray-NG + Tests & Debian Package ##
 ```
-gcc-c++ cmake redhat-lsb-core libcurl-devel libbsd-devel libnotify-devel jsoncpp-devel libxdg-basedir-devel libappindicator3-devel gstreamer-devel boost-devel gstreamer1-devel
+$ cmake <path-to-source>/radiotray-ng -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+$ make package
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo apt-get install -f
 ```

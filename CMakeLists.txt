@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
-
-if(POLICY CMP0048)
-    cmake_policy(SET CMP0048 OLD)
-endif(POLICY CMP0048)
+cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -12,12 +8,13 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 		CACHE STRING "Eclipse version" FORCE)
 endif()
 
+# todo: add version here?
 project(radiotray-ng CXX)
 
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 1)
+set(PROJECT_VERSION_PATCH 2)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -30,15 +27,11 @@ if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
 
-# find packages
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
-
 # search for libs
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Boost     REQUIRED filesystem system log program_options thread)
 find_package(wxWidgets REQUIRED core base adv)
-find_package(GMock)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
 pkg_search_module(GSTREAMER   REQUIRED gstreamer-1.0)
@@ -51,7 +44,7 @@ endif(NOT APPLE)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
-set(warnings "-Wno-deprecated-declarations -Wall -Wextra -Werror")
+set(warnings "-Wno-deprecated-declarations -Wall -Wextra -Werror -Wpedantic")
 set(CMAKE_CXX_FLAGS ${warnings})
 set(CMAKE_C_FLAGS   ${warnings})
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
@@ -76,12 +69,31 @@ else()
     set(APPINDICATOR_FOUND false)
 endif()
 
-# gmock available?
-if (GMOCK_FOUND AND BUILD_TESTS)
-	enable_testing()
-	add_subdirectory(tests)
+# build tests? Then we need googletest...
+if (BUILD_TESTS)
+    include(ExternalProject)
+
+    ExternalProject_Add(googletest
+        PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        INSTALL_COMMAND ""
+        GIT_TAG release-1.8.0
+        GIT_SHALLOW true)
+
+    ExternalProject_Get_Property(googletest SOURCE_DIR)
+    include_directories(${SOURCE_DIR}/googlemock/include ${SOURCE_DIR}/googletest/include)
+    ExternalProject_Get_Property(googletest BINARY_DIR)
+    link_directories(${BINARY_DIR}/googlemock)
+    set(GMOCK_BOTH_LIBRARIES gmock_main gmock)
+    unset(SOURCE_DIR)
+    unset(BINARY_DIR)
+
+    enable_testing()
+    add_subdirectory(tests)
+    add_subdirectory(tests/runners/)
 endif()
 
+add_subdirectory(debian)
 add_subdirectory(src/radiotray-ng)
 add_subdirectory(src/radiotray-ng/config)
 add_subdirectory(src/radiotray-ng/playlist)
@@ -91,17 +103,16 @@ add_subdirectory(src/radiotray-ng/player)
 add_subdirectory(src/radiotray-ng/notification)
 add_subdirectory(src/radiotray-ng/extras/media_keys)
 add_subdirectory(src/radiotray-ng/gui/editor)
+
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_subdirectory(src/radiotray-ng/extras/rtng_dbus)
     target_compile_definitions(radiotray-ng PRIVATE RTNG_DBUS)
 endif()
-add_subdirectory(tests/runners/) # test apps
 
 # which gui?
 if (APPINDICATOR_FOUND)
     target_compile_definitions(radiotray-ng PRIVATE APPINDICATOR_GUI)
     add_subdirectory(src/radiotray-ng/gui/appindicator)
-    add_subdirectory(debian)
 else()
     add_subdirectory(src/radiotray-ng/gui/ncurses)
 endif()

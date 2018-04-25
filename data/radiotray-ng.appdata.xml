@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2017-2018 Edward G. Bruck <ed.bruck1@gmail.com> -->
+<component type="desktop">
+  <id>radiotray-ng</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Radiotray-NG</name>
+  <summary>Internet Radio Player</summary>
+  <description>
+    <p>
+      Radiotray-NG runs in the system tray allowing you to select
+      and play configured radio stations.
+    </p>
+  </description>
+​  <launchable type="desktop-id">radiotray-ng.desktop</launchable>
+  <url type="homepage">https://github.com/ebruck/radiotray-ng</url>
+  <url type="bugtracker">https://github.com/ebruck/radiotray-ng/issues</url>
+  <screenshots>
+    <screenshot type="default">
+        <image>https://raw.githubusercontent.com/ebruck/radiotray-ng/master/images/screenshot_1.png</image>
+    </screenshot>
+    <screenshot type="default">
+        <image>https://raw.githubusercontent.com/ebruck/radiotray-ng/master/images/screenshot_7.png</image>
+    </screenshot>
+  </screenshots>
+  <project_group>Radiotray-NG</project_group>
+  <update_contact>ed.bruck1@gmail.com</update_contact>
+</component>
