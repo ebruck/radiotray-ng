@@ -23,6 +23,7 @@
 namespace
 {
 	const std::string content_type = "application/xspf+xml";
+
 	const std::string content =
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<playlist version=\"1\" xmlns = \"http://xspf.org/ns/0/\">\n"
@@ -49,8 +50,8 @@ TEST(XspfDecoder, test_that_playlist_can_be_decoded)
 	XspfDecoder xspf_decoder;
 
 	playlist_t pls;
-	ASSERT_FALSE(xspf_decoder.decode("", pls));
-	ASSERT_TRUE(xspf_decoder.decode(content, pls));
+	ASSERT_FALSE(xspf_decoder.decode(content_type,"", pls));
+	ASSERT_TRUE(xspf_decoder.decode(content_type,content, pls));
 	EXPECT_EQ(pls.size(), size_t(3));
 	EXPECT_EQ(pls[0], "http://example.com/song_1.mp3");
 	EXPECT_EQ(pls[2], "http://example.com/song_3.mp3");

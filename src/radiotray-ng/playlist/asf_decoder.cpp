@@ -34,7 +34,7 @@ bool AsfDecoder::is_decodable(const std::string& content_type, const std::string
 }
 
 
-bool AsfDecoder::decode(const std::string& content, playlist_t& playlist)
+bool AsfDecoder::decode(const std::string& /*content_type*/, const std::string& content, playlist_t& playlist)
 {
 	if (content.empty())
 	{

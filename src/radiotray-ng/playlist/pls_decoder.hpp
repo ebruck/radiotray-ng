@@ -27,7 +27,7 @@ public:
 
 	bool is_decodable(const std::string& content_type, const std::string& content);
 
-	bool decode(const std::string& payload, playlist_t& playlist);
+	bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
 
 	std::string get_name();
 };
