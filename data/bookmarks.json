@@ -110,6 +110,11 @@
       "stations" : [
          {
             "image" : null,
+            "name" : "Rumsey Retro Radio",
+            "url" : "https://www.rumseyretro.ca/assets/rumseyretro.pls"
+         },
+         {
+            "image" : null,
             "name" : "AM 1710",
             "url" : "http://lin2.ash.fast-serv.com:9022/listen.pls"
          },

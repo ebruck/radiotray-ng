@@ -65,8 +65,8 @@ TEST(RamDecoder, test_that_playlist_can_be_decoded)
 	RamDecoder pls_decoder;
 
 	playlist_t pls;
-	ASSERT_FALSE(pls_decoder.decode("", pls));
-	ASSERT_TRUE(pls_decoder.decode(content, pls));
+	ASSERT_FALSE(pls_decoder.decode(content_type,"", pls));
+	ASSERT_TRUE(pls_decoder.decode(content_type,content, pls));
 	EXPECT_EQ(pls.size(), size_t(4));
 	EXPECT_EQ(pls[0], "rtsp://ra2.panix.com/tutorial/sample.ra");
 	EXPECT_EQ(pls[2], "rtsp://realserver.example.com/media/sample1.smil?screensize=\"full\"");

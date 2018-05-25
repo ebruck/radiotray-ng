@@ -27,7 +27,7 @@ public:
 
 	virtual bool is_decodable(const std::string& content_type, const std::string& content);
 
-	virtual bool decode(const std::string& payload, playlist_t& playlist);
+	virtual bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
 
 	virtual std::string get_name();
 };

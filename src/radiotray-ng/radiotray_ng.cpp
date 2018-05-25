@@ -321,7 +321,7 @@ void RadiotrayNG::on_tags_changed_event_processing(const IEventBus::event& /*ev*
 			else
 			{
 				// sometimes tags are empty, especially with IHR...
-				if (data[TAG_TITLE] == " -" || data[TAG_TITLE] == "- ")
+				if (radiotray_ng::trim(data[TAG_TITLE]) == "-")
 				{
 					data.erase(TAG_TITLE);
 				}

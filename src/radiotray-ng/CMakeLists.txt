@@ -27,7 +27,6 @@ target_link_libraries(
   media_keys
   ${NOTIFY_LIBRARIES}
   ${CURL_LIBRARIES}
-  ${GLOG_LIBRARIES}
   ${Boost_LIBRARIES}
   ${XDG_BASEDIR_LIBRARIES}
   ${JSONCPP_LIBRARIES}
