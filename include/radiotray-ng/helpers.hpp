@@ -66,12 +66,6 @@ namespace radiotray_ng
 	}
 
 
-	inline char guess_line_terminator(const std::string& str)
-	{
-		return str.find('\n') != std::string::npos ? '\n' : '\r';
-	}
-
-
 	inline std::string word_wrap(std::string str, size_t width)
 	{
 	    size_t curWidth = width;

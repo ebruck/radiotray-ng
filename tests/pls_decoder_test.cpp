@@ -62,7 +62,7 @@ namespace
 		"[playlist]\r"
 		"numberofentries=3\r"
 		"File1=http://sj128.hnux.com\r"
-		"Title1=SmoothJazz.com Global Radio - The World's First 24/7 Since 2000 - KJAZ.DB\r"
+		"Title1=SmoothJazz.com Global Radio\nThe World's First 24/7 Since 2000 - KJAZ.DB\r"
 		"Length1=-1\r"
 		"File2=http://stream-05.shoutcast.com:8002 sid=8\r"
 		"Title2=SmoothJazz.com Global Radio - The World's First 24/7 Since 2000 - KJAZ.DB\r"

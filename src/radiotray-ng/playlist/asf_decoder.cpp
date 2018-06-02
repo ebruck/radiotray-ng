@@ -43,13 +43,14 @@ bool AsfDecoder::decode(const std::string& /*content_type*/, const std::string& 
 
 	playlist.clear();
 
-	std::stringstream ss(content);
+	std::string tmp(content);
+	std::replace(tmp.begin(), tmp.end(), '\r', '\n');
+	std::stringstream ss(tmp);
+
 	const std::string ref_entry = "Ref";
 
-	char line_terminator = radiotray_ng::guess_line_terminator(content);
-
 	std::string line;
-	while(std::getline(ss, line, line_terminator))
+	while(std::getline(ss, line, '\n'))
 	{
 		if (line.compare(0, ref_entry.length(), ref_entry) == 0)
 		{

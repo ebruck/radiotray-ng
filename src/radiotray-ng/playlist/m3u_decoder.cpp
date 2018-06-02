@@ -47,12 +47,12 @@ bool M3uDecoder::decode(const std::string& content_type, const std::string& cont
 	bool uri_list = (content_type.find("text/html") != std::string::npos ||
 		content_type.find("text/uri-list") != std::string::npos);
 
-	std::stringstream ss(content);
+	std::string tmp(content);
+	std::replace(tmp.begin(), tmp.end(), '\r', '\n');
+	std::stringstream ss(tmp);
+
 	std::string line;
-
-	char line_terminator = radiotray_ng::guess_line_terminator(content);
-
-	while(std::getline(ss, line, line_terminator))
+	while(std::getline(ss, line, '\n'))
 	{
 		if (!line.empty())
 		{
