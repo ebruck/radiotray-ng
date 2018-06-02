@@ -87,7 +87,7 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 	if (decoder)
 	{
 		// A decoder has identified it, so lets extract the playlist...
-		LOG(info) << "decoder: " << decoder->get_name();
+		LOG(info) << "decoder: " << decoder->get_name() << ", " << content_type;
 
 		return decoder->decode(content_type, content, playlist);
 	}

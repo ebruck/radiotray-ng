@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
 
+project(radiotray-ng CXX)
+
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++14"
@@ -7,9 +9,6 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 	set(CMAKE_ECLIPSE_VERSION "4.4"
 		CACHE STRING "Eclipse version" FORCE)
 endif()
-
-# todo: add version here?
-project(radiotray-ng CXX)
 
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
@@ -24,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK    ccache)
 endif(CCACHE_FOUND)
 
 # search for libs

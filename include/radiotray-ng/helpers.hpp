@@ -98,7 +98,7 @@ namespace radiotray_ng
 	}
 
 
-	inline std::string path_to_filename(const std::string& path)
+	inline std::string basename(const std::string& path)
 	{
 		return path.substr(path.rfind("/")+1);
 	}

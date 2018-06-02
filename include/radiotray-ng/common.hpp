@@ -26,7 +26,7 @@
 using playlist_t = std::vector<std::string>;
 
 // logging
-#define LOG(x)                            BOOST_LOG_TRIVIAL(x) << "(" << radiotray_ng::path_to_filename(__FILE__) << ":"  << __LINE__ << ") - "
+#define LOG(x)                            BOOST_LOG_TRIVIAL(x) << "(" << radiotray_ng::basename(__FILE__) << ":"  << __LINE__ << ") - "
 
 // event data keys
 #define ERROR_KEY                         "error"
