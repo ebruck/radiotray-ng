@@ -86,6 +86,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "tag-info-verbose" : true,
    "volume-level" : 100,
    "volume-step" : 1,
+   "wrap-track-info" : true,
    "media-key-mapping" : false,
    "media-key-previous-station" : "Previous",
    "media-key-next-station" : "Next",
@@ -115,6 +116,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
            track-info-copy: enable/disable track clicking to copy into clipboard 
                volume-step: value used to increment/decrement the volume level
+           wrap-track-info: enable/disable the wrapping of title & artist menu text
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
     media-key-next-station: media key to use for next station within current group

@@ -300,7 +300,7 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 void AppindicatorGui::update_status_menu_item(const std::string& state)
 {
-	bool copy_enabled = this->config->get_bool(TRACK_INFO_COPY_KEY, DEFAULT_TRACK_INFO_COPY_VALUE);
+	const bool copy_enabled = this->config->get_bool(TRACK_INFO_COPY_KEY, DEFAULT_TRACK_INFO_COPY_VALUE);
 
 	if (state == STATE_PLAYING)
 	{
@@ -320,11 +320,13 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 		}
 		else
 		{
-			status_text = radiotray_ng::word_wrap(title, 40);
+			const bool wrap_enabled = this->config->get_bool(WRAP_TRACK_INFO_KEY, DEFAULT_WRAP_TRACK_INFO_VALUE);
+
+			status_text = ((wrap_enabled) ? radiotray_ng::word_wrap(title, 40) : title);
 
 			if (!artist.empty())
 			{
-				status_text += "\n" + radiotray_ng::word_wrap(artist, 40);
+				status_text += "\n" + ((wrap_enabled) ? radiotray_ng::word_wrap(artist, 40) : artist);
 			}
 
 			if (copy_enabled)
