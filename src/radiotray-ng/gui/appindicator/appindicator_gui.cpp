@@ -322,18 +322,31 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 		{
 			const bool wrap_enabled = this->config->get_bool(WRAP_TRACK_INFO_KEY, DEFAULT_WRAP_TRACK_INFO_VALUE);
 
-			status_text = ((wrap_enabled) ? radiotray_ng::word_wrap(title, 40) : title);
+			const uint32_t wrap_len = this->config->get_uint32(WRAP_TRACK_INFO_LEN_KEY, DEFAULT_WRAP_TRACK_INFO_LEN_VALUE);
+
+			status_text = ((wrap_enabled) ? radiotray_ng::word_wrap(title, wrap_len) : title);
 
 			if (!artist.empty())
 			{
-				status_text += "\n" + ((wrap_enabled) ? radiotray_ng::word_wrap(artist, 40) : artist);
+				status_text += "\n" + ((wrap_enabled) ? radiotray_ng::word_wrap(artist, wrap_len) : artist);
 			}
 
 			if (copy_enabled)
 			{
 				gtk_widget_set_sensitive(this->status_menu_item, TRUE);
 			}
+
+			// if wrap is disabled then we truncate at the wrap_len to prevent wide menus...
+			if (!wrap_enabled)
+			{
+				if (status_text.length() > wrap_len)
+				{
+					status_text.resize(wrap_len);
+					status_text += "...";
+				}
+			}
 		}
+
 
 		gtk_menu_item_set_label(GTK_MENU_ITEM(this->status_menu_item), status_text.c_str());
 		return;

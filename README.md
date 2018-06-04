@@ -87,6 +87,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "volume-level" : 100,
    "volume-step" : 1,
    "wrap-track-info" : true,
+   "wrap-track-info-len" : 40,
    "media-key-mapping" : false,
    "media-key-previous-station" : "Previous",
    "media-key-next-station" : "Next",
@@ -117,6 +118,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
            track-info-copy: enable/disable track clicking to copy into clipboard 
                volume-step: value used to increment/decrement the volume level
            wrap-track-info: enable/disable the wrapping of title & artist menu text
+       wrap-track-info-len: maximum title & artist line length 
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
     media-key-next-station: media key to use for next station within current group
@@ -239,6 +241,8 @@ $ sudo apt-get install -f
 
 ## Build Radiotray-NG + Tests & Debian Package ##
 ```
+$ mkdir build
+$ cd build
 $ cmake <path-to-source>/radiotray-ng -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb

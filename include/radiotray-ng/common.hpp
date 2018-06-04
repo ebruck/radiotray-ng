@@ -97,6 +97,7 @@ using playlist_t = std::vector<std::string>;
 #define VOLUME_MAX_LEVEL_KEY              "volume-max-level"
 #define VOLUME_STEP_KEY                   "volume-step"
 #define WRAP_TRACK_INFO_KEY               "wrap-track-info"
+#define WRAP_TRACK_INFO_LEN_KEY           "wrap-track-info-len"
 
 // conf files etc.
 #define RTNG_BOOKMARK_FILE                "bookmarks.json"
@@ -145,3 +146,4 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_VOLUME_LEVEL_VALUE               uint32_t(100)
 #define DEFAULT_VOLUME_STEP_VALUE                uint32_t(1)
 #define DEFAULT_WRAP_TRACK_INFO_VALUE            (true)
+#define DEFAULT_WRAP_TRACK_INFO_LEN_VALUE        (40)
