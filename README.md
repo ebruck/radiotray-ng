@@ -99,6 +99,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "radiotray-ng-notification" : "radiotray-ng-notification"
 }
 ```
+* **Installed config will only include commonly edited entries, all others are using default values shown above.**
 ```
                  bookmarks: location of bookmarks file
            bookmark-editor: bookmark editor to launch
@@ -130,7 +131,6 @@ media-key-previous-station: media key to use for previous station within current
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
 
 ```
-* **Installed config will only include several commonly edited entries, all others are using default values shown above.**
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
 * No checks are made if a media key assignment collides with another action.
 
