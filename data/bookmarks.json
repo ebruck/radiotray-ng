@@ -110,11 +110,6 @@
       "stations" : [
          {
             "image" : null,
-            "name" : "Rumsey Retro Radio",
-            "url" : "http://184.75.223.178:8136/stream"
-         },
-         {
-            "image" : null,
             "name" : "AM 1710",
             "url" : "http://lin2.ash.fast-serv.com:9022/listen.pls"
          },
