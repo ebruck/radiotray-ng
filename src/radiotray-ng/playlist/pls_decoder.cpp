@@ -33,7 +33,7 @@ bool PlsDecoder::is_decodable(const std::string& content_type, const std::string
 }
 
 
-bool PlsDecoder::decode(const std::string& content, playlist_t& playlist)
+bool PlsDecoder::decode(const std::string& /*content_type*/, const std::string& content, playlist_t& playlist)
 {
 	if (content.empty())
 	{
@@ -42,13 +42,14 @@ bool PlsDecoder::decode(const std::string& content, playlist_t& playlist)
 
 	playlist.clear();
 
-	std::stringstream ss(content);
+	std::string tmp(content);
+	std::replace(tmp.begin(), tmp.end(), '\r', '\n');
+	std::stringstream ss(tmp);
+
 	const std::string file_entry = "File";
 
 	std::string line;
-	char line_terminator = radiotray_ng::guess_line_terminator(content);
-
-	while(std::getline(ss, line, line_terminator))
+	while(std::getline(ss, line, '\n'))
 	{
 		if (line.compare(0, file_entry.length(), file_entry) == 0)
 		{

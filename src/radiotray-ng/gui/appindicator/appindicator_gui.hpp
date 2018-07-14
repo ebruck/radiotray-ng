@@ -109,6 +109,4 @@ private:
 	std::string       resource_path;
 	bool              ignore_sleep_timer_toggle = false;
 	GtkClipboard*     clipboard = nullptr;
-
-
 };

@@ -62,7 +62,7 @@ namespace
 		"[playlist]\r"
 		"numberofentries=3\r"
 		"File1=http://sj128.hnux.com\r"
-		"Title1=SmoothJazz.com Global Radio - The World's First 24/7 Since 2000 - KJAZ.DB\r"
+		"Title1=SmoothJazz.com Global Radio\nThe World's First 24/7 Since 2000 - KJAZ.DB\r"
 		"Length1=-1\r"
 		"File2=http://stream-05.shoutcast.com:8002 sid=8\r"
 		"Title2=SmoothJazz.com Global Radio - The World's First 24/7 Since 2000 - KJAZ.DB\r"
@@ -91,8 +91,8 @@ TEST(PlsDecoder, test_that_playlist_can_be_decoded)
 	// \n line terminator
 	{
 		playlist_t pls;
-		ASSERT_FALSE(pls_decoder.decode("", pls));
-		ASSERT_TRUE(pls_decoder.decode(content, pls));
+		ASSERT_FALSE(pls_decoder.decode(content_type,"", pls));
+		ASSERT_TRUE(pls_decoder.decode(content_type,content, pls));
 		EXPECT_EQ(pls.size(), size_t(25));
 		EXPECT_EQ(pls[0], "http://4983.live.streamtheworld.com:80/KDFCFM_SC");
 		EXPECT_EQ(pls[24],"http://2943.live.streamtheworld.com:8000/KDFCFM_SC");
@@ -101,7 +101,7 @@ TEST(PlsDecoder, test_that_playlist_can_be_decoded)
 	// \r line terminator
 	{
 		playlist_t pls;
-		ASSERT_TRUE(pls_decoder.decode(content2, pls));
+		ASSERT_TRUE(pls_decoder.decode(content_type,content2, pls));
 		EXPECT_EQ(pls.size(), size_t(3));
 		EXPECT_EQ(pls[0], "http://sj128.hnux.com");
 		EXPECT_EQ(pls[2],"http://stream-94.shoutcast.com sid=1");

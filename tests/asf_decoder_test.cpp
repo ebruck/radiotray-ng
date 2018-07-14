@@ -46,8 +46,8 @@ TEST(AsfDecoder, test_that_playlist_can_be_decoded)
 	AsfDecoder asf_decoder;
 
 	playlist_t pls;
-	ASSERT_FALSE(asf_decoder.decode("", pls));
-	ASSERT_TRUE(asf_decoder.decode(content, pls));
+	ASSERT_FALSE(asf_decoder.decode(content_type,"", pls));
+	ASSERT_TRUE(asf_decoder.decode(content_type,content, pls));
 	EXPECT_EQ(pls.size(), size_t(2));
 	EXPECT_EQ(pls[0], "mms://windowsmediaserver/path/yourfile.asf");
 	EXPECT_EQ(pls[1], "mms://johngreek.live24.gr/polis2795?MSWMExt=.asf");

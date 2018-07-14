@@ -28,31 +28,45 @@ std::string M3uDecoder::get_name()
 bool M3uDecoder::is_decodable(const std::string& content_type, const std::string& /*content*/)
 {
 	return (content_type.find("audio/mpegurl"  ) != std::string::npos ||
-	        content_type.find("audio/x-mpegurl") != std::string::npos ||
-	        content_type.find("application/vnd.apple.mpegurl") != std::string::npos);
+			content_type.find("audio/x-mpegurl") != std::string::npos ||
+			content_type.find("text/html")       != std::string::npos ||
+			content_type.find("text/uri-list")   != std::string::npos ||
+			content_type.find("application/vnd.apple.mpegurl") != std::string::npos);
 }
 
 
-bool M3uDecoder::decode(const std::string& content, playlist_t& playlist)
+bool M3uDecoder::decode(const std::string& content_type, const std::string& content, playlist_t& playlist)
 {
+	playlist.clear();
+
 	if (content.empty())
 	{
 		return false;
 	}
 
-	playlist.clear();
+	bool uri_list = (content_type.find("text/html") != std::string::npos ||
+		content_type.find("text/uri-list") != std::string::npos);
 
-	std::stringstream ss(content);
+	std::string tmp(content);
+	std::replace(tmp.begin(), tmp.end(), '\r', '\n');
+	std::stringstream ss(tmp);
+
 	std::string line;
-
-	char line_terminator = radiotray_ng::guess_line_terminator(content);
-
-	while(std::getline(ss, line, line_terminator))
+	while(std::getline(ss, line, '\n'))
 	{
 		if (!line.empty())
 		{
 			if (line[0] != '#')
 			{
+				if (uri_list)
+				{
+					// if text/html or text/uri-list...
+					if (line.find("http://") != 0)
+					{
+						continue;
+					}
+				}
+
 				// we don't support playlist within a playlist
 				if (line.find(".m3u8") != std::string::npos)
 				{
