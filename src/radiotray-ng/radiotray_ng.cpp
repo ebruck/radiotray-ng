@@ -80,64 +80,48 @@ void RadiotrayNG::clear_tags()
 
 std::string RadiotrayNG::get_title()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->title;
 }
 
 
 std::string RadiotrayNG::get_artist()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->artist;
 }
 
 
 std::string RadiotrayNG::get_group()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->group;
 }
 
 
 std::string RadiotrayNG::get_station()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->station;
 }
 
 
 std::string RadiotrayNG::get_state()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->state;
 }
 
 
 std::string RadiotrayNG::get_bitrate()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->bitrate;
 }
 
 
 std::string RadiotrayNG::get_codec()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->codec;
 }
 
 
 std::string RadiotrayNG::get_volume()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	return this->volume;
 }
 
@@ -150,8 +134,6 @@ std::string RadiotrayNG::get_bookmarks()
 
 std::string RadiotrayNG::get_player_state()
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	Json::Value value;
 
 	value[DBUS_MSG_STATE_KEY]   = this->state;
@@ -176,24 +158,18 @@ std::string RadiotrayNG::get_config()
 
 void RadiotrayNG::set_title(const std::string& title)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->title = title;
 }
 
 
 void RadiotrayNG::set_artist(const std::string& artist)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->artist = artist;
 }
 
 
 void RadiotrayNG::set_station(const std::string& group, const std::string& station, bool notifications)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->group = group;
 	this->station = station;
 	this->station_notifications = notifications;
@@ -219,32 +195,24 @@ void RadiotrayNG::set_station(const std::string& group, const std::string& stati
 
 void RadiotrayNG::set_state(const std::string& state)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->state = state;
 }
 
 
 void RadiotrayNG::set_bitrate(const std::string& bitrate)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->bitrate = bitrate;
 }
 
 
 void RadiotrayNG::set_codec(const std::string& codec)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->codec = codec;
 }
 
 
 void RadiotrayNG::set_volume(const std::string& volume)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	this->volume = volume;
 }
 
@@ -284,8 +252,6 @@ void RadiotrayNG::previous_station_msg()
 
 void RadiotrayNG::on_tags_changed_event_processing(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
-	std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-
 	if (this->config->get_bool(SPLIT_TITLE_KEY, DEFAULT_SPLIT_TITLE_VALUE))
 	{
 		if (data.count(TAG_TITLE) && !data[TAG_TITLE].empty())
@@ -577,15 +543,11 @@ void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 
 	if (new_volume != volume)
 	{
-		// guard
-		{
-			std::lock_guard<std::mutex> lock(this->tag_update_mutex);
-			this->volume = std::to_string(new_volume);
-
-			LOG(debug) << "volume: " << this->volume;
-		}
+		this->volume = std::to_string(new_volume);
 
 		this->player->volume(new_volume);
+
+		LOG(debug) << "volume: " << this->volume;
 
 		this->config->save();
 	}

@@ -50,7 +50,7 @@ void init_logging()
 
 	auto sink = boost::log::add_file_log
 		(
-			keywords::file_name = xdg_data_home_dir + "radiotray-ng-%5N.log",
+			keywords::file_name = xdg_data_home_dir + "logs/radiotray-ng-%5N.log",
 			keywords::rotation_size = 1024 * 64, // 64K logs
 			keywords::open_mode = std::ios_base::app,
 			keywords::auto_flush = true,

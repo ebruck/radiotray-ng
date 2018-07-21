@@ -19,7 +19,6 @@
 
 #include <radiotray-ng/i_event_bus.hpp>
 #include <map>
-#include <mutex>
 #include <vector>
 
 
@@ -40,5 +39,4 @@ private:
 	event_map_list_t default_pos_map;
 	event_map_t      first_pos_map;
 	event_map_t      last_pos_map;
-	std::mutex       event_map_lock;
 };

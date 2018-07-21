@@ -22,8 +22,6 @@
 bool EventBus::subscribe(const IEventBus::event ev, IEventBus::event_callback_t cb,
 	const IEventBus::event_pos req_pos)
 {
-	std::lock_guard<std::mutex> lock(this->event_map_lock);
-
 	switch(req_pos)
 	{
 		case IEventBus::event_pos::first:
@@ -53,8 +51,6 @@ bool EventBus::subscribe(const IEventBus::event ev, IEventBus::event_callback_t 
 
 bool EventBus::publish(const IEventBus::event ev, IEventBus::event_data_t& data)
 {
-	std::lock_guard<std::mutex> lock(this->event_map_lock);
-
 	if (this->first_pos_map.count(ev))
 	{
 		this->first_pos_map[ev](ev, data);
