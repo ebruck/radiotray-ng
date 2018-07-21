@@ -249,6 +249,15 @@ void RadiotrayNG::set_volume(const std::string& volume)
 }
 
 
+void RadiotrayNG::set_volume_msg(const uint32_t volume)
+{
+	this->set_and_save_volume(std::min(volume,
+		this->config->get_uint32(VOLUME_MAX_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_MAX_VALUE)));
+
+	this->display_volume_level();
+}
+
+
 void RadiotrayNG::next_station_msg()
 {
 	if (!this->current_group_stations.empty())
@@ -568,10 +577,15 @@ void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 
 	if (new_volume != volume)
 	{
-		this->volume = std::to_string(new_volume);
-		this->player->volume(new_volume);
+		// guard
+		{
+			std::lock_guard<std::mutex> lock(this->tag_update_mutex);
+			this->volume = std::to_string(new_volume);
 
-		LOG(debug) << "volume: " << this->volume;
+			LOG(debug) << "volume: " << this->volume;
+		}
+
+		this->player->volume(new_volume);
 
 		this->config->save();
 	}

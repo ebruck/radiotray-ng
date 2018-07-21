@@ -87,6 +87,8 @@ public:
 
 	void set_volume(const std::string& volume);
 
+	void set_volume_msg(uint32_t volume);
+
 	bool reload_bookmarks();
 
 	void next_station_msg();

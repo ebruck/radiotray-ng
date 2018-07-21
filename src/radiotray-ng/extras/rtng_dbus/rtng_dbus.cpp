@@ -55,6 +55,9 @@ namespace
 		"      <arg type='s' direction='in'/>"
 		"      <arg type='s' direction='in'/>"
 		"    </method>"
+		"    <method name='set_volume'>"
+		"      <arg type='s' direction='in'/>"
+  		"    </method>"
 		"  </interface>"
 		"</node>";
 
@@ -154,8 +157,7 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 	if (method_name == "get_player_state")
 	{
 		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_player_state());
-		Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(var);
-		invocation->return_value(response);
+		invocation->return_value(Glib::VariantContainerBase::create_tuple(var));
 		return;
 	}
 
@@ -177,22 +179,38 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 	if (method_name == "get_bookmarks")
 	{
 		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_bookmarks());
-		Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(var);
-		invocation->return_value(response);
+		invocation->return_value(Glib::VariantContainerBase::create_tuple(var));
 		return;
 	}
 
 	if (method_name == "get_config")
 	{
 		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_config());
-		Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(var);
-		invocation->return_value(response);
+		invocation->return_value(Glib::VariantContainerBase::create_tuple(var));
+		return;
+	}
+
+	if (method_name == "set_volume")
+	{
+		Glib::Variant<Glib::ustring> param;
+
+		parameters.get_child(param, 0);
+		const Glib::ustring volume = param.get();
+
+		try
+		{
+			this->radiotray_ng->set_volume_msg(std::stoul(volume));
+			invocation->return_value(Glib::VariantContainerBase());
+		}
+		catch(std::invalid_argument& ex)
+		{
+			invocation->return_error(Gio::DBus::Error(Gio::DBus::Error::INVALID_ARGS, "volume not an integer"));
+		}
 		return;
 	}
 
 	// non-existent method on the interface...
-	Gio::DBus::Error error(Gio::DBus::Error::UNKNOWN_METHOD, "method does not exist");
-	invocation->return_error(error);
+	invocation->return_error(Gio::DBus::Error(Gio::DBus::Error::UNKNOWN_METHOD, "method does not exist"));
 }
 
 

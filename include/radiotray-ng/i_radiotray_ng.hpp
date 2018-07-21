@@ -69,6 +69,8 @@ public:
 
 	virtual void set_volume(const std::string& volume) = 0;
 
+	virtual void set_volume_msg(uint32_t volume) = 0;
+
 	virtual void previous_station_msg() = 0;
 
 	virtual void next_station_msg() = 0;
