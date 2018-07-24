@@ -196,6 +196,7 @@ Available commands:
 
     volume_up
     volume_down
+    set_volume 'level'
     play
     stop
     quit
