@@ -1,9 +1,11 @@
+include(GoogleTest)
+
 function(add_gmock_test target)
     add_executable(${target} ${ARGN})
     add_dependencies(${target} googletest)
     target_link_libraries(${target} config playlist bookmarks event_bus ${GMOCK_BOTH_LIBRARIES} ${XDG_BASEDIR_LIBRARIES} ${Boost_LIBRARIES} ${CURL_LIBRARIES} ${JSONCPP_LIBRARIES} pthread)
     target_include_directories(${target} PRIVATE ${JSONCPP_INCLUDE_DIRS})
-    add_test(${target} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target})
+    gtest_discover_tests(${target})
 endfunction()
 
 # utests
