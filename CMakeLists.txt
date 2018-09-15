@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10)
 
-project(radiotray-ng CXX)
+project(radiotray-ng VERSION 0.2.4 LANGUAGES CXX)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -74,16 +74,18 @@ if (BUILD_TESTS)
 
     ExternalProject_Add(googletest
         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        INSTALL_COMMAND ""
-        GIT_TAG release-1.8.0
-        GIT_SHALLOW true)
+        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
+        URL_HASH SHA256=9bf1fe5182a604b4135edc1a425ae356c9ad15e9b23f9f12a02e80184c3a249c
+        TIMEOUT 30
+        DOWNLOAD_NO_PROGRESS true
+        INSTALL_COMMAND "")
 
     ExternalProject_Get_Property(googletest SOURCE_DIR)
     include_directories(${SOURCE_DIR}/googlemock/include ${SOURCE_DIR}/googletest/include)
     ExternalProject_Get_Property(googletest BINARY_DIR)
-    link_directories(${BINARY_DIR}/googlemock)
-    set(GMOCK_BOTH_LIBRARIES gmock_main gmock)
+    link_directories(${BINARY_DIR}/googlemock ${BINARY_DIR}/googlemock/gtest)
+    set(GMOCK_BOTH_LIBRARIES gmock_main gmock gtest)
+    set_property(DIRECTORY PROPERTY CLEAN_NO_CUSTOM "${CMAKE_CURRENT_BINARY_DIR}/googletest")
     unset(SOURCE_DIR)
     unset(BINARY_DIR)
 
@@ -91,6 +93,8 @@ if (BUILD_TESTS)
     add_subdirectory(tests)
     add_subdirectory(tests/runners/)
 endif()
+
+set(BUILD_SHARED_LIBS NO)
 
 add_subdirectory(debian)
 add_subdirectory(src/radiotray-ng)

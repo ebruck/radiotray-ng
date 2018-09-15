@@ -33,4 +33,4 @@ configure_file(${PROJECT_SOURCE_DIR}/rtng_user_agent.hpp.in ${CMAKE_RUNTIME_OUTP
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rtng_user_agent.hpp.tmp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rtng_user_agent.hpp)
 execute_process(COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rtng_user_agent.hpp.tmp)
 
-message(STATUS "user-agent: ${RTNG_USER_AGENT}")
+#message(STATUS "user-agent: ${RTNG_USER_AGENT}")

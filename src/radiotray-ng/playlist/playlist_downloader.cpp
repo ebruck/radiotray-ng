@@ -126,9 +126,9 @@ bool PlaylistDownloader::download(const std::string& url, std::string& content_t
 		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_URL, url);
 		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_FOLLOWLOCATION, 1L);
 		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_FAILONERROR, 1L);
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_TIMEOUT, 10L);
 
-		uint32_t http_timeout = this->config->get_uint32(HTTP_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT_VALUE);
+		const uint32_t http_timeout = this->config->get_uint32(HTTP_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT_VALUE);
+
 		LOG(debug) << HTTP_TIMEOUT_KEY << "=" << http_timeout;
 
 		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_TIMEOUT, http_timeout);
