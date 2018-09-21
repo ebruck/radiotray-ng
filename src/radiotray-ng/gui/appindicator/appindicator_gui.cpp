@@ -178,11 +178,41 @@ void AppindicatorGui::on_action_menu_item(GtkWidget* /*widget*/, gpointer data)
 }
 
 
+void AppindicatorGui::build_root_bookmarks_menu_item()
+{
+	// append root items
+	std::vector<IBookmarks::station_data_t> root_stations;
+
+	if (this->bookmarks->get_group_stations(ROOT_BOOKMARK_GROUP, root_stations))
+	{
+		for (const IBookmarks::station_data_t& s : root_stations)
+		{
+			GtkWidget* menu_item = gtk_menu_item_new_with_label(s.name.c_str());
+			gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_item);
+
+			menu_item_data* cb_data = new menu_item_data{this->shared_from_this(), ROOT_BOOKMARK_GROUP, s.name};
+
+			g_signal_connect_data(menu_item, "activate",
+				GCallback(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
+
+			gtk_widget_show(menu_item);
+		}
+	}
+}
+
+
 void AppindicatorGui::build_bookmarks_menu_item()
 {
 	this->add_separator(this->menu);
 
-	for(size_t i = 0; i < this->bookmarks->size(); ++i)
+	const bool root_bottom = this->config->get_bool(ROOT_GROUP_BOTTOM_POS_KEY, DEFAULT_ROOT_GROUP_BOTTOM_POS_VALUE);
+
+	if (!root_bottom)
+	{
+		this->build_root_bookmarks_menu_item();
+	}
+
+	for (size_t i = 0; i < this->bookmarks->size(); ++i)
 	{
 		const std::string& group = (*this->bookmarks)[i].group;
 
@@ -195,7 +225,7 @@ void AppindicatorGui::build_bookmarks_menu_item()
 			GtkWidget* sub_menu_items = gtk_menu_new();
 			gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
-			for(const IBookmarks::station_data_t& s : (*this->bookmarks)[i].stations)
+			for (const IBookmarks::station_data_t& s : (*this->bookmarks)[i].stations)
 			{
 				GtkWidget* sub_menu_item = gtk_menu_item_new_with_label(s.name.c_str());
 				gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
@@ -212,23 +242,9 @@ void AppindicatorGui::build_bookmarks_menu_item()
 		}
 	}
 
-	// append root items
-	std::vector<IBookmarks::station_data_t> root_stations;
-
-	if (this->bookmarks->get_group_stations(ROOT_BOOKMARK_GROUP, root_stations))
+	if (root_bottom)
 	{
-		for(const IBookmarks::station_data_t& s : root_stations)
-		{
-			GtkWidget* menu_item = gtk_menu_item_new_with_label(s.name.c_str());
-			gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_item);
-
-			menu_item_data* cb_data = new menu_item_data{this->shared_from_this(), ROOT_BOOKMARK_GROUP, s.name};
-
-			g_signal_connect_data(menu_item, "activate",
-				GCallback(on_station_menu_item), cb_data, GClosureNotify(&menu_item_data::free_cb_data), GConnectFlags(0));
-
-			gtk_widget_show(menu_item);
-		}
+		this->build_root_bookmarks_menu_item();
 	}
 }
 

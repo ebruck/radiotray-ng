@@ -96,7 +96,8 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "media-keys-old-dbus-name" : false,
    "radiotray-ng-on" : "radiotray-ng-on",
    "radiotray-ng-off" : "radiotray-ng-off",
-   "radiotray-ng-notification" : "radiotray-ng-notification"
+   "radiotray-ng-notification" : "radiotray-ng-notification",
+   "root-group-bottom-pos" : true
 }
 ```
 * **Installed config will only include commonly edited entries, all others are using default values shown above.**
@@ -129,6 +130,7 @@ media-key-previous-station: media key to use for previous station within current
            radiotray-ng-on: installed theme icon name for "on" or path to image
           radiotray-ng-off: installed theme icon name for "off" or path to image
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
+     root-group-bottom-pos: render root group stations at bottom or top of menu
 
 ```
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.

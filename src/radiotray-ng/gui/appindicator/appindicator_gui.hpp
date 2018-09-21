@@ -71,6 +71,7 @@ private:
 	void build_sleep_timer_menu_item();
 	void build_about_menu_item();
 	void build_quit_menu_item();
+	void build_root_bookmarks_menu_item();
 
 	void add_separator(GtkWidget* menu);
 

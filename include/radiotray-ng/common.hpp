@@ -88,6 +88,7 @@ using playlist_t = std::vector<std::string>;
 #define RADIOTRAY_NG_ICON_ON_KEY          "radiotray-ng-on"
 #define RADIOTRAY_NG_ICON_OFF_KEY         "radiotray-ng-off"
 #define RADIOTRAY_NG_NOTIFICATION_KEY     "radiotray-ng-notification"
+#define ROOT_GROUP_BOTTOM_POS_KEY         "root-group-bottom-pos"
 #define SLEEP_TIMER_KEY                   "sleep-timer"
 #define SPLIT_TITLE_KEY                   "split-title"
 #define IHR_TITLE_KEY                     "ihr-title"
@@ -132,6 +133,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_RADIOTRAY_NG_ICON_ON_VALUE       "radiotray-ng-on"
 #define DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE      "radiotray-ng-off"
 #define DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE  "radiotray-ng-notification"
+#define DEFAULT_ROOT_GROUP_BOTTOM_POS_VALUE      (true)
 #define DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE    (false)
 #define DEFAULT_NOTIFICATION_VALUE               (true)
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
