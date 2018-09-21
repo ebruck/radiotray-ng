@@ -236,7 +236,11 @@ libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-fi
 
 ## Build Radiotray-NG & Debian Package ##
 ```
-$ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
@@ -244,9 +248,11 @@ $ sudo apt-get install -f
 
 ## Build Radiotray-NG + Tests & Debian Package ##
 ```
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
 $ mkdir build
 $ cd build
-$ cmake <path-to-source>/radiotray-ng -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+$ cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
