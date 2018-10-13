@@ -603,5 +603,4 @@ void RadiotrayNG::register_handlers()
 
 	this->event_bus->subscribe(IEventBus::event::message,
 		std::bind(&RadiotrayNG::on_message_event, this, std::placeholders::_1, std::placeholders::_2), IEventBus::event_pos::last);
-
 }

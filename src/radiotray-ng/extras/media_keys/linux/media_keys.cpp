@@ -37,16 +37,16 @@ public:
 		if (this->config->get_bool(MEDIA_KEY_MAPPING_KEY, DEFAULT_MEDIA_KEY_MAPPING_VALUE))
 		{
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_UP_KEY, DEFAULT_MEDIA_KEY_VOLUME_UP_VALUE))] =
-				std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_up_msg, this->radiotray_ng);
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE))] =
-				std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng);
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
-				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng);
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE))] =
-				std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng.get());
+				std::bind(&IRadioTrayNG::previous_station_msg, this->radiotray_ng);
 
 			this->log_media_keys();
 		}
@@ -179,9 +179,9 @@ void media_keys_t::on_gio_signal(GDBusProxy* /*proxy*/, gchar* /*sender_name*/, 
 
 void media_keys_t::gio_start()
 {
-	GError*     error{nullptr};
+	GError* error{nullptr};
 
-	LOG(info) << "starting media keys";
+	LOG(debug) << "starting media keys";
 
 	this->dbus_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 		GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
@@ -215,7 +215,7 @@ void media_keys_t::gio_stop()
 {
 	if (this->dbus_proxy)
 	{
-		LOG(info) << "stopping media keys";
+		LOG(debug) << "stopping media keys";
 
 		// cleanup
 		g_dbus_proxy_call(this->dbus_proxy,

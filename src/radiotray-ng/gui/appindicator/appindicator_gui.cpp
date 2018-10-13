@@ -225,7 +225,7 @@ void AppindicatorGui::build_bookmarks_menu_item()
 			GtkWidget* sub_menu_items = gtk_menu_new();
 			gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
-			for (const IBookmarks::station_data_t& s : (*this->bookmarks)[i].stations)
+			for (const auto& s : (*this->bookmarks)[i].stations)
 			{
 				GtkWidget* sub_menu_item = gtk_menu_item_new_with_label(s.name.c_str());
 				gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
