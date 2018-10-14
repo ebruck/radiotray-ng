@@ -54,13 +54,6 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screenshot_5.png)
 
 
-## Install ##
-
-Download the latest Debian package from the repo's release page.
-
-https://github.com/ebruck/radiotray-ng/releases
-
-
 ## Config File ##
 
 A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory with the following defaults:
@@ -226,6 +219,13 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
    "volume" : "15"
 }
 ```
+
+## Install ##
+
+Download a release or clone the repo and build the latest Debian package.
+
+https://github.com/ebruck/radiotray-ng/releases
+
 
 ## To Build on Ubuntu: ##
 
