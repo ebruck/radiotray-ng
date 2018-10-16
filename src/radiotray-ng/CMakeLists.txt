@@ -37,4 +37,4 @@ target_link_libraries(
 )
 
 add_dependencies(radiotray-ng user-agent)
-target_include_directories(radiotray-ng PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} ${GIOMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
+target_include_directories(radiotray-ng SYSTEM PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} ${GIOMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
