@@ -28,6 +28,12 @@ set(CPACK_GENERATOR                   "DEB")
 set(CPACK_PACKAGE_FILE_NAME            ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/debian/postinst;${PROJECT_SOURCE_DIR}/debian/postrm)
 
+# https://bugs.launchpad.net/ubuntu/+source/curl/+bug/1754294
+execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE OUTPUT_STRIP_TRAILING_WHITESPACE)
+if (${RELEASE} STREQUAL "16.04")
+   string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+endif()
+
 include(CPack)
 
 set(DESTINATION_DIR /usr/share/radiotray-ng)
