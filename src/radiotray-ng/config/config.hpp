@@ -20,7 +20,6 @@
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/i_config.hpp>
 #include <json/json.h>
-#include <mutex>
 
 
 class Config final : public IConfig
@@ -49,9 +48,6 @@ public:
 	std::string dump();
 
 private:
-	template<typename T> void private_set_value(const std::string& key, const T& value);
-
-	std::mutex config_lock;
 	const std::string config_file;
 	Json::Value config;
 };

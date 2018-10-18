@@ -54,13 +54,6 @@ The version here is what "I" wanted out of RadioTray.
 ![Screenshot](images/screenshot_5.png)
 
 
-## Install ##
-
-Download the latest Debian package from the repo's release page.
-
-https://github.com/ebruck/radiotray-ng/releases
-
-
 ## Config File ##
 
 A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory with the following defaults:
@@ -96,7 +89,8 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "media-keys-old-dbus-name" : false,
    "radiotray-ng-on" : "radiotray-ng-on",
    "radiotray-ng-off" : "radiotray-ng-off",
-   "radiotray-ng-notification" : "radiotray-ng-notification"
+   "radiotray-ng-notification" : "radiotray-ng-notification",
+   "root-group-bottom-pos" : true
 }
 ```
 * **Installed config will only include commonly edited entries, all others are using default values shown above.**
@@ -129,6 +123,7 @@ media-key-previous-station: media key to use for previous station within current
            radiotray-ng-on: installed theme icon name for "on" or path to image
           radiotray-ng-off: installed theme icon name for "off" or path to image
  radiotray-ng-notification: installed theme icon name for "notification" or path to image
+     root-group-bottom-pos: render root group stations at bottom or top of menu
 
 ```
 * Do not edit the config while Radiotray-NG is running or your changes will be lost.
@@ -196,6 +191,7 @@ Available commands:
 
     volume_up
     volume_down
+    set_volume 'level'
     play
     stop
     quit
@@ -224,16 +220,27 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
 }
 ```
 
+## Install ##
+
+Download a release or clone the repo and build the latest Debian package.
+
+https://github.com/ebruck/radiotray-ng/releases
+
+
 ## To Build on Ubuntu: ##
 
 Install these packages:
 ```
-libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5 cmake
+lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-dev libwxgtk3.0-0v5 cmake
 ```
 
 ## Build Radiotray-NG & Debian Package ##
 ```
-$ cmake <path-to-source>/radiotray-ng -DCMAKE_BUILD_TYPE=Release
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
@@ -241,10 +248,19 @@ $ sudo apt-get install -f
 
 ## Build Radiotray-NG + Tests & Debian Package ##
 ```
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
 $ mkdir build
 $ cd build
-$ cmake <path-to-source>/radiotray-ng -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+$ cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
 $ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
 $ sudo apt-get install -f
+```
+
+## To Build on Fedora: ##
+
+Install these packages:
+```
+redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel
 ```

@@ -1,3 +1,13 @@
+radiotray-ng (0.2.4) unstable; urgency=low
+
+      * Added dbus set_volume method
+      * Added root-group-bottom-pos config option
+      * Notification icon visibility on light backgrounds improved
+      * Minor build changes & bug fixes
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Wed, 17 Oct 2018 21:19:49 -0700
+
+
 radiotray-ng (0.2.3) unstable; urgency=low
 
       * Fixed playlist line ending type detection

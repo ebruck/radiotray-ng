@@ -22,7 +22,6 @@
 #include <radiotray-ng/i_event_bus.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
 
-#include <mutex>
 #include <memory>
 #include <string>
 #include <vector>
@@ -87,6 +86,8 @@ public:
 
 	void set_volume(const std::string& volume);
 
+	void set_volume_msg(uint32_t volume);
+
 	bool reload_bookmarks();
 
 	void next_station_msg();
@@ -115,8 +116,6 @@ private:
 	std::string codec;
 	std::string volume;
 	bool station_notifications;
-
-	std::mutex tag_update_mutex;
 
 	// event handlers
 	void on_state_changed_event(const IEventBus::event& ev, IEventBus::event_data_t& data);

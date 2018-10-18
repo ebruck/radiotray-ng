@@ -552,5 +552,5 @@ bool Bookmarks::get_station_notifications(const Json::Value& station)
 		return station[STATION_NOTIFICATIONS_KEY].asBool();
 	}
 
-	return true;
+	return DEFAULT_STATION_NOTIFICATION_VALUE;
 }

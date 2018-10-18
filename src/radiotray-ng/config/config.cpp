@@ -26,8 +26,6 @@ Config::Config(const std::string& config_file)
 
 bool Config::load()
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	LOG(debug) << "loading: " << this->config_file;
 
 	try
@@ -54,8 +52,6 @@ bool Config::load()
 
 bool Config::save()
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	LOG(debug) << "saving: " << this->config_file;
 
 	try
@@ -75,37 +71,26 @@ bool Config::save()
 }
 
 
-template<typename T>
-void Config::private_set_value(const std::string& key, const T& value)
-{
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
-	this->config[key] = value;
-}
-
-
 void Config::set_string(const std::string& key, const std::string& value)
 {
-	this->private_set_value(key, value);
+	this->config[key] = value;
 }
 
 
 void Config::set_uint32(const std::string& key, const uint32_t value)
 {
-	this->private_set_value(key, value);
+	this->config[key] = value;
 }
 
 
 void Config::set_bool(const std::string& key, const bool value)
 {
-	this->private_set_value(key, value);
+	this->config[key] = value;
 }
 
 
 std::string Config::get_string(const std::string& key, const std::string& default_value)
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	if (this->config.isMember(key))
 	{
 		return this->config[key].asString();
@@ -117,8 +102,6 @@ std::string Config::get_string(const std::string& key, const std::string& defaul
 
 uint32_t Config::get_uint32(const std::string& key, const uint32_t default_value)
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	if (this->config.isMember(key))
 	{
 		return this->config[key].asUInt();
@@ -130,8 +113,6 @@ uint32_t Config::get_uint32(const std::string& key, const uint32_t default_value
 
 bool Config::get_bool(const std::string& key, const bool default_value)
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	if (this->config.isMember(key))
 	{
 		return this->config[key].asBool();
@@ -143,8 +124,6 @@ bool Config::get_bool(const std::string& key, const bool default_value)
 
 bool Config::exists(const std::string& key)
 {
-	std::lock_guard<std::mutex> lock(this->config_lock);
-
 	return this->config.isMember(key);
 }
 

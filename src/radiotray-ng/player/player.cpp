@@ -330,7 +330,7 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 {
 	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
 
-	guint count = gst_tag_list_get_tag_size(list, tag);
+	const guint count = gst_tag_list_get_tag_size(list, tag);
 
 	for (guint i = 0; i < count; i++)
 	{
