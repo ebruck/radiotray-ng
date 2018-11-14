@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(radiotray-ng VERSION 0.2.4 LANGUAGES CXX)
+project(radiotray-ng VERSION 0.2.5 LANGUAGES CXX)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -13,7 +13,7 @@ endif()
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 4)
+set(PROJECT_VERSION_PATCH 5-dev)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir

@@ -75,6 +75,16 @@
             "image" : null,
             "name" : "CINEMIX",
             "url" : "http://cinemix.us/cine.asx"
+         },
+         {
+            "image" : null,
+            "name" : "WQXR",
+            "url" : "http://www.wqxr.org/stream/wqxr/mp3.pls"
+         },
+         {
+            "image" : null,
+            "name" : "BBC Radio 3",
+            "url" : "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p"
          }
       ]
    },
@@ -117,6 +127,11 @@
             "image" : null,
             "name" : "AM 600",
             "url" : "http://www.conyersradio.net/listen.m3u"
+         },
+         {
+            "image" : null,
+            "name" : "Rumsey Retro Radio",
+            "url" : "https://agnes.torontocast.com:2199/tunein/irukbies-stream.pls"
          },
          {
             "image" : null,
