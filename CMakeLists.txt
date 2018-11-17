@@ -131,7 +131,7 @@ add_custom_command(
         -D PROJECT_VERSION=${PROJECT_VERSION}
         -D CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
         -D CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
-        -P ${PROJECT_SOURCE_DIR}/user-agent.cmake
+        -P ${PROJECT_SOURCE_DIR}/cmake/user-agent.cmake
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
