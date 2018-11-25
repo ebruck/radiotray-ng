@@ -120,12 +120,12 @@
       "stations" : [
          {
             "image" : null,
-            "name" : "AM 1710",
-            "url" : "http://lin2.ash.fast-serv.com:9022/listen.pls"
+            "name" : "ABN Antioch OTR",
+            "url" : "http://radio.macinmind.com/listen.m3u"
          },
          {
             "image" : null,
-            "name" : "AM 600",
+            "name" : "AM600 Conyers OTR",
             "url" : "http://www.conyersradio.net/listen.m3u"
          },
          {
@@ -135,7 +135,7 @@
          },
          {
             "image" : null,
-            "name" : "WNAR",
+            "name" : "WNAR-AM Radio",
             "url" : "http://live.wnar-am.com:8500/listen.pls"
          }
       ]
