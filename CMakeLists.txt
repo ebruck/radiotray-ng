@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.7)
 
 project(radiotray-ng VERSION 0.2.4 LANGUAGES CXX)
 
