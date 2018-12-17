@@ -24,5 +24,7 @@ public:
 
 	virtual void run(int argc, char* argv[]) = 0;
 
+	virtual void reload_bookmarks() = 0;
+
 	virtual void stop() = 0;
 };

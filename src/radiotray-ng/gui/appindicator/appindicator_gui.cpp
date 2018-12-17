@@ -756,6 +756,12 @@ void AppindicatorGui::stop()
 }
 
 
+void AppindicatorGui::reload_bookmarks()
+{
+	AppindicatorGui::on_reload_bookmarks_menu_item(nullptr, gpointer(this));
+}
+
+
 void AppindicatorGui::run(int argc, char* argv[])
 {
 	gtk_init(&argc, &argv);
