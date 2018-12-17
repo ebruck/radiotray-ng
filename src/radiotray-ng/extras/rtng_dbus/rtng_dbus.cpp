@@ -121,7 +121,7 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 
 	if (method_name == "reload_bookmarks")
 	{
-		this->radiotray_ng->reload_bookmarks();
+		this->gui->reload_bookmarks();
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}
