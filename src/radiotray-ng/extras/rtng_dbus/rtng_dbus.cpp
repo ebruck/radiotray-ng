@@ -55,6 +55,9 @@ namespace
 		"      <arg type='s' direction='in'/>"
 		"      <arg type='s' direction='in'/>"
 		"    </method>"
+		"    <method name='play_url'>"
+		"      <arg type='s' direction='in'/>"
+		"    </method>"
 		"    <method name='set_volume'>"
 		"      <arg type='s' direction='in'/>"
   		"    </method>"
@@ -172,6 +175,18 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 		const Glib::ustring station = param.get();
 
 		this->radiotray_ng->play(group, station);
+		invocation->return_value(Glib::VariantContainerBase());
+		return;
+	}
+
+	if (method_name == "play_url")
+	{
+		Glib::Variant<Glib::ustring> param;
+
+		parameters.get_child(param, 0);
+		const Glib::ustring url = param.get();
+
+		this->radiotray_ng->play_url(url);
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}

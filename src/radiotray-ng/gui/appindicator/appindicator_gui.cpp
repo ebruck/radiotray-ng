@@ -294,7 +294,13 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 	if (state == STATE_STOPPED)
 	{
-		action_text = "Turn On \"" + this->radiotray_ng->get_station() + "\"";
+		action_text = "Turn On";
+
+		if (!this->radiotray_ng->get_station().empty())
+		{
+			action_text += " \"" + this->radiotray_ng->get_station() + "\"";
+		}
+
 		gtk_menu_item_set_label(GTK_MENU_ITEM(this->action_menu_item), action_text.c_str());
 
 		// Is the station still in our bookmarks?
@@ -306,7 +312,13 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 	if (state == STATE_PLAYING || state == STATE_BUFFERING)
 	{
-		action_text = "Turn Off \"" + this->radiotray_ng->get_station() + "\"";
+		action_text = "Turn Off";
+
+		if (!this->radiotray_ng->get_station().empty())
+		{
+			action_text += " \"" + this->radiotray_ng->get_station() + "\"";
+		}
+
 		gtk_menu_item_set_label(GTK_MENU_ITEM(this->action_menu_item), action_text.c_str());
 		gtk_widget_set_sensitive(this->action_menu_item, TRUE);
 		return;

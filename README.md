@@ -193,6 +193,7 @@ Available commands:
     volume_down
     set_volume 'level'
     play
+    play_url 'url'
     stop
     quit
     previous_station
