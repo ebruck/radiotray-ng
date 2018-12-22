@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 
 class IConfig;
 class IPlayer;
@@ -43,6 +44,8 @@ public:
 	virtual ~RadiotrayNG();
 
 	void play(const std::string& group, const std::string& station);
+
+	void play_url(const std::string& url);
 
 	void play();
 
@@ -136,4 +139,7 @@ private:
 
 	std::vector<IBookmarks::station_data_t> current_group_stations;
 	int current_station_index;
+
+	std::once_flag play_url_setup;
+	const std::string play_url_group;
 };

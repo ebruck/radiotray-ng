@@ -27,6 +27,8 @@ public:
 
 	virtual void play(const std::string& group, const std::string& station) = 0;
 
+	virtual void play_url(const std::string& url) = 0;
+
 	virtual void play() = 0;
 
 	virtual void volume_up() = 0;
