@@ -464,14 +464,8 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 
 void RadiotrayNG::play_url(const std::string& url)
 {
-	std::call_once(this->play_url_setup,
-		[this]()
-		{
-			// hack to allow play_url dbus messages...
-			this->bookmarks->add_group(this->play_url_group, "");
-			this->bookmarks->add_station(this->play_url_group, "", "", "", true);
-		});
-
+	this->bookmarks->add_group(this->play_url_group, "");
+	this->bookmarks->add_station(this->play_url_group, "", "", "", true);
 	this->bookmarks->update_station(this->play_url_group, "", url, "", true);
 	this->play(this->play_url_group, "");
 }
@@ -611,14 +605,6 @@ void RadiotrayNG::display_volume_level()
 
 bool RadiotrayNG::reload_bookmarks()
 {
-	// hack... preserve play_url data across reloads...
-	std::vector<IBookmarks::station_data_t> play_url_group_data;
-
-	if (this->bookmarks->get_group_stations(this->play_url_group, play_url_group_data))
-	{
-		this->bookmarks->remove_group(this->play_url_group);
-	}
-
 	bool result = this->bookmarks->load();
 
 	if (result)
@@ -626,13 +612,6 @@ bool RadiotrayNG::reload_bookmarks()
 		// always show...
 		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
 			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
-
-		// *sigh* now add it back...
-		if (!play_url_group_data.empty())
-		{
-			this->bookmarks->add_group(this->play_url_group, "");
-			this->bookmarks->add_station(this->play_url_group, "", play_url_group_data[0].url, "", true);
-		}
 
 		// force reloading of current groups station list...
 		this->set_station(this->group, this->station, this->station_notifications);
@@ -642,13 +621,6 @@ bool RadiotrayNG::reload_bookmarks()
 		// always show...
 		this->notification.notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
 			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
-
-		// *sigh* now add it back...
-		if (!play_url_group_data.empty())
-		{
-			this->bookmarks->add_group(this->play_url_group, "");
-			this->bookmarks->add_station(this->play_url_group, "", play_url_group_data[0].url, "", true);
-		}
 	}
 
 	return result;
