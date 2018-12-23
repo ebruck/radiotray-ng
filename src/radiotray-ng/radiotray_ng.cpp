@@ -507,12 +507,6 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 				this->config->set_string(LAST_STATION_KEY, std.name);
 				this->config->set_bool(LAST_STATION_NOTIFICATION_KEY, std.notifications);
 			}
-			else
-			{
-				this->config->set_string(LAST_STATION_GROUP_KEY, "");
-				this->config->set_string(LAST_STATION_KEY, "");
-				this->config->set_bool(LAST_STATION_NOTIFICATION_KEY, true);
-			}
 
 			this->set_station(group, std.name, std.notifications);
 
