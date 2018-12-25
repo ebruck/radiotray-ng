@@ -33,6 +33,7 @@
 
 #ifdef RTNG_DBUS
 #include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
+#include <radiotray-ng/extras/mpris_dbus/mpris_dbus.hpp>
 #endif
 
 #include <boost/log/utility/setup/file.hpp>
@@ -261,6 +262,7 @@ int main(int argc, char* argv[])
 
 #ifdef RTNG_DBUS
 	RtngDbus dbus(gui, radiotray_ng);
+	MprisDbus mpris_dbus(gui, radiotray_ng);
 #endif
 
 	// addons etc.
