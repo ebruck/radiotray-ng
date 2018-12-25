@@ -109,6 +109,7 @@ add_subdirectory(src/radiotray-ng/gui/editor)
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_subdirectory(src/radiotray-ng/extras/rtng_dbus)
+    add_subdirectory(src/radiotray-ng/extras/mpris_dbus)
     target_compile_definitions(radiotray-ng PRIVATE RTNG_DBUS)
 endif()
 
