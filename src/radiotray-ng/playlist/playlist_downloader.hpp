@@ -21,7 +21,6 @@
 #include <memory>
 
 class IPlaylistDecoder;
-class ICurl;
 class IConfig;
 
 
@@ -32,15 +31,6 @@ public:
 	PlaylistDownloader(std::shared_ptr<IConfig> config);
 
 	virtual ~PlaylistDownloader() = default;
-
-	/**
-	 * Overloaded constructor for unit testing. Allows for mocking while still making
-	 * class usage straight forward.
-	 *
-	 * @param config config object
-	 * @param curl curl library
-	 */
-	PlaylistDownloader(std::shared_ptr<IConfig> config, std::shared_ptr<ICurl>&& curl);
 
 	/**
 	 * Downloads playlist and runs the output through the list of supported decoders.
@@ -63,6 +53,5 @@ private:
 	static size_t curl_write_callback(char *buffer, size_t size, size_t nitems, void* userdata);
 
 	std::vector<std::shared_ptr<IPlaylistDecoder>> decoders;
-	std::shared_ptr<ICurl> const curl;
 	std::shared_ptr<IConfig> const config;
 };

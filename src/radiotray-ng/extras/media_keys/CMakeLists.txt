@@ -1,7 +1,7 @@
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    FILE(GLOB SRC_FILES "linux/*.cpp")
+    set(SRC_FILES linux/media_keys.cpp)
 else()
-    FILE(GLOB SRC_FILES "darwin/*.cpp")
+    set(SRC_FILES darwin/media_keys.cpp)
 endif()
 
 add_library(media_keys STATIC ${SRC_FILES})
