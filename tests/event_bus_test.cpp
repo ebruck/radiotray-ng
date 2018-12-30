@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <gmock/gmock.h>
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/event_bus/event_bus.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 
 

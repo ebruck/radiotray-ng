@@ -20,24 +20,17 @@
 #include <radiotray-ng/i_config.hpp>
 #include <rtng_user_agent.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
-#include "curl.hpp"
 #include "asf_decoder.hpp"
 #include "asx_decoder.hpp"
 #include "m3u_decoder.hpp"
 #include "pls_decoder.hpp"
 #include "ram_decoder.hpp"
 #include "xspf_decoder.hpp"
+#include <curl/curl.h>
 
 
 PlaylistDownloader::PlaylistDownloader(std::shared_ptr<IConfig> config)
-	: PlaylistDownloader(std::move(config), std::make_shared<Curl>())
-{
-}
-
-
-PlaylistDownloader::PlaylistDownloader(std::shared_ptr<IConfig> config, std::shared_ptr<ICurl>&& curl)
-	: curl(std::move(curl))
-	, config(std::move(config))
+	: config(std::move(config))
 {
 	this->install_decoders();
 }
@@ -102,8 +95,8 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 
 bool PlaylistDownloader::download(const std::string& url, std::string& content_type, std::string& content, long& http_resp_code, size_t max_bytes)
 {
-	std::unique_ptr<CURL, std::function<void(CURL*)>> curl_handle(this->curl->curl_easy_init(),
-		std::bind(&ICurl::curl_easy_cleanup, this->curl, std::placeholders::_1));
+	std::unique_ptr<CURL, std::function<void(CURL*)>> curl_handle(curl_easy_init(),
+		std::bind(curl_easy_cleanup, std::placeholders::_1));
 
 	content.clear();
 
@@ -111,11 +104,11 @@ bool PlaylistDownloader::download(const std::string& url, std::string& content_t
 	{
 		// handle icecast's "ICY 200 OK"
 		curl_slist* http_200_aliases{nullptr};
-		http_200_aliases = this->curl->curl_slist_append(http_200_aliases, "ICY");
+		http_200_aliases = curl_slist_append(http_200_aliases, "ICY");
 
 		if (http_200_aliases != nullptr)
 		{
-			this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_HTTP200ALIASES, http_200_aliases);
+			curl_easy_setopt(curl_handle.get(), CURLOPT_HTTP200ALIASES, http_200_aliases);
 		}
 		else
 		{
@@ -123,37 +116,39 @@ bool PlaylistDownloader::download(const std::string& url, std::string& content_t
 		}
 
 		// defaults
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_URL, url);
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_FOLLOWLOCATION, 1L);
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_FAILONERROR, 1L);
+		curl_easy_setopt(curl_handle.get(), CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl_handle.get(), CURLOPT_FOLLOWLOCATION, 1L);
+		curl_easy_setopt(curl_handle.get(), CURLOPT_FAILONERROR, 1L);
+
+		curl_easy_setopt(curl_handle.get(), CURLOPT_SSL_VERIFYHOST, 0);
 
 		const uint32_t http_timeout = this->config->get_uint32(HTTP_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT_VALUE);
 
 		LOG(debug) << HTTP_TIMEOUT_KEY << "=" << http_timeout;
 
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_TIMEOUT, http_timeout);
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_WRITEFUNCTION,
+		curl_easy_setopt(curl_handle.get(), CURLOPT_TIMEOUT, http_timeout);
+		curl_easy_setopt(curl_handle.get(), CURLOPT_WRITEFUNCTION,
 			reinterpret_cast<void*>(PlaylistDownloader::curl_write_callback));
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_USERAGENT, RTNG_USER_AGENT);
+		curl_easy_setopt(curl_handle.get(), CURLOPT_USERAGENT, RTNG_USER_AGENT);
 
 		callback_pair_t cb_pair{&content, max_bytes};
-		this->curl->curl_easy_setopt(curl_handle.get(), CURLOPT_WRITEDATA, static_cast<void*>(&cb_pair));
+		curl_easy_setopt(curl_handle.get(), CURLOPT_WRITEDATA, static_cast<void*>(&cb_pair));
 
-		CURLcode res = this->curl->curl_easy_perform(curl_handle.get());
+		CURLcode res = curl_easy_perform(curl_handle.get());
 
-		this->curl->curl_slist_free_all(http_200_aliases);
-		this->curl->curl_easy_getinfo(curl_handle.get(), CURLINFO_RESPONSE_CODE, &http_resp_code);
+		curl_slist_free_all(http_200_aliases);
+		curl_easy_getinfo(curl_handle.get(), CURLINFO_RESPONSE_CODE, &http_resp_code);
 
 		// write error usually means we hit our upper limit for data to retrieve..
 		if (res != CURLE_OK && res != CURLE_WRITE_ERROR)
 		{
-			LOG(error) << "curl_easy_perform() failed: " << this->curl->curl_easy_strerror(res) << " " << http_resp_code;
+			LOG(error) << "curl_easy_perform() failed: " << curl_easy_strerror(res) << " " << http_resp_code;
 			return false;
 		}
 
 		// get content-type
 		char* c_type = nullptr;
-		this->curl->curl_easy_getinfo(curl_handle.get(), CURLINFO_CONTENT_TYPE, &c_type);
+		curl_easy_getinfo(curl_handle.get(), CURLINFO_CONTENT_TYPE, &c_type);
 
 		if (c_type)
 		{
