@@ -120,8 +120,6 @@ void Player::stop()
 		// buffering timeout.
 		this->buffering = false;
 
-		this->state_playing_sent = false;
-
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
@@ -285,11 +283,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			{
 				if (new_state == GST_STATE_PLAYING)
 				{
-					if (!player->state_playing_sent)
-					{
-						player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
-						player->state_playing_sent = true;
-					}
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{

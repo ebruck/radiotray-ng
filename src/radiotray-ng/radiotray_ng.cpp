@@ -56,6 +56,8 @@ void RadiotrayNG::stop()
 {
 	LOG(info) << "stopping player";
 
+	this->playing_notification_sent = false;
+
 	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE) &&
 		this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
 	{
@@ -372,7 +374,12 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			if (!this->playing_notification_sent)
+			{
+				this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+
+				this->playing_notification_sent = true;
+			}
 
 			return;
 		}
@@ -477,6 +484,8 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 	{
 		this->player->stop();
 	}
+
+	this->playing_notification_sent = false;
 
 	playlist_t pls;
 	IBookmarks::station_data_t std;
