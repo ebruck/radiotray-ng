@@ -56,7 +56,6 @@ private:
 	GstClock*   clock;
 	GstClockID  clock_id;
 	bool        buffering = false;
-	bool        state_playing_sent = false;
 
 	playlist_t current_playlist;
 

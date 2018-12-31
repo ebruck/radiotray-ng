@@ -117,7 +117,9 @@ private:
 	std::string bitrate;
 	std::string codec;
 	std::string volume;
+
 	bool station_notifications;
+	bool playing_notification_sent = false;
 
 	// event handlers
 	void on_state_changed_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
