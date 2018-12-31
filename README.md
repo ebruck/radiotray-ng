@@ -265,3 +265,5 @@ Install these packages:
 ```
 redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel
 ```
+### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
+
