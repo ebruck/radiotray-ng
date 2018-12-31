@@ -229,6 +229,8 @@ int main(int argc, char* argv[])
 
 	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
 
+	LOG(info) << RTNG_USER_AGENT;
+
 	auto config = std::make_shared<Config>(config_path + RTNG_CONFIG_FILE);
 
 	// load config or create a new one
