@@ -409,6 +409,7 @@ EditorFrame::onClose(wxCloseEvent& event)
 	}
 
 	this->saveConfiguration();
+	this->group_list->clearGroups();
     this->Destroy();
 }
 
@@ -424,6 +425,7 @@ EditorFrame::onQuit(wxCommandEvent& /* event */)
 	}
 
 	this->saveConfiguration();
+	this->group_list->clearGroups();
     this->Destroy();
 }
 
