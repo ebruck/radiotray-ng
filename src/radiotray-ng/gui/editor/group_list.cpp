@@ -99,6 +99,7 @@ GroupList::GroupList(wxWindow* parent, StationList* list) :
 
 GroupList::~GroupList()
 {
+	this->clearGroups();
 }
 
 bool
@@ -137,21 +138,24 @@ GroupList::onItemSelected(wxListEvent& event)
 void
 GroupList::onDeleteAllItems(wxListEvent& /* event */)
 {
-	this->station_list->clearStations();
-
-	long item = -1;
-	for ( ;; )
+	if (this->GetItemCount())
 	{
-		item = this->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_DONTCARE);
-		if (item == -1)
-		{
-			break;
-		}
+		this->station_list->clearStations();
 
-		GroupList::ItemData* data = reinterpret_cast<GroupList::ItemData*>(this->GetItemData(item));
-		if (data)
+		long item = -1;
+		for ( ;; )
 		{
-			delete data;
+			item = this->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_DONTCARE);
+			if (item == -1)
+			{
+				break;
+			}
+
+			GroupList::ItemData* data = reinterpret_cast<GroupList::ItemData*>(this->GetItemData(item));
+			if (data)
+			{
+				delete data;
+			}
 		}
 	}
 }
