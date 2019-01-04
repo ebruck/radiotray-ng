@@ -59,6 +59,7 @@ bool Player::play_next()
 
 		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
 		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
+		g_object_set(this->souphttpsrc, "is-live", TRUE, NULL);
 
 		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size*buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
@@ -167,7 +168,7 @@ void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*us
 
 gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
 {
-	Player* player{(Player*)user_data};
+	auto player{static_cast<Player*>(user_data)};
 
 	gst_clock_id_unref(player->clock_id);
 	player->clock_id = nullptr;
@@ -180,6 +181,7 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 		gst_element_set_state(player->pipeline, GST_STATE_NULL);
 		gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
 		gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+		g_object_set(player->souphttpsrc, "is-live", TRUE, NULL);
 	}
 
 	return TRUE;
@@ -188,7 +190,7 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 
 gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpointer user_data)
 {
-	Player* player{static_cast<Player*>(user_data)};
+	auto player{static_cast<Player*>(user_data)};
 
 	switch (GST_MESSAGE_TYPE (message))
 	{
@@ -383,6 +385,7 @@ void Player::gst_start()
 		return;
 	}
 
+	g_object_set(this->souphttpsrc, "is-live", TRUE, NULL);
 	g_object_set(this->pipeline, "audio-sink", audio_sink, NULL);
 
 	// get clock for buffering timeouts...
