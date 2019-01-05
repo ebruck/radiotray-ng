@@ -37,7 +37,6 @@ using playlist_t = std::vector<std::string>;
 
 // state data values
 #define STATE_BUFFERING                   "buffering"
-#define STATE_PAUSED                      "paused"
 #define STATE_PLAYING                     "playing"
 #define STATE_STOPPED                     "stopped"
 #define STATE_CONNECTING                  "connecting"
@@ -110,7 +109,7 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright © 2017-2018 - The Radiotray-NG Authors"
+#define APP_COPYRIGHT                     "Copyright © 2017-2019 - The Radiotray-NG Authors"
 #define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"

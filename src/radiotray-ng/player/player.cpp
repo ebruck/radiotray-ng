@@ -54,14 +54,14 @@ bool Player::play_next()
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
-		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-		uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
+		const uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+		const uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
 
 		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
 		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
 		g_object_set(this->souphttpsrc, "is-live", TRUE, NULL);
 
-		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size*buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
+		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size * buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
 		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
@@ -324,7 +324,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer user_data)
 {
-	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
+	auto& event_data = *static_cast<IEventBus::event_data_t*>(user_data);
 
 	const guint count = gst_tag_list_get_tag_size(list, tag);
 
