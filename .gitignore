@@ -58,3 +58,5 @@ local.properties
 .vscode/
 
 build/
+
+cmake-build-debug/

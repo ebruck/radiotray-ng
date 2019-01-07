@@ -33,7 +33,8 @@ bool DsDecoder::is_url_direct_stream(const std::string& url)
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 
     return boost::ends_with(tmp, ".m3u8") ||
-           boost::ends_with(tmp, ".mp3");
+           boost::ends_with(tmp, ".mp3")  ||
+           boost::ends_with(tmp, ".aac");
 }
 
 

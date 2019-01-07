@@ -25,11 +25,11 @@ class DsDecoder final : public IPlaylistDecoder
 public:
     virtual ~DsDecoder() = default;
 
-    virtual bool is_url_direct_stream(const std::string& url);
+    bool is_url_direct_stream(const std::string& url);
 
-    virtual bool is_decodable(const std::string& content_type, const std::string& content);
+    bool is_decodable(const std::string& content_type, const std::string& content);
 
-    virtual bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
+    bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
 
-    virtual std::string get_name();
+    std::string get_name();
 };
