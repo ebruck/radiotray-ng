@@ -17,18 +17,19 @@
 
 #pragma once
 
-#include "m3u_decoder.hpp"
+#include <radiotray-ng/i_playlist_decoder.hpp>
 
 
-// RAM is the same as m3u
-class RamDecoder final : public M3uDecoder
+class DsDecoder final : public IPlaylistDecoder
 {
 public:
-	virtual ~RamDecoder() = default;
+    virtual ~DsDecoder() = default;
 
-	bool is_url_direct_stream(const std::string& /*url*/) { return false; };
+    virtual bool is_url_direct_stream(const std::string& url);
 
-	bool is_decodable(const std::string& content_type, const std::string& content);
+    virtual bool is_decodable(const std::string& content_type, const std::string& content);
 
-	std::string get_name();
+    virtual bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
+
+    virtual std::string get_name();
 };

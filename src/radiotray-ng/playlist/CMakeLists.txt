@@ -5,6 +5,8 @@ add_library(playlist STATIC
     asx_decoder.hpp
     m3u_decoder.cpp
     m3u_decoder.hpp
+    ds_decoder.cpp
+    ds_decoder.hpp
     pls_decoder.cpp
     pls_decoder.hpp
     ram_decoder.cpp

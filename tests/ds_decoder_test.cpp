@@ -1,4 +1,4 @@
-// Copyright 2017 Edward G. Bruck <ed.bruck1@gmail.com>
+// Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
 //
 // This file is part of Radiotray-NG.
 //
@@ -15,20 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <radiotray-ng/playlist/ds_decoder.hpp>
+#include <gtest/gtest.h>
 
-#include "m3u_decoder.hpp"
 
-
-// RAM is the same as m3u
-class RamDecoder final : public M3uDecoder
+TEST(DsDecoder, test_that_url_is_detected_as_a_direct_stream)
 {
-public:
-	virtual ~RamDecoder() = default;
+    DsDecoder ds_decoder;
 
-	bool is_url_direct_stream(const std::string& /*url*/) { return false; };
-
-	bool is_decodable(const std::string& content_type, const std::string& content);
-
-	std::string get_name();
-};
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.m3u8"));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.M3u8"));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mp3"));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mP3"));
+}

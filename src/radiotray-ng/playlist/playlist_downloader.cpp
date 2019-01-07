@@ -23,6 +23,7 @@
 #include "asf_decoder.hpp"
 #include "asx_decoder.hpp"
 #include "m3u_decoder.hpp"
+#include "ds_decoder.hpp"
 #include "pls_decoder.hpp"
 #include "ram_decoder.hpp"
 #include "xspf_decoder.hpp"
@@ -38,6 +39,7 @@ PlaylistDownloader::PlaylistDownloader(std::shared_ptr<IConfig> config)
 
 void PlaylistDownloader::install_decoders()
 {
+	this->decoders.emplace_back(std::make_shared<DsDecoder>());
 	this->decoders.emplace_back(std::make_shared<PlsDecoder>());
 	this->decoders.emplace_back(std::make_shared<M3uDecoder>());
 	this->decoders.emplace_back(std::make_shared<AsxDecoder>());
@@ -55,6 +57,17 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 	std::string content_type;
 
 	long http_resp_code{0};
+
+	for(auto& decoder : this->decoders)
+	{
+		if (decoder->is_url_direct_stream(url))
+		{
+			LOG(info) << "detected as a direct stream, decoder: " << decoder->get_name();
+
+			playlist.push_back(url);
+			return true;
+		}
+	}
 
 	// Try downloading N bytes in case it's a media stream
 	if (!this->download(url, content_type, content, http_resp_code, 4096))

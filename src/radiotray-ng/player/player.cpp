@@ -355,12 +355,17 @@ void Player::gst_start()
 {
 	gst_init(nullptr, nullptr);
 
-	if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
+	if ((this->pipeline = gst_element_factory_make("playbin3", "player")) == nullptr)
 	{
-		LOG(error) << "could not create playbin element";
+		LOG(error) << "could not create playbin3 element, falling back to playbin";
 
-		gst_deinit();
-		return;
+		if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
+		{
+			LOG(error) << "could not create playbin element";
+
+			gst_deinit();
+			return;
+		}
 	}
 
 	if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)
