@@ -289,13 +289,11 @@ GroupList::addGroup()
 	GroupEditorDialog dlg(this->GetParent());
 	if (dlg.ShowModal() != wxID_OK)
 	{
-		dlg.Destroy();
 		return true;
 	}
 
 	std::string name, image;
 	dlg.getData(name, image);
-	dlg.Destroy();
 
 	// trim data
 	name = radiotray_ng::trim(name);

@@ -377,6 +377,8 @@ void Player::gst_start()
 			gst_deinit();
 			return;
 		}
+
+		LOG(warning) << "m3u8 support will not be available using playbin";
 	}
 
 	if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)
