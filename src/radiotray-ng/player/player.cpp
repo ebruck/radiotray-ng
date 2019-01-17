@@ -198,18 +198,29 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			gchar* debug_info;
 			gst_message_parse_error(message, &err, &debug_info);
 
-			LOG(error) << "error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message;
+			LOG(error) << "error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message
+				<< " , " << int(err->domain) << ":" << int(err->code);
+
 			LOG(error) << "debugging information: " << ((debug_info) ? debug_info : "none");
 
 			gst_element_set_state(player->pipeline, GST_STATE_NULL);
 			gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
 
-			if (!player->play_next())
+			if (err->domain == GST_RESOURCE_ERROR && err->code == GST_RESOURCE_ERROR_SEEK)
 			{
-				LOG(debug) << "setting state to: " << STATE_STOPPED;
+				LOG(error) << "dropped connection, restarting stream...";
 
-				player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
-				player->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, err->message);
+				gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+			}
+			else
+			{
+				if (!player->play_next())
+				{
+					LOG(debug) << "setting state to: " << STATE_STOPPED;
+
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
+					player->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, err->message);
+				}
 			}
 
 			g_clear_error(&err);
