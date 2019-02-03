@@ -35,10 +35,10 @@
 #include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
 #endif
 
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/file.hpp>
 #include <boost/program_options.hpp>
 
 
@@ -94,11 +94,11 @@ void set_logging_level(std::shared_ptr<IConfig> config)
 }
 
 
-void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& config_path)
+void set_config_defaults(std::shared_ptr<IConfig> config, const boost::filesystem::path& program_location, const std::string& config_path)
 {
 	namespace fs = boost::filesystem;
 
-	std::string bookmarks_file{config_path + RTNG_BOOKMARK_FILE};
+	const std::string bookmarks_file{config_path + RTNG_BOOKMARK_FILE};
 
 	// something for the user to edit...
 	config->set_string(BOOKMARKS_KEY, bookmarks_file);
@@ -110,7 +110,23 @@ void set_config_defaults(std::shared_ptr<IConfig> config, const std::string& con
 	// copy over included bookmarks file if none exists...
 	if (!fs::exists(bookmarks_file))
 	{
-		fs::copy(RTNG_DEFAULT_BOOKMARK_FILE, bookmarks_file);
+		if (fs::exists(RTNG_DEFAULT_BOOKMARK_FILE))
+		{
+			fs::copy(RTNG_DEFAULT_BOOKMARK_FILE, bookmarks_file);
+		}
+		else
+		{
+			const auto alt_bookmarks_file = program_location.parent_path() / RTNG_BOOKMARK_FILE;
+
+			if (fs::exists(alt_bookmarks_file))
+			{
+				fs::copy(alt_bookmarks_file, bookmarks_file);
+			}
+			else
+			{
+				LOG(error) << "no default bookmarks found!";
+			}
+		}
 	}
 
 	config->save();
@@ -237,7 +253,7 @@ int main(int argc, char* argv[])
 	if (!config->load())
 	{
 		// not there, so lets set some defaults...
-		set_config_defaults(config, config_path);
+		set_config_defaults(config, argv[0], config_path);
 	}
 
 	// adjust logging level...
