@@ -22,7 +22,6 @@ The version here is what "I" wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Cross compile on Mac (via brew packages) using a very simple ncurses interface.
 * Full AppIndicator support
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
@@ -33,7 +32,7 @@ The version here is what "I" wanted out of RadioTray.
 ## Future: ##
 
 * ~~Cross platform bookmark editor application.~~
-* Mac support (icons, menu, media keys etc.)
+* Cross compile on Mac (via brew packages) with icons, menu, media keys etc.
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
 **Icons:** [http://www.iconsplace.com/]
