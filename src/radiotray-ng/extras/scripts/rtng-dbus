@@ -23,37 +23,36 @@
 #
 # Available commands:
 #
-#    volume_up
-#    volume_down
-#    set_volume 'level'
-#    play
-#    play_url 'url'
-#    stop
-#    quit
-#    previous_station
-#    reload_bookmarks
-#    next_station
 #    get_bookmarks
 #    get_config
 #    get_player_state
+#    next_station
+#    play
 #    play_station 'group' 'station'
+#    play_url 'url'
+#    previous_station
+#    quit
+#    reload_bookmarks
+#    set_volume 'level'
+#    stop
+#    volume_down
+#    volume_up
 
 QDBUS=/usr/bin/qdbus
-SHELL=gnome-shell
+DESKTOP=gnome-shell
 
-PID=$(pgrep -u $(whoami) $SHELL -x)
+PID=$(pgrep -u $(whoami) $DESKTOP -x)
 
 if [ ! -z "${PID}" ]; then
-    export $(dbus-launch)
+    if [ "$#" -gt 0 ]; then
+        export $(dbus-launch)
 
-    DBUS_SESSION_BUS_ADDRESS=$(cat /proc/$PID/environ | tr '\0' '\n' | awk -FDBUS_SESSION_BUS_ADDRESS= '/DBUS_SESSION_BUS_ADDRESS=/ {print $2}')
-    QDBUS_CMD="$QDBUS com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
+        DBUS_SESSION_BUS_ADDRESS=$(cat /proc/$PID/environ | tr '\0' '\n' | awk -FDBUS_SESSION_BUS_ADDRESS= '/DBUS_SESSION_BUS_ADDRESS=/ {print $2}')
+        QDBUS_CMD="$QDBUS com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
 
-    if [ "$#" -eq 3 ]; then
-        $QDBUS_CMD "$2" "$3"
-    elif [ "$#" -eq 2 ]; then
-        $QDBUS_CMD "$2"
-    else
-        $QDBUS_CMD
+        for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
+
+        eval $QDBUS_CMD $ARGS
+        kill $DBUS_SESSION_BUS_PID
     fi
 fi
