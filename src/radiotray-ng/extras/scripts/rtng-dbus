@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
+#
+# This file is part of Radiotray-NG.
+#
+# Radiotray-NG is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Radiotray-NG is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
+
+# Issue dbus commands from a cron job.
+#
+# Usage: rtng-dbus <command> [ARG1] [ARG2]
+#
+# Available commands:
+#
+#    volume_up
+#    volume_down
+#    set_volume 'level'
+#    play
+#    play_url 'url'
+#    stop
+#    quit
+#    previous_station
+#    reload_bookmarks
+#    next_station
+#    get_bookmarks
+#    get_config
+#    get_player_state
+#    play_station 'group' 'station'
+
+QDBUS=/usr/bin/qdbus
+SHELL=gnome-shell
+
+PID=$(pgrep -u $(whoami) $SHELL -x)
+
+if [ ! -z "${PID}" ]; then
+    export $(dbus-launch)
+
+    DBUS_SESSION_BUS_ADDRESS=$(cat /proc/$PID/environ | tr '\0' '\n' | awk -FDBUS_SESSION_BUS_ADDRESS= '/DBUS_SESSION_BUS_ADDRESS=/ {print $2}')
+    QDBUS_CMD="$QDBUS com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
+
+    if [ "$#" -eq 3 ]; then
+        $QDBUS_CMD "$2" "$3"
+    elif [ "$#" -eq 2 ]; then
+        $QDBUS_CMD "$2"
+    else
+        $QDBUS_CMD
+    fi
+fi
