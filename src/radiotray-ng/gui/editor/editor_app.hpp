@@ -32,6 +32,12 @@
 #define APPLICATION_PID_NAME	"rtng-bookmark-editor.pid"
 
 
+namespace
+{
+	const std::string TEXT_DELIMITER("\t");
+}
+
+
 class EditorApp : public wxApp
 {
 public:

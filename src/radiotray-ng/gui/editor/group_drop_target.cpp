@@ -29,7 +29,6 @@
 
 namespace
 {
-	const std::string TEXT_DELIMITER(":::");
 }
 
 GroupDropTarget::GroupDropTarget(GroupDragAndDrop* object) :
