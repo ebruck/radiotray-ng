@@ -211,6 +211,8 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 				LOG(error) << "dropped connection, restarting stream...";
 
 				gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+
+				player->buffering = true;
 			}
 			else
 			{
