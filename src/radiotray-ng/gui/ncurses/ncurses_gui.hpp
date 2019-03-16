@@ -34,6 +34,8 @@ public:
 
 	void run(int argc, char* argv[]);
 
+	void reload_bookmarks() { /* TODO */ }
+
 	void stop(){};
 
 private:

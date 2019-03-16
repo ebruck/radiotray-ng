@@ -25,6 +25,8 @@ class IPlaylistDecoder
 public:
 	virtual ~IPlaylistDecoder() = default;
 
+	virtual bool is_url_direct_stream(const std::string& url) = 0;
+
 	virtual bool is_decodable(const std::string& content_type, const std::string& content) = 0;
 
 	virtual bool decode(const std::string& content_type, const std::string& content, playlist_t& playlist) = 0;

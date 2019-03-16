@@ -54,13 +54,13 @@ bool Player::play_next()
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
-		uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-		uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
+		const uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+		const uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
 
 		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
 		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
 
-		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size*buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
+		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size * buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
 		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
 
@@ -120,8 +120,6 @@ void Player::stop()
 		// buffering timeout.
 		this->buffering = false;
 
-		this->state_playing_sent = false;
-
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
@@ -169,7 +167,7 @@ void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*us
 
 gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
 {
-	Player* player{(Player*)user_data};
+	auto player{static_cast<Player*>(user_data)};
 
 	gst_clock_id_unref(player->clock_id);
 	player->clock_id = nullptr;
@@ -190,7 +188,7 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 
 gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpointer user_data)
 {
-	Player* player{static_cast<Player*>(user_data)};
+	auto player{static_cast<Player*>(user_data)};
 
 	switch (GST_MESSAGE_TYPE (message))
 	{
@@ -200,18 +198,31 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			gchar* debug_info;
 			gst_message_parse_error(message, &err, &debug_info);
 
-			LOG(error) << "error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message;
+			LOG(error) << "error received from element " << GST_OBJECT_NAME(message->src) << ": " << err->message
+				<< " , " << int(err->domain) << ":" << int(err->code);
+
 			LOG(error) << "debugging information: " << ((debug_info) ? debug_info : "none");
 
 			gst_element_set_state(player->pipeline, GST_STATE_NULL);
 			gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
 
-			if (!player->play_next())
+			if (err->domain == GST_RESOURCE_ERROR && err->code == GST_RESOURCE_ERROR_SEEK)
 			{
-				LOG(debug) << "setting state to: " << STATE_STOPPED;
+				LOG(error) << "dropped connection, restarting stream...";
 
-				player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
-				player->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, err->message);
+				gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+
+				player->buffering = true;
+			}
+			else
+			{
+				if (!player->play_next())
+				{
+					LOG(debug) << "setting state to: " << STATE_STOPPED;
+
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
+					player->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, err->message);
+				}
 			}
 
 			g_clear_error(&err);
@@ -285,11 +296,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			{
 				if (new_state == GST_STATE_PLAYING)
 				{
-					if (!player->state_playing_sent)
-					{
-						player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
-						player->state_playing_sent = true;
-					}
+					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{
@@ -328,7 +335,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer user_data)
 {
-	IEventBus::event_data_t& event_data = *(static_cast<IEventBus::event_data_t*>(user_data));
+	auto& event_data = *static_cast<IEventBus::event_data_t*>(user_data);
 
 	const guint count = gst_tag_list_get_tag_size(list, tag);
 
@@ -361,12 +368,19 @@ void Player::gst_start()
 {
 	gst_init(nullptr, nullptr);
 
-	if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
+	if ((this->pipeline = gst_element_factory_make("playbin3", "player")) == nullptr)
 	{
-		LOG(error) << "could not create playbin element";
+		LOG(error) << "could not create playbin3 element, falling back to playbin";
 
-		gst_deinit();
-		return;
+		if ((this->pipeline = gst_element_factory_make("playbin", "player")) == nullptr)
+		{
+			LOG(error) << "could not create playbin element";
+
+			gst_deinit();
+			return;
+		}
+
+		LOG(warning) << "m3u8 support will not be available using playbin";
 	}
 
 	if ((this->souphttpsrc = gst_element_factory_make("souphttpsrc", "source")) == nullptr)

@@ -17,33 +17,19 @@
 
 #pragma once
 
-#include <radiotray-ng/i_curl.hpp>
+#include <radiotray-ng/i_playlist_decoder.hpp>
 
 
-class Curl final : public ICurl
+class DsDecoder final : public IPlaylistDecoder
 {
 public:
-	Curl();
+    virtual ~DsDecoder() = default;
 
-	virtual ~Curl();
+    bool is_url_direct_stream(const std::string& url);
 
-	CURL* curl_easy_init();
+    bool is_decodable(const std::string& content_type, const std::string& content);
 
-	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, const std::string& param);
+    bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
 
-	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, long param);
-
-	CURLcode curl_easy_setopt(CURL* curl, CURLoption option, void* param);
-
-	CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info, void* param);
-
-	CURLcode curl_easy_perform(CURL* curl);
-
-	const char* curl_easy_strerror(CURLcode error);
-
-	void curl_easy_cleanup(CURL* curl);
-
-	curl_slist* curl_slist_append(curl_slist* list, const char* string);
-
-	void curl_slist_free_all(curl_slist* list);
+    std::string get_name();
 };

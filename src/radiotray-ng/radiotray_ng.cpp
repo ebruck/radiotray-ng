@@ -21,6 +21,8 @@
 #include <radiotray-ng/i_player.hpp>
 #include <radiotray-ng/playlist/playlist_downloader.hpp>
 #include <json/json.h>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <cmath>
 
 
@@ -32,6 +34,7 @@ RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookm
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
 	, current_station_index(-1)
+	, play_url_group("PLAY-URL:" + boost::uuids::to_string(boost::uuids::random_generator()()))
 {
 	this->notification_image = radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE));
 
@@ -52,6 +55,8 @@ RadiotrayNG::~RadiotrayNG()
 void RadiotrayNG::stop()
 {
 	LOG(info) << "stopping player";
+
+	this->playing_notification_sent = false;
 
 	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE) &&
 		this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
@@ -128,6 +133,23 @@ std::string RadiotrayNG::get_volume()
 
 std::string RadiotrayNG::get_bookmarks()
 {
+	// hack... filter out play_url group...
+	std::vector<IBookmarks::station_data_t> play_url_group_data;
+
+	if (this->bookmarks->get_group_stations(this->play_url_group, play_url_group_data))
+	{
+		this->bookmarks->remove_group(this->play_url_group);
+		const std::string dump{this->bookmarks->dump()};
+
+		// *sigh* now add it back...
+		if (!play_url_group_data.empty())
+		{
+			this->bookmarks->add_group(this->play_url_group, "");
+			this->bookmarks->add_station(this->play_url_group, "", play_url_group_data[0].url, "", true);
+		}
+		return dump;
+	}
+
 	return this->bookmarks->dump();
 }
 
@@ -141,7 +163,7 @@ std::string RadiotrayNG::get_player_state()
 	value[DBUS_MSG_TITLE_KEY]   = this->title;
 	value[DBUS_MSG_ARTIST_KEY]  = this->artist;
 	value[DBUS_MSG_STATION_KEY] = this->station;
-	value[DBUS_MSG_GROUP_KEY]   = this->group;
+	value[DBUS_MSG_GROUP_KEY]   = (this->group != this->play_url_group) ? this->group : "";
 	value[DBUS_MSG_CODEC_KEY]   = this->codec;
 	value[DBUS_MSG_BITRATE_KEY] = this->bitrate;
 	value[DBUS_MSG_IMAGE_KEY]   = radiotray_ng::word_expand(this->notification_image);
@@ -352,7 +374,12 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 	{
 		if (data[STATE_KEY] == STATE_PLAYING)
 		{
-			this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+			if (!this->playing_notification_sent)
+			{
+				this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+
+				this->playing_notification_sent = true;
+			}
 
 			return;
 		}
@@ -367,7 +394,9 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 
 			if (data[STATE_KEY] == STATE_BUFFERING)
 			{
-				this->notification.notify("Buffering", this->get_station(), this->notification_image);
+				const auto station = this->get_station();
+
+				this->notification.notify("Buffering", (station.empty()) ? APP_NAME_DISPLAY : station, this->notification_image);
 				return;
 			}
 		}
@@ -440,12 +469,23 @@ void RadiotrayNG::on_tags_changed_event_notification(const IEventBus::event& /*e
 }
 
 
+void RadiotrayNG::play_url(const std::string& url)
+{
+	this->bookmarks->add_group(this->play_url_group, "");
+	this->bookmarks->add_station(this->play_url_group, "", "", "", true);
+	this->bookmarks->update_station(this->play_url_group, "", url, "", true);
+	this->play(this->play_url_group, "");
+}
+
+
 void RadiotrayNG::play(const std::string& group, const std::string& station)
 {
 	if (this->state == STATE_PLAYING)
 	{
 		this->player->stop();
 	}
+
+	this->playing_notification_sent = false;
 
 	playlist_t pls;
 	IBookmarks::station_data_t std;
@@ -470,9 +510,12 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 
 		if (PlaylistDownloader(this->config).download_playlist(std.url, pls))
 		{
-			this->config->set_string(LAST_STATION_GROUP_KEY, group);
-			this->config->set_string(LAST_STATION_KEY, std.name);
-			this->config->set_bool(LAST_STATION_NOTIFICATION_KEY, std.notifications);
+			if (group != this->play_url_group)
+			{
+				this->config->set_string(LAST_STATION_GROUP_KEY, group);
+				this->config->set_string(LAST_STATION_KEY, std.name);
+				this->config->set_bool(LAST_STATION_NOTIFICATION_KEY, std.notifications);
+			}
 
 			this->set_station(group, std.name, std.notifications);
 

@@ -32,7 +32,6 @@
 
 namespace
 {
-	const std::string TEXT_DELIMITER(":::");
 	const int MAX_DRAG_TEXT = 20;
 	const int DRAG_FONT_POINT = 12;
 	const std::string DRAG_TAIL(" ...");

@@ -1,3 +1,14 @@
+radiotray-ng (0.2.5) unstable; urgency=low
+
+      * Updated & added new stations
+      * Added dbus play_url method
+      * Added initial m3u8 support
+      * Various dbus & editor bug fixes
+      * Added rtng-dbus & rtng2xml scripts
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Fri, 15 Mar 2019 22:57:10 -0700
+
+
 radiotray-ng (0.2.4) unstable; urgency=low
 
       * Added dbus set_volume method

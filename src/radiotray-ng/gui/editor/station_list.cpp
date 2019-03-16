@@ -101,6 +101,7 @@ StationList::StationList(wxWindow* parent) : wxListCtrl(parent, STATION_LIST_ID)
 
 StationList::~StationList()
 {
+	this->clearStations();
 }
 
 bool
@@ -138,19 +139,22 @@ StationList::restoreConfiguration()
 void
 StationList::onDeleteAllItems(wxListEvent& /* event */)
 {
-	long item = -1;
-	for ( ;; )
+	if (this->GetItemCount())
 	{
-		item = this->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_DONTCARE);
-		if (item == -1)
+		long item = -1;
+		for ( ;; )
 		{
-			break;
-		}
+			item = this->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_DONTCARE);
+			if (item == -1)
+			{
+				break;
+			}
 
-		StationList::ItemData* data = reinterpret_cast<StationList::ItemData*>(this->GetItemData(item));
-		if (data)
-		{
-			delete data;
+			StationList::ItemData* data = reinterpret_cast<StationList::ItemData*>(this->GetItemData(item));
+			if (data)
+			{
+				delete data;
+			}
 		}
 	}
 
@@ -230,14 +234,12 @@ StationList::addStation()
 
 	if (dlg.ShowModal() != wxID_OK)
 	{
-		dlg.Destroy();
 		return true;
 	}
 
 	std::string name, url, image;
 	bool notifications;
 	dlg.getData(name, url, image, notifications);
-	dlg.Destroy();
 
 	// trim data
 	name = radiotray_ng::trim(name);
@@ -250,7 +252,7 @@ StationList::addStation()
 	}
 
 	IBookmarks::group_data_t group = (*this->editor_bookmarks->getBookmarks().get())[this->group_index];
-	if (this->editor_bookmarks->getBookmarks()->add_station(group.group, name, url, image, true /* todo: get value from editor? */) == false)
+	if (this->editor_bookmarks->getBookmarks()->add_station(group.group, name, url, image, notifications) == false)
 	{
 		wxMessageBox(wxT("Failed to add the station."), wxT("Error"));
 		return false;

@@ -409,6 +409,7 @@ EditorFrame::onClose(wxCloseEvent& event)
 	}
 
 	this->saveConfiguration();
+	this->group_list->clearGroups();
     this->Destroy();
 }
 
@@ -424,6 +425,7 @@ EditorFrame::onQuit(wxCommandEvent& /* event */)
 	}
 
 	this->saveConfiguration();
+	this->group_list->clearGroups();
     this->Destroy();
 }
 
@@ -514,7 +516,7 @@ EditorFrame::onAbout(wxCommandEvent& /* event */)
     aboutInfo.SetName(APPLICATION_NAME);
 	aboutInfo.SetDescription(version);
 
-	std::string license = "Copyright (C) 2017-2018  Michael A. Burns\n\nThis program comes with absolutely no warranty.\n"
+	std::string license = "Copyright (C) 2017-2019  Michael A. Burns\n\nThis program comes with absolutely no warranty.\n"
 		"See the GNU General Public License, version 3 or later for details.";
 
 	aboutInfo.SetCopyright(license);

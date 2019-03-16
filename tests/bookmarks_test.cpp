@@ -16,10 +16,9 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/bookmarks/bookmarks.hpp>
-#include "mocks/mock_i_curl.hpp"
-#include <unistd.h>
 #include <radiotray-ng/i_bookmarks.hpp>
-
+#include <gtest/gtest.h>
+#include <unistd.h>
 
 namespace
 {

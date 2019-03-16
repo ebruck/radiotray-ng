@@ -1,7 +1,7 @@
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    FILE(GLOB SRC_FILES "linux/*.cpp")
+    set(SRC_FILES linux/notification.cpp)
 else()
-    FILE(GLOB SRC_FILES "darwin/*.cpp")
+    set(SRC_FILES darwin/notification.cpp)
 endif()
 
 add_library(notification STATIC ${SRC_FILES})

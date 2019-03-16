@@ -44,6 +44,8 @@ public:
 
 	void play(const std::string& group, const std::string& station);
 
+	void play_url(const std::string& url);
+
 	void play();
 
 	void volume_up();
@@ -115,7 +117,9 @@ private:
 	std::string bitrate;
 	std::string codec;
 	std::string volume;
+
 	bool station_notifications;
+	bool playing_notification_sent = false;
 
 	// event handlers
 	void on_state_changed_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
@@ -136,4 +140,6 @@ private:
 
 	std::vector<IBookmarks::station_data_t> current_group_stations;
 	int current_station_index;
+
+	const std::string play_url_group;
 };

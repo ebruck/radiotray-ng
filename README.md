@@ -22,7 +22,6 @@ The version here is what "I" wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Cross compile on Mac (via brew packages) using a very simple ncurses interface.
 * Full AppIndicator support
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
@@ -33,7 +32,7 @@ The version here is what "I" wanted out of RadioTray.
 ## Future: ##
 
 * ~~Cross platform bookmark editor application.~~
-* Mac support (icons, menu, media keys etc.)
+* Cross compile on Mac (via brew packages) with icons, menu, media keys etc.
 * ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
 **Icons:** [http://www.iconsplace.com/]
@@ -193,6 +192,7 @@ Available commands:
     volume_down
     set_volume 'level'
     play
+    play_url 'url'
     stop
     quit
     previous_station
@@ -264,3 +264,5 @@ Install these packages:
 ```
 redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel
 ```
+### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
+

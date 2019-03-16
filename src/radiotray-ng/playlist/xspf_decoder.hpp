@@ -25,6 +25,8 @@ class XspfDecoder final : public IPlaylistDecoder
 public:
 	virtual ~XspfDecoder() = default;
 
+	bool is_url_direct_stream(const std::string& /*url*/) { return false; };
+
 	bool is_decodable(const std::string& content_type, const std::string& content);
 
 	bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);

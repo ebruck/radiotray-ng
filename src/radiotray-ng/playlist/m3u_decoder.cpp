@@ -67,13 +67,6 @@ bool M3uDecoder::decode(const std::string& content_type, const std::string& cont
 					}
 				}
 
-				// we don't support playlist within a playlist
-				if (line.find(".m3u8") != std::string::npos)
-				{
-					LOG(warning) << "no support for m3u8 within a playlist";
-					continue;
-				}
-
 				playlist.push_back(radiotray_ng::trim(line));
 			}
 		}

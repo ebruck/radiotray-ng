@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+#
+# Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
+#
+# This file is part of Radiotray-NG.
+#
+# Radiotray-NG is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Radiotray-NG is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
+
+# Generates an XML playlist that iTunes can import.
+
+import json
+import os
+import sys
+from xml.sax.saxutils import escape
+
+
+def generate_xml_playlist(bookmarks):
+    playlist_xml  = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    playlist_xml += '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+    playlist_xml += '<plist version="1.0">\n'
+    playlist_xml += '<dict>\n'
+    playlist_xml += '\t<key>Tracks</key>\n'
+    playlist_xml += '\t<dict>\n'
+
+    track_id = 0
+    for group in bookmarks:
+        for station in group['stations']:
+            track_id += 1
+            playlist_xml += '\t\t<key>{}</key>\n'.format(track_id)
+            playlist_xml += '\t\t<dict>\n'
+            playlist_xml += '\t\t\t<key>Track ID</key><integer>{}</integer>\n'.format(track_id)
+            playlist_xml += '\t\t\t<key>Name</key><string>{}</string>\n'.format(escape(station['name']))
+            playlist_xml += '\t\t\t<key>Kind</key><string>Internet audio stream</string>\n'
+            playlist_xml += '\t\t\t<key>Track Type</key><string>URL</string>\n'
+            playlist_xml += '\t\t\t<key>Location</key><string>{}</string>\n'.format(escape(station['url']))
+            playlist_xml += '\t\t</dict>\n'
+
+    playlist_xml += '\t</dict>\n'
+    playlist_xml += '\t<key>Playlists</key>\n'
+    playlist_xml += '\t<array>\n'
+
+    track_id = 0
+    for group in bookmarks:
+        playlist_xml += '\t\t<dict>\n'
+        playlist_xml += '\t\t<key>Name</key><string>{}</string>\n'.format(escape(group['group']))
+        playlist_xml += '\t\t<key>Description</key><string>Radiotray-NG</string>\n'
+        playlist_xml += '\t\t<key>Playlist Items</key>\n'
+        playlist_xml += '\t\t<array>\n'
+        for station in group["stations"]:
+            track_id += 1
+            playlist_xml += '\t\t\t<dict>\n'
+            playlist_xml += '\t\t\t\t<key>Track ID</key><integer>{}</integer>\n'.format(track_id)
+            playlist_xml += '\t\t\t</dict>\n'
+        playlist_xml += '\t\t</array>\n'
+        playlist_xml += '\t\t</dict>\n'
+
+    playlist_xml += '\t</array>\n'
+    playlist_xml += '</dict>\n'
+    playlist_xml += '</plist>\n'
+
+    return playlist_xml
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("usage: rtng2xml <path to radiotray-ng bookmark file>")
+        exit(1)
+
+    if os.path.exists(sys.argv[1]):
+        print(generate_xml_playlist(json.load(open(sys.argv[1]))).expandtabs(4))
+    else:
+        print(sys.argv[1], "not found!")

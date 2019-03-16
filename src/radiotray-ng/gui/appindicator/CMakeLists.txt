@@ -1,6 +1,4 @@
-FILE(GLOB SRC_FILES "*.cpp")
-
-add_library(appindicator_gui STATIC ${SRC_FILES})
+add_library(appindicator_gui STATIC appindicator_gui.cpp appindicator_gui.hpp)
 add_dependencies(appindicator_gui user-agent)
 target_link_libraries(appindicator_gui)
 
