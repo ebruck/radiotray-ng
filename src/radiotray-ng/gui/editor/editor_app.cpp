@@ -65,7 +65,7 @@ EditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 bool
 EditorApp::OnInit()
 {
-	this->instance_checker = std::make_unique<wxSingleInstanceChecker>(APPLICATION_PID_NAME, radiotray_ng::get_data_dir(APP_NAME));
+	this->instance_checker = std::make_unique<wxSingleInstanceChecker>(APPLICATION_PID_NAME, radiotray_ng::get_runtime_dir());
 	if (this->instance_checker->IsAnotherRunning())
 	{
 		wxLogError(_("Another instance is already running, aborting."));
