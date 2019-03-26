@@ -132,9 +132,12 @@ namespace radiotray_ng
 			// https://bugs.launchpad.net/ubuntu/+source/libxdg-basedir/+bug/1821670
 			// Not sure why non-cached call uses XDG_RUNTIME_DIRECTORY environment
 			// variable instead of XDG_RUNTIME_DIR...
-			std::string xdg_runtime_dir = xdgRuntimeDirectory(&xdg_handle);
+			auto xdg_runtime_dir = xdgRuntimeDirectory(&xdg_handle);
 			xdgWipeHandle(&xdg_handle);
-			return xdg_runtime_dir;
+			if (xdg_runtime_dir)
+			{
+				return xdg_runtime_dir;
+			}
 		}
 		return std::string();
 	}
