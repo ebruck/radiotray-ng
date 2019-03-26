@@ -64,6 +64,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
+   "disable-logging" : false,
    "file-monitor" : true,
    "file-monitor-interval" : 10,
    "invert-menu" : false,
@@ -100,6 +101,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
            buffer-duration: number of seconds to buffer
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
+           disable-logging: enable/disable logging
               file-monitor: enable/disable notifcation of bookmark file changes
      file-monitor-interval: time in seconds to poll for bookmark file changes
               invert-menu : menu rendered in reverse order

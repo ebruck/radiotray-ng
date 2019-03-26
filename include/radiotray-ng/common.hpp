@@ -69,6 +69,7 @@ using playlist_t = std::vector<std::string>;
 #define BUFFER_DURATION_KEY               "buffer-duration"
 #define COMPACT_MENU_KEY                  "compact-menu"
 #define DEBUG_LOGGING_KEY                 "debug-logging"
+#define DISABLE_LOGGING_KEY               "disable-logging"
 #define FILE_MONITOR_KEY                  "file-monitor"
 #define FILE_MONITOR_INTERVAL_KEY         "file-monitor-interval"
 #define HTTP_TIMEOUT_KEY                  "http-timeout"
@@ -120,6 +121,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_BOOKMARK_EDITOR                  "rtng-bookmark-editor"
 #define DEFAULT_COMPACT_MENU_VALUE               (false)
 #define DEFAULT_DEBUG_LOGGING_VALUE              (false)
+#define DEFAULT_DISABLE_LOGGING_VALUE            (false)
 #define DEFAULT_FILE_MONITOR_VALUE               (true)
 #define DEFAULT_FILE_MONITOR_INTERVAL_VALUE      (10)
 #define DEFAULT_HTTP_TIMEOUT_VALUE               (15)

@@ -26,8 +26,6 @@ Config::Config(const std::string& config_file)
 
 bool Config::load()
 {
-	LOG(debug) << "loading: " << this->config_file;
-
 	try
 	{
 		std::ifstream ifile(this->config_file);
