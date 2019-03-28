@@ -50,13 +50,13 @@ void init_logging(std::shared_ptr<IConfig> config)
 	}
 	else
 	{
-		std::string xdg_data_home_dir = radiotray_ng::get_data_dir(APP_NAME);
+		std::string xdg_cache_home_dir = radiotray_ng::get_cache_dir(APP_NAME);
 
 		namespace keywords = boost::log::keywords;
 
 		auto sink = boost::log::add_file_log
 			(
-				keywords::file_name = xdg_data_home_dir + "logs/radiotray-ng-%5N.log",
+				keywords::file_name = xdg_cache_home_dir + "radiotray-ng-%5N.log",
 				keywords::rotation_size = 1024 * 64, // 64K logs
 				keywords::open_mode = std::ios_base::app,
 				keywords::auto_flush = true,
@@ -73,7 +73,7 @@ void init_logging(std::shared_ptr<IConfig> config)
 
 		sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector
 			(
-				keywords::target = xdg_data_home_dir + "logs/",
+				keywords::target = xdg_cache_home_dir,
 				keywords::max_size = 1024 * 512 // ~512K of logs
 			));
 

@@ -123,6 +123,12 @@ namespace radiotray_ng
 		return xdg_data_home_dir;
 	}
 
+	inline std::string get_cache_dir(const std::string& app_name)
+	{
+		std::string xdg_cache_home_dir = xdgCacheHome(nullptr);
+		xdg_cache_home_dir += std::string("/") + app_name + std::string("/");
+		return xdg_cache_home_dir;
+	}
 
 	inline std::string get_runtime_dir()
 	{
