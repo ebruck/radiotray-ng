@@ -98,24 +98,6 @@ namespace radiotray_ng
 	}
 
 
-	inline std::string to_upper_copy(std::string s)
-	{
-	    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-	    return s;
-	}
-
-
-	inline void load_string_file(const std::string& p, std::string& str)
-	{
-		std::ifstream file;
-		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		file.open(p, std::ios_base::binary);
-		std::size_t sz = static_cast<std::size_t>(boost::filesystem::file_size(p));
-		str.resize(sz, '\0');
-		file.read(&str[0], sz);
-	}
-
-
 	inline std::string get_data_dir(const std::string& app_name)
 	{
 		std::string xdg_data_home_dir = xdgConfigHome(nullptr);
@@ -123,12 +105,14 @@ namespace radiotray_ng
 		return xdg_data_home_dir;
 	}
 
+
 	inline std::string get_cache_dir(const std::string& app_name)
 	{
 		std::string xdg_cache_home_dir = xdgCacheHome(nullptr);
 		xdg_cache_home_dir += std::string("/") + app_name + std::string("/");
 		return xdg_cache_home_dir;
 	}
+
 
 	inline std::string get_runtime_dir()
 	{

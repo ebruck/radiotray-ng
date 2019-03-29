@@ -44,7 +44,7 @@
 
 void init_logging(std::shared_ptr<IConfig> config)
 {
-	if (config->get_bool(DISABLE_LOGGING_KEY, DEFAULT_DEBUG_LOGGING_VALUE))
+	if (config->get_bool(DISABLE_LOGGING_KEY, DEFAULT_DISABLE_LOGGING_VALUE))
 	{
 		boost::log::core::get()->set_logging_enabled(false);
 	}
