@@ -357,7 +357,15 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 			str = g_strdup_value_contents(gst_tag_list_get_value_index(list, tag, i));
 		}
 
-		event_data[gst_tag_get_nick(tag)] = str;
+		// todo: for now ignore anything that looks encoded...
+		if (std::string(str).find("<?xml") == std::string::npos)
+		{
+			event_data[gst_tag_get_nick(tag)] = str;
+		}
+		else
+		{
+			LOG(debug) << "ignoring encoded tag: " << gst_tag_get_nick(tag) << " : " << str;
+		}
 
 		g_free(str);
 	}
