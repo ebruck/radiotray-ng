@@ -1,0 +1,42 @@
+commonSteps: &commonSteps
+    steps:
+      # Each step starts in the checked-out source directory.
+      - checkout
+      - run:
+          name: Make project
+          command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make package'
+      - run:
+          name: Copy artifacts to tmp
+          command: 'mkdir /artifacts && cd build && cp *.deb /artifacts'
+      - store_artifacts:
+          path: /artifacts
+
+version: 2.1
+
+jobs:
+  Ubuntu-18_04-build:
+    <<: *commonSteps
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-18.04"
+    environment:
+      - CI_OS: linux
+  Ubuntu-18_10-build:
+    <<: *commonSteps
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-18.10"
+    environment:
+      - CI_OS: linux
+  Ubuntu-19_04-build:
+    <<: *commonSteps
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-19.04"
+    environment:
+      - CI_OS: linux
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - Ubuntu-18_04-build
+      - Ubuntu-18_10-build
+      - Ubuntu-19_04-build
