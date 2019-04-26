@@ -14,6 +14,12 @@ commonSteps: &commonSteps
 version: 2.1
 
 jobs:
+  Ubuntu-16_04-build:
+    <<: *commonSteps
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-16.04"
+    environment:
+      - CI_OS: linux
   Ubuntu-18_04-build:
     <<: *commonSteps
     docker:
@@ -37,6 +43,7 @@ workflows:
   version: 2
   build:
     jobs:
+      - Ubuntu-16_04-build
       - Ubuntu-18_04-build
       - Ubuntu-18_10-build
       - Ubuntu-19_04-build
