@@ -53,16 +53,20 @@ namespace radiotray_ng
 
 	inline std::string word_expand(const std::string& s)
 	{
-		std::string tmp;
-
 		if (!s.empty())
 		{
-			wordexp_t exp_result;
-			wordexp(s.c_str(), &exp_result, 0);
-			tmp = exp_result.we_wordv[0];
-			wordfree(&exp_result);
+			// any spaces then we can't use wordexp...
+			if (s.find(' ') == std::string::npos)
+			{
+				std::string tmp;
+				wordexp_t exp_result;
+				wordexp(s.c_str(), &exp_result, 0);
+				tmp = exp_result.we_wordv[0];
+				wordfree(&exp_result);
+				return tmp;
+			}
 		}
-		return tmp;
+		return s;
 	}
 
 
