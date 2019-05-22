@@ -21,6 +21,7 @@
 
 import json
 import os
+import re
 import sys
 from xml.sax.saxutils import escape
 
@@ -43,7 +44,8 @@ def generate_xml_playlist(bookmarks):
             playlist_xml += '\t\t\t<key>Name</key><string>{}</string>\n'.format(escape(station['name']))
             playlist_xml += '\t\t\t<key>Kind</key><string>Internet audio stream</string>\n'
             playlist_xml += '\t\t\t<key>Track Type</key><string>URL</string>\n'
-            playlist_xml += '\t\t\t<key>Location</key><string>{}</string>\n'.format(escape(station['url']))
+            playlist_xml += '\t\t\t<key>Location</key><string>{}</string>\n'.format(
+                escape(re.sub('^http', 'itals', station['url']) if station['url'].endswith('.m3u8') else station['url']))
             playlist_xml += '\t\t</dict>\n'
 
     playlist_xml += '\t</dict>\n'
@@ -57,7 +59,7 @@ def generate_xml_playlist(bookmarks):
         playlist_xml += '\t\t<key>Description</key><string>Radiotray-NG</string>\n'
         playlist_xml += '\t\t<key>Playlist Items</key>\n'
         playlist_xml += '\t\t<array>\n'
-        for station in group["stations"]:
+        for _ in range(len(group['stations'])):
             track_id += 1
             playlist_xml += '\t\t\t<dict>\n'
             playlist_xml += '\t\t\t\t<key>Track ID</key><integer>{}</integer>\n'.format(track_id)
@@ -72,12 +74,12 @@ def generate_xml_playlist(bookmarks):
     return playlist_xml
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("usage: rtng2xml <path to radiotray-ng bookmark file>")
+        print('usage: rtng2xml <path to radiotray-ng bookmark file>')
         exit(1)
 
     if os.path.exists(sys.argv[1]):
-        print(generate_xml_playlist(json.load(open(sys.argv[1]))).expandtabs(4))
+        print(generate_xml_playlist(json.load(open(sys.argv[1]))))
     else:
-        print(sys.argv[1], "not found!")
+        print(sys.argv[1], 'not found!')
