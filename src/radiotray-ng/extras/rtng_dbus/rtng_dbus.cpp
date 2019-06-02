@@ -265,7 +265,10 @@ void RtngDbus::dbus_setup()
 		Gio::DBus::SlotNameAcquired(),
 		[this](const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&)
 		{
-			connection->unregister_object(this->registered_id);
+			if (connection)
+			{
+				connection->unregister_object(this->registered_id);
+			}
 		});
 
 }
