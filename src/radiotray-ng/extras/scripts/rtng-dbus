@@ -38,21 +38,14 @@
 #    volume_down
 #    volume_up
 
-QDBUS=/usr/bin/qdbus
-DESKTOP=gnome-shell
+if [ "$#" -gt 0 ]; then
+    export $(dbus-launch)
 
-PID=$(pgrep -u $(whoami) $DESKTOP -x)
+    DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+    QDBUS_CMD="qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
 
-if [ ! -z "${PID}" ]; then
-    if [ "$#" -gt 0 ]; then
-        export $(dbus-launch)
+    for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
 
-        DBUS_SESSION_BUS_ADDRESS=$(cat /proc/$PID/environ | tr '\0' '\n' | awk -FDBUS_SESSION_BUS_ADDRESS= '/DBUS_SESSION_BUS_ADDRESS=/ {print $2}')
-        QDBUS_CMD="$QDBUS com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
-
-        for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
-
-        eval $QDBUS_CMD $ARGS
-        kill $DBUS_SESSION_BUS_PID
-    fi
+    eval $QDBUS_CMD $ARGS
+    kill $DBUS_SESSION_BUS_PID
 fi
