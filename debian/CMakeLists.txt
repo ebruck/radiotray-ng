@@ -50,6 +50,7 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/256x256/apps/"            
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/hicolor/24x24/apps/"                DESTINATION "/usr/share/icons/hicolor/24x24/apps"        FILES_MATCHING PATTERN "*.png")
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-dark/apps/24/"          DESTINATION "/usr/share/icons/ubuntu-mono-dark/apps/24"  FILES_MATCHING PATTERN "*.svg")
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/ubuntu-mono-light/apps/24/"         DESTINATION "/usr/share/icons/ubuntu-mono-light/apps/24" FILES_MATCHING PATTERN "*.svg")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/Yaru/apps/256x256/"                 DESTINATION "/usr/share/icons/Yaru/256x256/apps"         FILES_MATCHING PATTERN "*.png")
 install(FILES     "${PROJECT_SOURCE_DIR}/data/about/radiotray-ng.png"             DESTINATION ${DESTINATION_DIR})
 install(FILES     "${PROJECT_SOURCE_DIR}/data/bookmarks.json"                     DESTINATION ${DESTINATION_DIR})
 install(PROGRAMS  "${PROJECT_SOURCE_DIR}/src/radiotray-ng/extras/scripts/rt2rtng" DESTINATION "/usr/bin/")
@@ -60,3 +61,4 @@ install(FILES     "${PROJECT_SOURCE_DIR}/data/rtng-bookmark-editor.desktop"     
 install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.appdata.xml"           DESTINATION "/usr/share/metainfo/")
 install(FILES     "${PROJECT_SOURCE_DIR}/debian/copyright"                        DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
 install(FILES     "${PROJECT_BINARY_DIR}/changelog.Debian.gz"                     DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
+install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"               DESTINATION "/etc/xdg/autostart")

@@ -5,5 +5,4 @@ set -e
 gtk-update-icon-cache -f -t -q /usr/share/icons/hicolor/
 gtk-update-icon-cache -f -t -q /usr/share/icons/ubuntu-mono-dark/
 gtk-update-icon-cache -f -t -q /usr/share/icons/ubuntu-mono-light/
-
-cp -f /usr/share/applications/radiotray-ng.desktop /etc/xdg/autostart/
+gtk-update-icon-cache -f -t -q /usr/share/icons/Yaru/
