@@ -96,7 +96,7 @@ endif()
 
 set(BUILD_SHARED_LIBS NO)
 
-add_subdirectory(debian)
+add_subdirectory(package)
 add_subdirectory(src/radiotray-ng)
 add_subdirectory(src/radiotray-ng/config)
 add_subdirectory(src/radiotray-ng/playlist)

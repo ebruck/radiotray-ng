@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-gtk-update-icon-cache -f -t -q /usr/share/icons/hicolor/
-gtk-update-icon-cache -f -t -q /usr/share/icons/ubuntu-mono-dark/
-gtk-update-icon-cache -f -t -q /usr/share/icons/ubuntu-mono-light/
-gtk-update-icon-cache -f -t -q /usr/share/icons/Yaru/

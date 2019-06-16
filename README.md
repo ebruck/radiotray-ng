@@ -264,7 +264,17 @@ $ sudo apt-get install -f
 
 Install these packages:
 ```
-redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel
+redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel rpm-build
 ```
-### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
 
+```
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM
+$ make package
+$ sudo dnf install ./radiotray-ng_x.y.z_<i386|amd64>.rpm
+```
+
+### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
