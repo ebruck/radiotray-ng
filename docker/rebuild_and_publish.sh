@@ -12,3 +12,6 @@ docker push radiotrayng/circleci:ubuntu-18.10
 
 docker build -t radiotrayng/circleci:ubuntu-19.04 - <ubuntu/19.04/Dockerfile
 docker push radiotrayng/circleci:ubuntu-19.04
+
+docker build -t radiotrayng/circleci:fedora-30 - <fedora/30/Dockerfile
+docker push radiotrayng/circleci:fedora-30
