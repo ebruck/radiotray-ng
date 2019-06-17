@@ -15,7 +15,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR       ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH       ${PROJECT_VERSION_PATCH})
 set(CPACK_PACKAGE_RELOCATABLE         FALSE)
-set(DESTINATION_DIR                   "/usr/share/radiotray-ng/")
+set(DESTINATION_DIR                   /usr/share/radiotray-ng/)
 
 if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     set(CPACK_SYSTEM_NAME "i386")
@@ -49,10 +49,10 @@ if (CPACK_GENERATOR MATCHES "DEB")
     execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/package/postinst)
     execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/package/postrm)
 
-    install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/ubuntu-mono-dark/apps/24/"  DESTINATION "/usr/share/icons/ubuntu-mono-dark/apps/24"  FILES_MATCHING PATTERN "*.svg")
-    install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/ubuntu-mono-light/apps/24/" DESTINATION "/usr/share/icons/ubuntu-mono-light/apps/24" FILES_MATCHING PATTERN "*.svg")
-    install(FILES     "${PROJECT_SOURCE_DIR}/package/copyright"                      DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
-    install(FILES     "${PROJECT_BINARY_DIR}/changelog.Debian.gz"                    DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/themes/ubuntu-mono-dark/apps/24/  DESTINATION /usr/share/icons/ubuntu-mono-dark/apps/24  FILES_MATCHING PATTERN *.svg)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/themes/ubuntu-mono-light/apps/24/ DESTINATION /usr/share/icons/ubuntu-mono-light/apps/24 FILES_MATCHING PATTERN *.svg)
+    install(FILES     ${PROJECT_SOURCE_DIR}/package/copyright                      DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME})
+    install(FILES     ${PROJECT_BINARY_DIR}/changelog.Debian.gz                    DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME})
 endif()
 
 if (CPACK_GENERATOR MATCHES "RPM")
@@ -64,24 +64,59 @@ if (CPACK_GENERATOR MATCHES "RPM")
     set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE   ${PROJECT_SOURCE_DIR}/package/postinst)
     set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE ${PROJECT_SOURCE_DIR}/package/postrm)
 
-    install(FILES "${PROJECT_SOURCE_DIR}/README.md" DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
-    install(FILES "${PROJECT_SOURCE_DIR}/AUTHORS"   DESTINATION "/usr/share/doc/${CPACK_PACKAGE_NAME}")
-    install(FILES "${PROJECT_SOURCE_DIR}/COPYING"   DESTINATION "/usr/share/licences/${CPACK_PACKAGE_NAME}")
+    install(FILES ${PROJECT_SOURCE_DIR}/README.md DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME})
+    install(FILES ${PROJECT_SOURCE_DIR}/AUTHORS   DESTINATION /usr/share/doc/${CPACK_PACKAGE_NAME})
+    install(FILES ${PROJECT_SOURCE_DIR}/COPYING   DESTINATION /usr/share/licences/${CPACK_PACKAGE_NAME})
+
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/applications)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/metainfo)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/licences)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/hicolor)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/hicolor/24x24)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/hicolor/24x24/apps)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/hicolor/256x256)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/hicolor/256x256/apps)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/breeze)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/breeze/apps)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/breeze/apps/22)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/breeze/apps/48)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/Yaru)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/Yaru/256x256)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/icons/Yaru/256x256/apps)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /etc/xdg)
+    list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /etc/xdg/autostart)
+
+    set(CPACK_RPM_CHANGELOG_FILE ${PROJECT_SOURCE_DIR}/package/changelog.rpm)
 endif()
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/hicolor/256x256/apps/"       DESTINATION "/usr/share/icons/hicolor/256x256/apps" FILES_MATCHING PATTERN "*.png")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/hicolor/24x24/apps/"         DESTINATION "/usr/share/icons/hicolor/24x24/apps"   FILES_MATCHING PATTERN "*.png")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/Yaru/apps/256x256/"          DESTINATION "/usr/share/icons/Yaru/256x256/apps"    FILES_MATCHING PATTERN "*.png")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/breeze/apps/22/"             DESTINATION "/usr/share/icons/breeze/apps/22"       FILES_MATCHING PATTERN "*.svg")
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/data/themes/breeze/apps/48/"             DESTINATION "/usr/share/icons/breeze/apps/48"       FILES_MATCHING PATTERN "*.svg")
-install(FILES     "${PROJECT_SOURCE_DIR}/data/about/radiotray-ng.png"             DESTINATION ${DESTINATION_DIR})
-install(FILES     "${PROJECT_SOURCE_DIR}/data/bookmarks.json"                     DESTINATION ${DESTINATION_DIR})
-install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"               DESTINATION "/usr/share/applications/")
-install(FILES     "${PROJECT_SOURCE_DIR}/data/rtng-bookmark-editor.desktop"       DESTINATION "/usr/share/applications/")
-install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.appdata.xml"           DESTINATION "/usr/share/metainfo/")
-install(FILES     "${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop"               DESTINATION "/etc/xdg/autostart/")
-install(PROGRAMS  "${PROJECT_SOURCE_DIR}/src/radiotray-ng/extras/scripts/rt2rtng" DESTINATION "/usr/bin/")
-install(PROGRAMS  "${PROJECT_BINARY_DIR}/radiotray-ng"                            DESTINATION "/usr/bin/")
-install(PROGRAMS  "${PROJECT_BINARY_DIR}/rtng-bookmark-editor"                    DESTINATION "/usr/bin/")
+install(FILES ${PROJECT_SOURCE_DIR}/data/themes/hicolor/256x256/apps/radiotray-ng-on.png
+              ${PROJECT_SOURCE_DIR}/data/themes/hicolor/256x256/apps/radiotray-ng-off.png
+              ${PROJECT_SOURCE_DIR}/data/themes/hicolor/256x256/apps/radiotray-ng-notification.png
+              DESTINATION /usr/share/icons/hicolor/256x256/apps)
+
+install(FILES ${PROJECT_SOURCE_DIR}/data/themes/hicolor/24x24/apps/radiotray-ng-on.png
+              ${PROJECT_SOURCE_DIR}/data/themes/hicolor/24x24/apps/radiotray-ng-off.png
+              DESTINATION /usr/share/icons/hicolor/24x24/apps)
+
+install(FILES ${PROJECT_SOURCE_DIR}/data/themes/Yaru/256x256/apps/radiotray-ng-notification.png
+              DESTINATION /usr/share/icons/Yaru/256x256/apps)
+
+install(FILES ${PROJECT_SOURCE_DIR}/data/themes/breeze/apps/22/radiotray-ng-on.svg
+              ${PROJECT_SOURCE_DIR}/data/themes/breeze/apps/22/radiotray-ng-off.svg
+              DESTINATION /usr/share/icons/breeze/apps/22)
+
+install(FILES ${PROJECT_SOURCE_DIR}/data/themes/breeze/apps/48/radiotray-ng-notification.svg
+              DESTINATION /usr/share/icons/breeze/apps/48)
+
+install(FILES     ${PROJECT_SOURCE_DIR}/data/about/radiotray-ng.png             DESTINATION ${DESTINATION_DIR})
+install(FILES     ${PROJECT_SOURCE_DIR}/data/bookmarks.json                     DESTINATION ${DESTINATION_DIR})
+install(FILES     ${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop               DESTINATION /usr/share/applications/)
+install(FILES     ${PROJECT_SOURCE_DIR}/data/rtng-bookmark-editor.desktop       DESTINATION /usr/share/applications/)
+install(FILES     ${PROJECT_SOURCE_DIR}/data/radiotray-ng.appdata.xml           DESTINATION /usr/share/metainfo/)
+install(FILES     ${PROJECT_SOURCE_DIR}/data/radiotray-ng.desktop               DESTINATION /etc/xdg/autostart/)
+install(PROGRAMS  ${PROJECT_SOURCE_DIR}/src/radiotray-ng/extras/scripts/rt2rtng DESTINATION /usr/bin/)
+install(PROGRAMS  ${PROJECT_BINARY_DIR}/radiotray-ng                            DESTINATION /usr/bin/)
+install(PROGRAMS  ${PROJECT_BINARY_DIR}/rtng-bookmark-editor                    DESTINATION /usr/bin/)
 
 include(CPack)
