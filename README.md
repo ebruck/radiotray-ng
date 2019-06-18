@@ -1,4 +1,5 @@
 # Radiotray-NG: An Internet radio player for Linux #
+[![CircleCI](https://circleci.com/gh/ebruck/radiotray-ng/tree/v0.2.6-dev.svg?style=shield)](https://circleci.com/gh/ebruck/radiotray-ng/tree/v0.2.6-dev)
 
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 
@@ -272,7 +273,7 @@ $ git clone https://github.com/ebruck/radiotray-ng.git
 $ cd radiotray-ng
 $ mkdir build
 $ cd build
-$ cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.rpm
 ```
