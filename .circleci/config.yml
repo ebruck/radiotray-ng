@@ -2,6 +2,7 @@ commonStepsUbuntu: &commonStepsUbuntu
     steps:
       # Each step starts in the checked-out source directory.
       - checkout
+      - run: git fetch --tags && git tag
       - run:
           name: Make project
           command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make package'
@@ -15,6 +16,7 @@ commonStepsFedora: &commonStepsFedora
     steps:
       # Each step starts in the checked-out source directory.
       - checkout
+      - run: git fetch --tags && git tag
       - run:
           name: Make project
           command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM && make package'

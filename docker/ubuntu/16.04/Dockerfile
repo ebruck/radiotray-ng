@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 RUN set -ex; \
     apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ curl wget \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ curl wget git openssh-client \
                    lsb-release \
                    libcurl3-openssl-dev \
                    libjsoncpp-dev \

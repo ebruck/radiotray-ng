@@ -2,7 +2,7 @@ FROM ubuntu:19.04
 
 RUN set -ex; \
     apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ cmake curl wget \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ cmake curl wget git openssh-client \
                    lsb-release \
                    libcurl4-openssl-dev \
                    libjsoncpp-dev \
