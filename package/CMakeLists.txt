@@ -1,10 +1,14 @@
+# gather system info...
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE CODENAME        OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND lsb_release -i -s OUTPUT_VARIABLE DISTRIBUTOR_ID  OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE         OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 # default to debian...
 if (NOT CPACK_GENERATOR)
     set(CPACK_GENERATOR "DEB")
 endif()
 
-execute_process(COMMAND lsb_release -d -s OUTPUT_VARIABLE DISTRO OUTPUT_STRIP_TRAILING_WHITESPACE)
-message( "Building version: ${PROJECT_VERSION} for ${DISTRO} -- ${CPACK_GENERATOR} packaging..." )
+message( "Building version: ${PROJECT_VERSION} for ${DISTRIBUTOR_ID} ${RELEASE} -- ${CPACK_GENERATOR} packaging..." )
 
 set(CPACK_PACKAGE_VENDOR              "Edward G. Bruck")
 set(CPACK_PACKAGE_CONTACT             "ed.bruck1@gmail.com")
@@ -23,7 +27,8 @@ else()
     set(CPACK_SYSTEM_NAME "amd64")
 endif()
 
-set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${CPACK_SYSTEM_NAME})
+set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
+string(TOLOWER ${CPACK_PACKAGE_FILE_NAME} CPACK_PACKAGE_FILE_NAME)
 
 if (CPACK_GENERATOR MATCHES "DEB")
     set(BOOST_DEB_VERSION                  "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
@@ -36,9 +41,7 @@ if (CPACK_GENERATOR MATCHES "DEB")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm)
 
     # no libcurl4 on Debian Stretch
-    execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE CODENAME OUTPUT_STRIP_TRAILING_WHITESPACE)
     # https://bugs.launchpad.net/ubuntu/+source/curl/+bug/1754294
-    execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (${RELEASE} STREQUAL "16.04" OR ${CODENAME} STREQUAL "stretch")
        string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
     endif()
@@ -87,7 +90,7 @@ if (CPACK_GENERATOR MATCHES "RPM")
     list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /etc/xdg)
     list(APPEND CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /etc/xdg/autostart)
 
-    set(CPACK_RPM_CHANGELOG_FILE ${PROJECT_SOURCE_DIR}/package/changelog.rpm)
+    set(CPACK_RPM_CHANGELOG_FILE ${PROJECT_SOURCE_DIR}/package/changelog-rpm)
 endif()
 
 install(FILES ${PROJECT_SOURCE_DIR}/data/themes/hicolor/256x256/apps/radiotray-ng-on.png

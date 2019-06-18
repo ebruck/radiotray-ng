@@ -1,0 +1,6 @@
+* Fri Mar 15 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.5
+- Updated & added new stations
+- Added dbus play_url method
+- Added initial m3u8 support
+- Various dbus & editor bug fixes
+- Added rtng-dbus & rtng2xml scripts
