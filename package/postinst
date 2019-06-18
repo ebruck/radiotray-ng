@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 gtk-update-icon-cache -f -t -q /usr/share/icons/breeze/
 gtk-update-icon-cache -f -t -q /usr/share/icons/hicolor/
 gtk-update-icon-cache -f -t -q /usr/share/icons/Yaru/
