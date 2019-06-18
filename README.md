@@ -244,7 +244,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 $ sudo apt-get install -f
 ```
 
@@ -256,7 +256,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 $ sudo apt-get install -f
 ```
 
@@ -274,7 +274,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM
 $ make package
-$ sudo dnf install ./radiotray-ng_x.y.z_<i386|amd64>.rpm
+$ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.rpm
 ```
 
 ### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
