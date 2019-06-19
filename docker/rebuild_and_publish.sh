@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -xe
 
 docker build -t radiotrayng/circleci:ubuntu-16.04 - <ubuntu/16.04/Dockerfile
