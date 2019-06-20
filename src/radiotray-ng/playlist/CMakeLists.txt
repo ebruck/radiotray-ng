@@ -16,6 +16,5 @@ add_library(playlist STATIC
     playlist_downloader.cpp
     playlist_downloader.hpp)
 
-target_link_libraries(playlist)
 add_dependencies(playlist user-agent)
 target_include_directories(playlist PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
