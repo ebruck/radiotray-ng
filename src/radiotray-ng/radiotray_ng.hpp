@@ -113,6 +113,7 @@ private:
 	std::string artist;
 	std::string group;
 	std::string station;
+	std::string url;
 	std::string state;
 	std::string bitrate;
 	std::string codec;

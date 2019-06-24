@@ -53,6 +53,7 @@ using playlist_t = std::vector<std::string>;
 #define DBUS_MSG_TITLE_KEY                "title"
 #define DBUS_MSG_ARTIST_KEY               "artist"
 #define DBUS_MSG_STATION_KEY              "station"
+#define DBUS_MSG_URL_KEY                  "url"
 #define DBUS_MSG_GROUP_KEY                "group"
 #define DBUS_MSG_CODEC_KEY                "codec"
 #define DBUS_MSG_BITRATE_KEY              "bitrate"

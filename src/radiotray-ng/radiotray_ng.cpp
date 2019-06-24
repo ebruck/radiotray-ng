@@ -163,6 +163,7 @@ std::string RadiotrayNG::get_player_state()
 	value[DBUS_MSG_TITLE_KEY]   = this->title;
 	value[DBUS_MSG_ARTIST_KEY]  = this->artist;
 	value[DBUS_MSG_STATION_KEY] = this->station;
+	value[DBUS_MSG_URL_KEY]     = this->url;
 	value[DBUS_MSG_GROUP_KEY]   = (this->group != this->play_url_group) ? this->group : "";
 	value[DBUS_MSG_CODEC_KEY]   = this->codec;
 	value[DBUS_MSG_BITRATE_KEY] = this->bitrate;
@@ -521,6 +522,8 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 
 			if (this->player->play(pls))
 			{
+				this->url = std.url;
+
 				this->config->save();
 				return;
 			}
