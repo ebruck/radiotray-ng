@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
 #
 # This file is part of Radiotray-NG.
@@ -26,6 +26,7 @@
 #    get_bookmarks
 #    get_config
 #    get_player_state
+#    mute
 #    next_station
 #    play
 #    play_station 'group' 'station'
@@ -39,13 +40,18 @@
 #    volume_up
 
 if [ "$#" -gt 0 ]; then
-    export $(dbus-launch)
+    if [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]; then
+        export $(dbus-launch)
+        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+    fi
 
-    DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
     QDBUS_CMD="qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
 
     for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
 
     eval $QDBUS_CMD $ARGS
-    kill $DBUS_SESSION_BUS_PID
+
+    if [ ! -z "${DBUS_SESSION_BUS_PID}" ]; then
+        kill $DBUS_SESSION_BUS_PID
+    fi
 fi
