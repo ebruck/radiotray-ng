@@ -146,6 +146,28 @@ void Player::volume(const uint32_t percent)
 }
 
 
+void Player::mute()
+{
+    g_object_set(G_OBJECT(this->pipeline), "mute", TRUE, NULL);
+}
+
+
+void Player::unmute()
+{
+    g_object_set(G_OBJECT(this->pipeline), "mute", FALSE, NULL);
+}
+
+
+bool Player::is_muted()
+{
+    gboolean muted{};
+
+    g_object_get(G_OBJECT(this->pipeline), "mute", &muted, NULL);
+
+    return !!muted;
+}
+
+
 void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
 {
 	// set our user-agent...

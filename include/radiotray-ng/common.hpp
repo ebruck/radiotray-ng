@@ -57,6 +57,7 @@ using playlist_t = std::vector<std::string>;
 #define DBUS_MSG_GROUP_KEY                "group"
 #define DBUS_MSG_CODEC_KEY                "codec"
 #define DBUS_MSG_BITRATE_KEY              "bitrate"
+#define DBUS_MSG_MUTE_KEY                 "mute"
 #define DBUS_MSG_IMAGE_KEY                "image"
 
 // http codes

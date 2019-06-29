@@ -191,20 +191,21 @@ The editor supports all of the typical editor operations including adding, editi
 ```
 Available commands:
 
-    volume_up
-    volume_down
-    set_volume 'level'
-    play
-    play_url 'url'
-    stop
-    quit
-    previous_station
-    reload_bookmarks
-    next_station
     get_bookmarks
     get_config
     get_player_state
+    play
     play_station 'group' 'station'
+    play_url 'url'
+    previous_station
+    next_station
+    reload_bookmarks
+    set_volume 'level'        
+    volume_down
+    volume_up
+    mute
+    stop
+    quit
 ```
 ```
 Example:
@@ -216,9 +217,11 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
    "codec" : "MPEG-1 Layer 3 (MP3)",
    "group" : "Old Time Radio",
    "image" : "radiotray-ng-notification",
+   "mute" : false,
    "state" : "playing",
    "station" : "AM 1710 Antioch OTR",
    "title" : "Jul 15, 1948: Summer Night w/Ida Lupino",
+   "url" : "http://radio.macinmind.com/listen.m3u",
    "volume" : "15"
 }
 ```
@@ -275,7 +278,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
-$ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.rpm
+$ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|x86_64>.rpm
 ```
 
 ### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).

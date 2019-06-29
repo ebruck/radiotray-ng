@@ -48,6 +48,8 @@ public:
 
 	void play();
 
+	void mute();
+
 	void volume_up();
 
 	void volume_up_msg();
