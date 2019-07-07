@@ -1,3 +1,12 @@
+* Sun Jul 07 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.6
+- Added disable-logging config option
+- Added Yaru & Breeze icons
+- Log & pid files now written to standard xdg locations
+- RPM packaging
+- get_player_state dbus now includes url information
+- Added dbus mute method
+- Minor build changes & bug fixes
+
 * Fri Mar 15 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.5
 - Updated & added new stations
 - Added dbus play_url method
