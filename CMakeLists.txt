@@ -13,7 +13,7 @@ endif()
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 5)
+set(PROJECT_VERSION_PATCH 6)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -96,7 +96,7 @@ endif()
 
 set(BUILD_SHARED_LIBS NO)
 
-add_subdirectory(debian)
+add_subdirectory(package)
 add_subdirectory(src/radiotray-ng)
 add_subdirectory(src/radiotray-ng/config)
 add_subdirectory(src/radiotray-ng/playlist)

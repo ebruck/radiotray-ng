@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
 #
 # This file is part of Radiotray-NG.
@@ -26,6 +26,7 @@
 #    get_bookmarks
 #    get_config
 #    get_player_state
+#    mute
 #    next_station
 #    play
 #    play_station 'group' 'station'
@@ -38,21 +39,19 @@
 #    volume_down
 #    volume_up
 
-QDBUS=/usr/bin/qdbus
-DESKTOP=gnome-shell
-
-PID=$(pgrep -u $(whoami) $DESKTOP -x)
-
-if [ ! -z "${PID}" ]; then
-    if [ "$#" -gt 0 ]; then
+if [ "$#" -gt 0 ]; then
+    if [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]; then
         export $(dbus-launch)
+        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+    fi
 
-        DBUS_SESSION_BUS_ADDRESS=$(cat /proc/$PID/environ | tr '\0' '\n' | awk -FDBUS_SESSION_BUS_ADDRESS= '/DBUS_SESSION_BUS_ADDRESS=/ {print $2}')
-        QDBUS_CMD="$QDBUS com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
+    QDBUS_CMD="qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
 
-        for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
+    for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
 
-        eval $QDBUS_CMD $ARGS
+    eval $QDBUS_CMD $ARGS
+
+    if [ ! -z "${DBUS_SESSION_BUS_PID}" ]; then
         kill $DBUS_SESSION_BUS_PID
     fi
 fi

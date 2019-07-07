@@ -1,0 +1,64 @@
+commonStepsUbuntu: &commonStepsUbuntu
+    steps:
+      # Each step starts in the checked-out source directory.
+      - checkout
+      - run: git fetch --tags && git tag
+      - run:
+          name: Make project
+          command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make package'
+      - run:
+          name: Copy artifacts to tmp
+          command: 'mkdir /artifacts && cd build && cp *.deb /artifacts'
+      - store_artifacts:
+          path: /artifacts
+
+commonStepsFedora: &commonStepsFedora
+    steps:
+      # Each step starts in the checked-out source directory.
+      - checkout
+      - run: git fetch --tags && git tag
+      - run:
+          name: Make project
+          command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM && make package'
+      - run:
+          name: Copy artifacts to tmp
+          command: 'mkdir /artifacts && cd build && cp *.rpm /artifacts'
+      - store_artifacts:
+          path: /artifacts
+
+version: 2.1
+
+jobs:
+  Ubuntu-16_04-build:
+    <<: *commonStepsUbuntu
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-16.04"
+    environment:
+      - CI_OS: linux
+  Ubuntu-18_04-build:
+    <<: *commonStepsUbuntu
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-18.04"
+    environment:
+      - CI_OS: linux
+  Ubuntu-19_04-build:
+    <<: *commonStepsUbuntu
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-19.04"
+    environment:
+      - CI_OS: linux
+  Fedora-30-build:
+    <<: *commonStepsFedora
+    docker:
+      - image: "radiotrayng/circleci:fedora-30"
+    environment:
+      - CI_OS: linux
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - Ubuntu-16_04-build
+      - Ubuntu-18_04-build
+      - Ubuntu-19_04-build
+      - Fedora-30-build

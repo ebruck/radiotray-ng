@@ -146,6 +146,28 @@ void Player::volume(const uint32_t percent)
 }
 
 
+void Player::mute()
+{
+    g_object_set(G_OBJECT(this->pipeline), "mute", TRUE, NULL);
+}
+
+
+void Player::unmute()
+{
+    g_object_set(G_OBJECT(this->pipeline), "mute", FALSE, NULL);
+}
+
+
+bool Player::is_muted()
+{
+    gboolean muted{};
+
+    g_object_get(G_OBJECT(this->pipeline), "mute", &muted, NULL);
+
+    return !!muted;
+}
+
+
 void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
 {
 	// set our user-agent...
@@ -357,7 +379,15 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 			str = g_strdup_value_contents(gst_tag_list_get_value_index(list, tag, i));
 		}
 
-		event_data[gst_tag_get_nick(tag)] = str;
+		// todo: for now ignore anything that looks encoded...
+		if (std::string(str).find("<?xml") == std::string::npos)
+		{
+			event_data[gst_tag_get_nick(tag)] = str;
+		}
+		else
+		{
+			LOG(debug) << "ignoring encoded tag: " << gst_tag_get_nick(tag) << " : " << str;
+		}
 
 		g_free(str);
 	}

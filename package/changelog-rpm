@@ -1,0 +1,96 @@
+* Sun Jul 07 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.6
+- Added disable-logging config option
+- Added Yaru & Breeze icons
+- Log & pid files now written to standard xdg locations
+- RPM packaging
+- get_player_state dbus now includes url information
+- Added dbus mute method
+- Minor build changes & bug fixes
+
+* Fri Mar 15 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.5
+- Updated & added new stations
+- Added dbus play_url method
+- Added initial m3u8 support
+- Various dbus & editor bug fixes
+- Added rtng-dbus & rtng2xml scripts
+
+* Wed Oct 17 2018 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.4
+- Added dbus set_volume method
+- Added root-group-bottom-pos config option
+- Notification icon visibility on light backgrounds improved
+- Minor build changes & bug fixes
+
+* Fri Jul 13 2018 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.3
+- Fixed playlist line ending type detection
+- Added wrap-track-info & wrap-track-info-len config options
+- Better handling of text/uri-list & text/html playlists
+- Minor build changes
+
+* Tue Apr 24 2018 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.2
+- Added copying title & artist to clipboard config option
+- Added per station notification option & editor support
+- Added dbus reload_bookmarks & quit methods
+- Minor build changes
+
+* Sat Feb 17 2018 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.1
+- Fixed editor group & station reordering
+- Added BUILD_TESTS cmake option
+- Added dbus get_config method
+
+* Sat Dec 30 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.0
+- Added contributed Bookmark Editor (Thanks Mike!)
+- Added iHeartRadio tag parsing
+- Added buffer-duration config option
+- Fixed jsoncpp build warnings breaking Arch builds
+- Minor bug fixes
+
+* Sat Oct 07 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.8
+- Added icon middle click support for starting/stopping playback
+- Added command line help etc.
+- Added invert-menu configuration option for bottom dock users
+- Added Bluegrass station to default bookmark file
+- Fixed wrong api used for menu separators
+- Fixed output not using autoaudiosink
+- Reduced notifications if player buffers
+
+* Sat Sep 02 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.7
+- Added dbus interface
+- Added --play option for resuming playback on startup
+- Added optional notification of external bookmark file changes
+- Updated to libappindicator3
+
+* Wed Jun 28 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.6
+- new icon config overrides
+- sleep timer dialog added
+- support for gnome-settings-daemon media key api changes
+- added Fedora build instructions
+
+* Sat Apr 22 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.5
+- Fixed startup crash seen on some systems using gcc 6.x
+- Added compact-menu option to disable the use of menu separators
+- Removed ncurses requirement if appindicator library is found
+- Notification uses station name if artist tag is missing
+- Smarter boost dependency detection
+- Added rt2rtng script for converting RadioTray bookmarks
+- Fixed user-agent and release build issues
+- Logging & aboutbox now include git commit used to generate binary
+- Added optional mapping of media keys for previous/next station etc
+
+* Thu Feb 23 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.4
+- Disabling notifications prevented stopping of player
+- Fixed lintian package errors
+
+* Sat Feb 18 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.3
+- Support building on 32bit architectures
+- Added 24x24 icons and pid file to prevent multiple instances from
+  running
+
+* Wed Feb 15 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.2
+- Fixed gdk threading not being initialized before calling gtk_init
+- Don't overwrite bad bookmarks file on startup
+
+* Sun Feb 12 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.1
+- Fixed word_wrap infinite loop
+
+* Sat Feb 11 2017 Edward G. Bruck <ed.bruck1@gmail.com> - 0.1.0
+- Initial release.

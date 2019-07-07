@@ -53,16 +53,20 @@ namespace radiotray_ng
 
 	inline std::string word_expand(const std::string& s)
 	{
-		std::string tmp;
-
 		if (!s.empty())
 		{
-			wordexp_t exp_result;
-			wordexp(s.c_str(), &exp_result, 0);
-			tmp = exp_result.we_wordv[0];
-			wordfree(&exp_result);
+			// any spaces then we can't use wordexp...
+			if (s.find(' ') == std::string::npos)
+			{
+				std::string tmp;
+				wordexp_t exp_result;
+				wordexp(s.c_str(), &exp_result, 0);
+				tmp = exp_result.we_wordv[0];
+				wordfree(&exp_result);
+				return tmp;
+			}
 		}
-		return tmp;
+		return s;
 	}
 
 
@@ -98,29 +102,41 @@ namespace radiotray_ng
 	}
 
 
-	inline std::string to_upper_copy(std::string s)
-	{
-	    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-	    return s;
-	}
-
-
-	inline void load_string_file(const std::string& p, std::string& str)
-	{
-		std::ifstream file;
-		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		file.open(p, std::ios_base::binary);
-		std::size_t sz = static_cast<std::size_t>(boost::filesystem::file_size(p));
-		str.resize(sz, '\0');
-		file.read(&str[0], sz);
-	}
-
-
 	inline std::string get_data_dir(const std::string& app_name)
 	{
 		std::string xdg_data_home_dir = xdgConfigHome(nullptr);
 		xdg_data_home_dir += std::string("/") + app_name + std::string("/");
 		return xdg_data_home_dir;
+	}
+
+
+	inline std::string get_cache_dir(const std::string& app_name)
+	{
+		std::string xdg_cache_home_dir = xdgCacheHome(nullptr);
+		xdg_cache_home_dir += std::string("/") + app_name + std::string("/");
+		return xdg_cache_home_dir;
+	}
+
+
+	inline std::string get_runtime_dir()
+	{
+		xdgHandle xdg_handle;
+		std::string runtime_dir;
+
+		if (xdgInitHandle(&xdg_handle))
+		{
+			// https://bugs.launchpad.net/ubuntu/+source/libxdg-basedir/+bug/1821670
+			// Not sure why non-cached call uses XDG_RUNTIME_DIRECTORY environment
+			// variable instead of XDG_RUNTIME_DIR...
+			auto xdg_runtime_dir = xdgRuntimeDirectory(&xdg_handle);
+			if (xdg_runtime_dir)
+			{
+				runtime_dir = xdg_runtime_dir;
+			}
+			xdgWipeHandle(&xdg_handle);
+		}
+
+		return runtime_dir;
 	}
 
 

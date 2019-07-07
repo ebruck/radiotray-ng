@@ -1,4 +1,5 @@
 # Radiotray-NG: An Internet radio player for Linux #
+[![CircleCI](https://circleci.com/gh/ebruck/radiotray-ng/tree/master.svg?style=shield)](https://circleci.com/gh/ebruck/radiotray-ng/tree/master)
 
 It became clear as one of the early contributors to the RadioTray project that it
 was not getting the attention it required and was probably dead. A lot of the 
@@ -64,6 +65,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "buffer-size" : 320000,
    "compact-menu" : false,
    "debug-logging" : false,
+   "disable-logging" : false,
    "file-monitor" : true,
    "file-monitor-interval" : 10,
    "invert-menu" : false,
@@ -100,6 +102,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
            buffer-duration: number of seconds to buffer
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
+           disable-logging: enable/disable logging
               file-monitor: enable/disable notifcation of bookmark file changes
      file-monitor-interval: time in seconds to poll for bookmark file changes
               invert-menu : menu rendered in reverse order
@@ -188,20 +191,21 @@ The editor supports all of the typical editor operations including adding, editi
 ```
 Available commands:
 
-    volume_up
-    volume_down
-    set_volume 'level'
-    play
-    play_url 'url'
-    stop
-    quit
-    previous_station
-    reload_bookmarks
-    next_station
     get_bookmarks
     get_config
     get_player_state
+    play
     play_station 'group' 'station'
+    play_url 'url'
+    previous_station
+    next_station
+    reload_bookmarks
+    set_volume 'level'        
+    volume_down
+    volume_up
+    mute
+    stop
+    quit
 ```
 ```
 Example:
@@ -213,9 +217,11 @@ $ qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng
    "codec" : "MPEG-1 Layer 3 (MP3)",
    "group" : "Old Time Radio",
    "image" : "radiotray-ng-notification",
+   "mute" : false,
    "state" : "playing",
    "station" : "AM 1710 Antioch OTR",
    "title" : "Jul 15, 1948: Summer Night w/Ida Lupino",
+   "url" : "http://radio.macinmind.com/listen.m3u",
    "volume" : "15"
 }
 ```
@@ -242,7 +248,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 $ sudo apt-get install -f
 ```
 
@@ -254,7 +260,7 @@ $ mkdir build
 $ cd build
 $ cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
 $ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<i386|amd64>.deb
+$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 $ sudo apt-get install -f
 ```
 
@@ -262,7 +268,17 @@ $ sudo apt-get install -f
 
 Install these packages:
 ```
-redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel
+redhat-lsb cmake libcurl-devel boost-devel wxGTK3-devel jsoncpp-devel gstreamer1-devel libxdg-basedir-devel libbsd-devel libappindicator-gtk3-devel libnotify-devel glibmm24-devel rpm-build
 ```
-### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
 
+```
+$ git clone https://github.com/ebruck/radiotray-ng.git
+$ cd radiotray-ng
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
+$ make package
+$ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|x86_64>.rpm
+```
+
+### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).

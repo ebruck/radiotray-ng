@@ -32,7 +32,9 @@ namespace
 		"    </method>"
 		"    <method name='play'>"
 		"    </method>"
-		"    <method name='stop'>"
+        "    <method name='mute'>"
+        "    </method>"
+        "    <method name='stop'>"
 		"    </method>"
 		"    <method name='quit'>"
 		"    </method>"
@@ -103,6 +105,13 @@ void RtngDbus::on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /*conne
 		invocation->return_value(Glib::VariantContainerBase());
 		return;
 	}
+
+    if (method_name == "mute")
+    {
+        this->radiotray_ng->mute();
+        invocation->return_value(Glib::VariantContainerBase());
+        return;
+    }
 
 	if (method_name == "stop")
 	{
@@ -265,7 +274,10 @@ void RtngDbus::dbus_setup()
 		Gio::DBus::SlotNameAcquired(),
 		[this](const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&)
 		{
-			connection->unregister_object(this->registered_id);
+			if (connection)
+			{
+				connection->unregister_object(this->registered_id);
+			}
 		});
 
 }

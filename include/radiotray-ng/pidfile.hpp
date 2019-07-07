@@ -35,7 +35,15 @@ namespace radiotray_ng
 			: pfh(nullptr)
 			, already_running(false)
 		{
-			std::string pid_file{radiotray_ng::get_data_dir(app_name) + "/" + app_name + ".pid"};
+			std::string base_dir{radiotray_ng::get_runtime_dir()};
+
+			// fallback to config dir?
+			if (base_dir.empty())
+			{
+				base_dir = radiotray_ng::get_data_dir(app_name);
+			}
+
+			std::string pid_file{base_dir + "/" + app_name + ".pid"};
 
 			pid_t otherpid;
 			this->pfh = pidfile_open(pid_file.c_str(), 0600, &otherpid);

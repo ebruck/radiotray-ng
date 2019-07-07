@@ -163,9 +163,11 @@ std::string RadiotrayNG::get_player_state()
 	value[DBUS_MSG_TITLE_KEY]   = this->title;
 	value[DBUS_MSG_ARTIST_KEY]  = this->artist;
 	value[DBUS_MSG_STATION_KEY] = this->station;
+	value[DBUS_MSG_URL_KEY]     = this->url;
 	value[DBUS_MSG_GROUP_KEY]   = (this->group != this->play_url_group) ? this->group : "";
 	value[DBUS_MSG_CODEC_KEY]   = this->codec;
 	value[DBUS_MSG_BITRATE_KEY] = this->bitrate;
+	value[DBUS_MSG_MUTE_KEY]    = this->player->is_muted();
 	value[DBUS_MSG_IMAGE_KEY]   = radiotray_ng::word_expand(this->notification_image);
 
 	return value.toStyledString();
@@ -521,6 +523,8 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 
 			if (this->player->play(pls))
 			{
+				this->url = std.url;
+
 				this->config->save();
 				return;
 			}
@@ -580,6 +584,29 @@ void RadiotrayNG::volume_down_msg()
 }
 
 
+void RadiotrayNG::mute()
+{
+    std::string msg{"Volume: " + this->volume + "% "};
+
+    if (!this->player->is_muted())
+    {
+        this->player->mute();
+
+        msg += "(Mute)";
+    }
+    else
+    {
+        this->player->unmute();
+    }
+
+    if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+    {
+        this->notification.notify(msg, APP_NAME_DISPLAY,
+            radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+    }
+}
+
+
 void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 {
 	const uint32_t volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
@@ -596,13 +623,17 @@ void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 	}
 }
 
+
 void RadiotrayNG::display_volume_level()
 {
-	// Always show since media keys don't repeat, which makes it hard to tell if the volume is changing...
-	std::string volume_str = "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
+    if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+    {
+        std::string volume_str =
+            "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
-	this->notification.notify(volume_str, APP_NAME_DISPLAY,
-		radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+        this->notification.notify(volume_str, APP_NAME_DISPLAY,
+            radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+    }
 }
 
 

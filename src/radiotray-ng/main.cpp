@@ -42,38 +42,45 @@
 #include <boost/program_options.hpp>
 
 
-void init_logging()
+void init_logging(std::shared_ptr<IConfig> config)
 {
-	std::string xdg_data_home_dir = radiotray_ng::get_data_dir(APP_NAME);
+	if (config->get_bool(DISABLE_LOGGING_KEY, DEFAULT_DISABLE_LOGGING_VALUE))
+	{
+		boost::log::core::get()->set_logging_enabled(false);
+	}
+	else
+	{
+		std::string xdg_cache_home_dir = radiotray_ng::get_cache_dir(APP_NAME);
 
-	namespace keywords = boost::log::keywords;
+		namespace keywords = boost::log::keywords;
 
-	auto sink = boost::log::add_file_log
-		(
-			keywords::file_name = xdg_data_home_dir + "logs/radiotray-ng-%5N.log",
-			keywords::rotation_size = 1024 * 64, // 64K logs
-			keywords::open_mode = std::ios_base::app,
-			keywords::auto_flush = true,
-			keywords::format =
-				(
-					boost::log::expressions::stream
-					<< boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "[%Y-%m-%d %H:%M:%S.%f]")
-					<< " [" << boost::log::expressions::attr< boost::log::attributes::current_thread_id::value_type >("ThreadID")
-					<< "] [" << std::setw(5) << std::left << boost::log::trivial::severity << "] " <<  boost::log::expressions::smessage
-				)
-		);
+		auto sink = boost::log::add_file_log
+			(
+				keywords::file_name = xdg_cache_home_dir + "radiotray-ng-%5N.log",
+				keywords::rotation_size = 1024 * 64, // 64K logs
+				keywords::open_mode = std::ios_base::app,
+				keywords::auto_flush = true,
+				keywords::format =
+					(
+						boost::log::expressions::stream
+						<< boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "[%Y-%m-%d %H:%M:%S.%f]")
+						<< " [" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID")
+						<< "] [" << std::setw(5) << std::left << boost::log::trivial::severity << "] " << boost::log::expressions::smessage
+					)
+			);
 
-	boost::log::add_common_attributes();
+		boost::log::add_common_attributes();
 
-	sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector
-		(
-			keywords::target = xdg_data_home_dir + "logs/",
-			keywords::max_size = 1024 * 512 // ~512K of logs
-		));
+		sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector
+			(
+				keywords::target = xdg_cache_home_dir,
+				keywords::max_size = 1024 * 512 // ~512K of logs
+			));
 
-	sink->locked_backend()->scan_for_files();
+		sink->locked_backend()->scan_for_files();
 
-	boost::log::core::get()->add_sink(sink);
+		boost::log::core::get()->add_sink(sink);
+	}
 }
 
 
@@ -241,12 +248,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	init_logging();
-
-	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
-
-	LOG(info) << RTNG_USER_AGENT;
-
 	auto config = std::make_shared<Config>(config_path + RTNG_CONFIG_FILE);
 
 	// load config or create a new one
@@ -255,6 +256,12 @@ int main(int argc, char* argv[])
 		// not there, so lets set some defaults...
 		set_config_defaults(config, argv[0], config_path);
 	}
+
+	init_logging(config);
+
+	LOG(info) << APP_NAME << " (" << RTNG_GIT_VERSION << ") starting up";
+
+	LOG(info) << RTNG_USER_AGENT;
 
 	// adjust logging level...
 	set_logging_level(config);

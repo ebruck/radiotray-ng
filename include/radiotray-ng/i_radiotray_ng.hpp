@@ -31,6 +31,8 @@ public:
 
 	virtual void play() = 0;
 
+	virtual void mute() = 0;
+
 	virtual void volume_up() = 0;
 
 	virtual void volume_up_msg() = 0;

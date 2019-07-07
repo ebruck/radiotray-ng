@@ -29,4 +29,10 @@ public:
 	virtual void stop() = 0;
 
 	virtual void volume(uint32_t percent) = 0;
+
+	virtual void mute() = 0;
+
+    virtual void unmute() = 0;
+
+	virtual bool is_muted() = 0;
 };
