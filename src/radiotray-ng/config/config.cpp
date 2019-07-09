@@ -31,10 +31,12 @@ bool Config::load()
 		std::ifstream ifile(this->config_file);
 		ifile.exceptions(std::ios::failbit);
 
-		Json::Reader reader;
-		if (!reader.parse(ifile, this->config))
+		Json::CharReaderBuilder rbuilder;
+		std::string parse_err;
+
+		if (!Json::parseFromStream(rbuilder, ifile, &this->config, &parse_err))
 		{
-			LOG(error) << "Failed to parse: " << this->config_file << " : " << reader.getFormattedErrorMessages();
+			LOG(error) << "Failed to parse: " << this->config_file << " : " << parse_err;
 			return false;
 		}
 	}
@@ -57,7 +59,9 @@ bool Config::save()
 		std::ofstream ofile(this->config_file);
 		ofile.exceptions(std::ios::failbit);
 
-		ofile << Json::StyledWriter().write(this->config);
+		Json::StreamWriterBuilder wbuilder;
+		std::unique_ptr<Json::StreamWriter> const writer(wbuilder.newStreamWriter());
+		writer->write(this->config, &ofile);
 	}
 	catch(std::exception& /*e*/)
 	{

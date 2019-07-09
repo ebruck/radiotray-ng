@@ -80,8 +80,10 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 		{
 			EXPECT_TRUE(bm.get_group_as_json(GROUP_A, json_str));
 			Json::Value json;
-			Json::Reader reader;
-			reader.parse(json_str, json);
+			Json::CharReaderBuilder rbuilder;
+			std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+			std::string parse_errors;
+			EXPECT_TRUE(reader->parse(json_str.c_str(), json_str.c_str() + json_str.size(), &json, &parse_errors));
 
 			EXPECT_EQ(json["group"].asString(), GROUP_A);
 			EXPECT_EQ(json["image"].asString(), GROUP_IMAGE_A);
@@ -108,8 +110,10 @@ TEST(Bookmarks, test_that_a_group_is_added_and_removed)
 			EXPECT_TRUE(bm.add_station_from_json(GROUP_A, json_str, station_name));
 			EXPECT_TRUE(bm.get_station_as_json(GROUP_A, station_name, json_str));
 			Json::Value json;
-			Json::Reader reader;
-			reader.parse(json_str, json);
+			Json::CharReaderBuilder rbuilder;
+			std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+			std::string parse_errors;
+			EXPECT_TRUE(reader->parse(json_str.c_str(), json_str.c_str() + json_str.size(), &json, &parse_errors));
 
 			EXPECT_EQ(json["image"].asString(), "image_json");
 			EXPECT_EQ(json["name"].asString(), "name_json");

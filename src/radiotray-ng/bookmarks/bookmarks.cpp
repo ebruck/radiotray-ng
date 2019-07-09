@@ -35,12 +35,13 @@ bool Bookmarks::load()
 		std::ifstream ifile(this->bookmarks_file);
 		ifile.exceptions(std::ios::failbit);
 
-		Json::Reader reader;
+		Json::CharReaderBuilder rbuilder;
 		Json::Value new_bookmarks;
+		std::string parse_errors;
 
-		if (!reader.parse(ifile, new_bookmarks))
+		if (!Json::parseFromStream(rbuilder, ifile, &new_bookmarks, &parse_errors))
 		{
-			LOG(error) << "Failed to parse: " << this->bookmarks_file << " : " << reader.getFormattedErrorMessages();
+			LOG(error) << "Failed to parse: " << this->bookmarks_file << " : " << parse_errors;
 			return false;
 		}
 
@@ -78,7 +79,9 @@ bool Bookmarks::save_as(const std::string& new_filename)
 		std::ofstream ofile(filename);
 		ofile.exceptions(std::ios::failbit);
 
-		ofile << Json::StyledWriter().write(this->bookmarks);
+		Json::StreamWriterBuilder wbuilder;
+		std::unique_ptr<Json::StreamWriter> const writer(wbuilder.newStreamWriter());
+		writer->write(this->bookmarks, &ofile);
 	}
 	catch(std::exception& /*e*/)
 	{
@@ -474,7 +477,9 @@ bool Bookmarks::get_group_as_json(const std::string& group_name, std::string& js
 
 	if (this->find_group(group_name, group_index))
 	{
-		json = Json::StyledWriter().write(this->bookmarks[Json::ArrayIndex(group_index)]);
+		Json::StreamWriterBuilder wbuilder;
+		json = Json::writeString(wbuilder, this->bookmarks[Json::ArrayIndex(group_index)]);
+
 		return true;
 	}
 
@@ -496,7 +501,9 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 			// may not be there...
 			station[NOTIFICATION_KEY] = this->get_station_notifications(station);
 
-			json = Json::StyledWriter().write(station);
+			Json::StreamWriterBuilder wbuilder;
+			json = Json::writeString(wbuilder, station);
+
 			return true;
 		}
 	}
@@ -508,12 +515,14 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 bool Bookmarks::add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name)
 {
 	// first, validate the station
-	Json::Reader reader;
 	Json::Value station;
+	Json::CharReaderBuilder rbuilder;
+	std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+	std::string parse_errors;
 
-	if (!reader.parse(json, station))
+	if (!reader->parse(json.c_str(), json.c_str() + json.size(), &station, &parse_errors))
 	{
-		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << reader.getFormattedErrorMessages();
+		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << parse_errors;
 		return false;
 	}
 
