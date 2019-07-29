@@ -1,0 +1,151 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR radiotray-ng team
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://github.com/ebruck/radiotray-ng/issues\n"
+"POT-Creation-Date: 2019-07-30 01:11+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../radiotray_ng.cpp:595
+msgid "(Mute)"
+msgstr ""
+
+#: ../appindicator_gui.cpp:483
+msgid "About"
+msgstr ""
+
+#: ../appindicator_gui.cpp:271
+msgid "Bitrate"
+msgstr ""
+
+#: ../appindicator_gui.cpp:456
+msgid "Bookmark Editor..."
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:656
+msgid "Bookmarks Reload Failed"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:647
+msgid "Bookmarks Reloaded"
+msgstr ""
+
+#: ../appindicator_gui.cpp:591
+msgid "Bookmarks changed on disk"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:401
+msgid "Buffering"
+msgstr ""
+
+#: ../appindicator_gui.cpp:603
+msgid "Cancel"
+msgstr ""
+
+#: ../appindicator_gui.cpp:279
+msgid "Codec"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:393
+msgid "Connecting"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:412
+msgid "Error"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:536
+msgid "Failed to download playlist"
+msgstr ""
+
+#: ../appindicator_gui.cpp:638
+msgid "Invalid sleep timer"
+msgstr ""
+
+#: ../appindicator_gui.cpp:611
+msgid "Minutes"
+msgstr ""
+
+#: ../appindicator_gui.cpp:605
+msgid "OK"
+msgstr ""
+
+#: ../appindicator_gui.cpp:341
+msgid "Playing"
+msgstr ""
+
+#: ../appindicator_gui.cpp:449
+msgid "Preferences"
+msgstr ""
+
+#: ../appindicator_gui.cpp:492
+msgid "Quit"
+msgstr ""
+
+#: ../appindicator_gui.cpp:461
+msgid "Reload Bookmarks"
+msgstr ""
+
+#: ../appindicator_gui.cpp:470 ../appindicator_gui.cpp:600
+msgid "Sleep Timer"
+msgstr ""
+
+#: ../appindicator_gui.cpp:579
+msgid "Sleep timer expired"
+msgstr ""
+
+#: ../appindicator_gui.cpp:668
+msgid "Sleep timer stopped"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:542
+msgid "Station Error"
+msgstr ""
+
+#: ../appindicator_gui.cpp:384 ../../../radiotray_ng.cpp:64
+msgid "Stopped"
+msgstr ""
+
+#: ../appindicator_gui.cpp:314
+msgid "Turn Off"
+msgstr ""
+
+#: ../appindicator_gui.cpp:296
+msgid "Turn On"
+msgstr ""
+
+#: ../appindicator_gui.cpp:264 ../../../radiotray_ng.cpp:589
+#: ../../../radiotray_ng.cpp:632
+msgid "Volume"
+msgstr ""
+
+#: ../appindicator_gui.cpp:421
+msgid "action"
+msgstr ""
+
+#: ../../../radiotray_ng.cpp:353
+msgid "kb/s"
+msgstr ""
+
+#: ../appindicator_gui.cpp:675
+msgid "minute sleep timer started"
+msgstr ""
+
+#: ../appindicator_gui.cpp:399
+msgid "status"
+msgstr ""
+
+#: ../appindicator_gui.cpp:437
+msgid "volume"
+msgstr ""

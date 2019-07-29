@@ -23,6 +23,8 @@
 #include <string>
 #include <iomanip>
 
+#include <rtng_i18n.hpp>
+
 using playlist_t = std::vector<std::string>;
 
 // logging

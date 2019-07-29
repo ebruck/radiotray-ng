@@ -135,6 +135,10 @@ if (LSB_RELEASE_EXECUTABLE)
     install(PROGRAMS  ${PROJECT_BINARY_DIR}/radiotray-ng                            DESTINATION /usr/bin/)
     install(PROGRAMS  ${PROJECT_BINARY_DIR}/rtng-bookmark-editor                    DESTINATION /usr/bin/)
 
+    foreach(LANG ${LANGUAGES})
+        install(DIRECTORY ${PROJECT_BINARY_DIR}/${LANG}/LC_MESSAGES DESTINATION /usr/share/locale/${LANG} OPTIONAL FILES_MATCHING PATTERN *.mo)
+    endforeach(LANG ${LANGUAGES})
+
     include(CPack)
 else()
     message(AUTHOR_WARNING "lsb_release not found! -- packaging disabled")

@@ -122,7 +122,7 @@ endif()
 
 # user agent
 add_custom_command(
-     OUTPUT  rtng_user_agent
+    OUTPUT  rtng_user_agent
     COMMENT "Generating rtng_user_agent.hpp"
     COMMAND ${CMAKE_COMMAND}
         -D PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -136,3 +136,5 @@ add_custom_command(
 )
 
 add_custom_target(user-agent ALL DEPENDS rtng_user_agent)
+
+add_subdirectory(cmake/i18n)

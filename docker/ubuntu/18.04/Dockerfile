@@ -21,4 +21,5 @@ RUN set -ex; \
                    libglibmm-2.4-dev \
                    libwxgtk3.0-dev \
                    libwxgtk3.0-0v5 \
+                   intltool \
         && rm -rf /var/lib/apt/lists/*

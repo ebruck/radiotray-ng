@@ -21,5 +21,6 @@ RUN set -ex; \
                    libglibmm-2.4-dev \
                    libwxgtk3.0-dev \
                    libwxgtk3.0-0v5 \
+                   intltool \
         && wget -qO- "https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C /usr/local \
         && rm -rf /var/lib/apt/lists/*

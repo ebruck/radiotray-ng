@@ -61,7 +61,7 @@ void RadiotrayNG::stop()
 	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE) &&
 		this->config->get_bool(NOTIFICATION_VERBOSE_KEY, DEFAULT_NOTIFICATION_VERBOSE_VALUE))
 	{
-		this->notification.notify("Stopped", this->get_station(), this->notification_image);
+		this->notification.notify(_("Stopped"), this->get_station(), this->notification_image);
 	}
 
 	this->player->stop();
@@ -350,7 +350,7 @@ void RadiotrayNG::on_tags_changed_event_processing(const IEventBus::event& /*ev*
 		{
 			if (!data[TAG_BITRATE].empty())
 			{
-				this->bitrate = std::to_string(lround(std::stoul(data[TAG_BITRATE])/1000.0)) + " kb/s";
+				this->bitrate = std::to_string(lround(std::stoul(data[TAG_BITRATE])/1000.0)) + " " + _("kb/s");
 			}
 		}
 		catch(std::invalid_argument& ex)
@@ -390,7 +390,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 		{
 			if (data[STATE_KEY] == STATE_CONNECTING)
 			{
-				this->notification.notify("Connecting", APP_NAME_DISPLAY, this->notification_image);
+				this->notification.notify(_("Connecting"), APP_NAME_DISPLAY, this->notification_image);
 				return;
 			}
 
@@ -398,7 +398,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 			{
 				const auto station = this->get_station();
 
-				this->notification.notify("Buffering", (station.empty()) ? APP_NAME_DISPLAY : station, this->notification_image);
+				this->notification.notify(_("Buffering"), (station.empty()) ? APP_NAME_DISPLAY : station, this->notification_image);
 				return;
 			}
 		}
@@ -409,7 +409,7 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 void RadiotrayNG::on_station_error_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
 	// always show errors
-	this->notification.notify("Error", data[ERROR_KEY], this->notification_image);
+	this->notification.notify(_("Error"), data[ERROR_KEY], this->notification_image);
 }
 
 
@@ -533,13 +533,13 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 		LOG(error) << "failed to download playlist: " << std.url;
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
-		this->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, "Failed to download playlist");
+		this->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, _("Failed to download playlist"));
 	}
 	else
 	{
 		LOG(error) << "failed to read bookmark: " << group << " : " << station;
 
-		this->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, "Station Error");
+		this->event_bus->publish_only(IEventBus::event::station_error, ERROR_KEY, _("Station Error"));
 	}
 }
 
@@ -586,13 +586,13 @@ void RadiotrayNG::volume_down_msg()
 
 void RadiotrayNG::mute()
 {
-    std::string msg{"Volume: " + this->volume + "% "};
+    std::string msg  = std::string(_("Volume")) + ": " + this->volume + "% ";
 
     if (!this->player->is_muted())
     {
         this->player->mute();
 
-        msg += "(Mute)";
+        msg += _("(Mute)");
     }
     else
     {
@@ -629,7 +629,7 @@ void RadiotrayNG::display_volume_level()
     if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
     {
         std::string volume_str =
-            "Volume: " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
+            std::string (_("Volume")) + ": " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
         this->notification.notify(volume_str, APP_NAME_DISPLAY,
             radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
@@ -644,7 +644,7 @@ bool RadiotrayNG::reload_bookmarks()
 	if (result)
 	{
 		// always show...
-		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
+		this->notification.notify(_("Bookmarks Reloaded"), APP_NAME_DISPLAY,
 			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 
 		// force reloading of current groups station list...
@@ -653,7 +653,7 @@ bool RadiotrayNG::reload_bookmarks()
 	else
 	{
 		// always show...
-		this->notification.notify("Bookmarks Reload Failed", APP_NAME_DISPLAY,
+		this->notification.notify(_("Bookmarks Reload Failed"), APP_NAME_DISPLAY,
 			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
 	}
 

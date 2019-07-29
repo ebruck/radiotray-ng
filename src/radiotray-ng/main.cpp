@@ -41,6 +41,7 @@
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/program_options.hpp>
 
+#include <locale.h>
 
 void init_logging(std::shared_ptr<IConfig> config)
 {
@@ -230,7 +231,21 @@ bool process_command_line_args(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	if (!process_command_line_args(argc, argv))
+    std::locale::global(std::locale(""));
+
+#if HAVE_GETTEXT
+    const char * i18n_domain = GETTEXT_DOMAIN;
+
+#ifndef NDEBUG
+    // under debug build search .mo files in cwd
+    bindtextdomain (i18n_domain, ".");
+#endif
+
+    bind_textdomain_codeset(i18n_domain, "UTF-8");
+    textdomain (i18n_domain);
+#endif
+
+    if (!process_command_line_args(argc, argv))
 	{
 		return 0;
 	}

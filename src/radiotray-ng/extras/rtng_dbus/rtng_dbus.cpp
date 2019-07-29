@@ -254,7 +254,7 @@ void RtngDbus::on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connec
 
 void RtngDbus::dbus_setup()
 {
-	std::locale::global(std::locale(""));
+	//std::locale::global(std::locale(""));
 
 	Gio::init();
 

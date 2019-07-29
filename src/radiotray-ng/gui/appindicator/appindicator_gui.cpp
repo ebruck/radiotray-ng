@@ -21,7 +21,6 @@
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <rtng_user_agent.hpp>
 
-
 AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_ptr<IRadioTrayNG> radiotray_ng,
 	                             std::shared_ptr<IBookmarks> bookmarks, std::shared_ptr<IEventBus> event_bus)
 	: radiotray_ng(std::move(radiotray_ng))
@@ -262,14 +261,14 @@ void AppindicatorGui::add_separator(GtkWidget* menu)
 
 void AppindicatorGui::update_volume_menu_item()
 {
-	std::string volume_info{std::string("Volume: ") + this->radiotray_ng->get_volume() + std::string("%")};
+	std::string volume_info{std::string(_("Volume")) + ": " + this->radiotray_ng->get_volume() + "%"};
 
 	if (this->config->get_bool(TAG_INFO_VERBOSE_KEY, DEFAULT_TAG_INFO_VERBOSE_VALUE))
 	{
 		std::string bitrate = this->radiotray_ng->get_bitrate();
 		if (!bitrate.empty())
 		{
-			std::string bitrate_info{std::string(", Bitrate: ") + bitrate};
+			std::string bitrate_info{std::string(", ")+ _("Bitrate") + ": " + bitrate};
 
 			volume_info += bitrate_info;
 		}
@@ -277,7 +276,7 @@ void AppindicatorGui::update_volume_menu_item()
 		std::string codec = this->radiotray_ng->get_codec();
 		if (!codec.empty())
 		{
-			std::string codec_info{std::string("\nCodec: ") + codec};
+			std::string codec_info{std::string("\n") + _("Codec") + ": " + codec};
 
 			volume_info += codec_info;
 		}
@@ -294,7 +293,7 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 	if (state == STATE_STOPPED)
 	{
-		action_text = "Turn On";
+		action_text = _("Turn On");
 
 		if (!this->radiotray_ng->get_station().empty())
 		{
@@ -312,7 +311,7 @@ void AppindicatorGui::update_action_menu_item(const std::string& state)
 
 	if (state == STATE_PLAYING || state == STATE_BUFFERING)
 	{
-		action_text = "Turn Off";
+		action_text = _("Turn Off");
 
 		if (!this->radiotray_ng->get_station().empty())
 		{
@@ -339,7 +338,7 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 		// at least a title will be there...
 		if (title.empty())
 		{
-			status_text = std::string("Playing");
+			status_text = std::string(_("Playing"));
 
 			if (copy_enabled)
 			{
@@ -382,7 +381,7 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 
 	if (state == STATE_STOPPED)
 	{
-		gtk_menu_item_set_label(GTK_MENU_ITEM(this->status_menu_item), std::string("Stopped").c_str());
+		gtk_menu_item_set_label(GTK_MENU_ITEM(this->status_menu_item), _("Stopped"));
 
 		if (copy_enabled)
 		{
@@ -397,7 +396,7 @@ void AppindicatorGui::build_status_menu_item()
 {
 	this->add_separator(this->menu);
 
-	this->status_menu_item = gtk_menu_item_new_with_label("status");
+	this->status_menu_item = gtk_menu_item_new_with_label(_("status"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->status_menu_item);
 	gtk_widget_set_sensitive(this->status_menu_item, FALSE);
 
@@ -419,7 +418,7 @@ void AppindicatorGui::build_status_menu_item()
 
 void AppindicatorGui::build_action_menu_item()
 {
-	this->action_menu_item = gtk_menu_item_new_with_label("action");
+	this->action_menu_item = gtk_menu_item_new_with_label(_("action"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->action_menu_item);
 	gtk_widget_show(this->action_menu_item);
 
@@ -435,7 +434,7 @@ void AppindicatorGui::build_volume_menu_item()
 {
 	this->add_separator(this->menu);
 
-	this->volume_menu_item = gtk_menu_item_new_with_label("volume");
+	this->volume_menu_item = gtk_menu_item_new_with_label(_("volume"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), this->volume_menu_item);
 	gtk_widget_show(this->volume_menu_item);
 
@@ -447,19 +446,19 @@ void AppindicatorGui::build_preferences_menu()
 {
 	this->add_separator(this->menu);
 
-	GtkWidget* menu_items = gtk_menu_item_new_with_label("Preferences");
+	GtkWidget* menu_items = gtk_menu_item_new_with_label(_("Preferences"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menu), menu_items);
 	gtk_widget_show(menu_items);
 
 	GtkWidget* sub_menu_items = gtk_menu_new();
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_items), sub_menu_items);
 
-	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label("Bookmark Editor...");
+	GtkWidget* sub_menu_item = gtk_menu_item_new_with_label(_("Bookmark Editor..."));
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_bookmark_editor_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
 
-	sub_menu_item = gtk_menu_item_new_with_label("Reload Bookmarks");
+	sub_menu_item = gtk_menu_item_new_with_label(_("Reload Bookmarks"));
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
@@ -468,7 +467,7 @@ void AppindicatorGui::build_preferences_menu()
 
 void AppindicatorGui::build_sleep_timer_menu_item()
 {
-	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label("Sleep Timer");
+	this->sleep_timer_menu_item = (GtkCheckMenuItem*)gtk_check_menu_item_new_with_label(_("Sleep Timer"));
 
 	// toggle before we hook up callback as a reload loses this state...
 	gtk_check_menu_item_set_active(this->sleep_timer_menu_item, this->sleep_timer_id);
@@ -481,7 +480,7 @@ void AppindicatorGui::build_sleep_timer_menu_item()
 
 void AppindicatorGui::build_about_menu_item()
 {
-	auto menu_items = gtk_menu_item_new_with_label("About");
+	auto menu_items = gtk_menu_item_new_with_label(_("About"));
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", G_CALLBACK(&AppindicatorGui::on_about_menu_item), this);
 	gtk_widget_show(menu_items);
@@ -490,7 +489,7 @@ void AppindicatorGui::build_about_menu_item()
 
 void AppindicatorGui::build_quit_menu_item()
 {
-	auto menu_items = gtk_menu_item_new_with_label("Quit");
+	auto menu_items = gtk_menu_item_new_with_label(_("Quit"));
 	gtk_menu_shell_append(GTK_MENU_SHELL (this->menu), menu_items);
 	g_signal_connect(menu_items, "activate", GCallback(gtk_main_quit), nullptr);
 	gtk_widget_show(menu_items);
@@ -577,7 +576,7 @@ gboolean AppindicatorGui::on_timer_event(gpointer data)
 
 	gtk_check_menu_item_set_active(app->sleep_timer_menu_item, FALSE);
 
-	app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer expired");
+	app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, _("Sleep timer expired"));
 
 	return FALSE;
 }
@@ -589,7 +588,7 @@ gboolean AppindicatorGui::on_file_monitor_timer_event(gpointer data)
 
 	if (app->bookmarks_monitor->changed())
 	{
-		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Bookmarks changed on disk");
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, _("Bookmarks changed on disk"));
 	}
 
 	return TRUE;
@@ -598,18 +597,18 @@ gboolean AppindicatorGui::on_file_monitor_timer_event(gpointer data)
 
 bool AppindicatorGui::sleep_timer_dialog()
 {
-	auto dialog = gtk_dialog_new_with_buttons("Sleep Timer",
+	auto dialog = gtk_dialog_new_with_buttons(_("Sleep Timer"),
 		nullptr,
 		GTK_DIALOG_DESTROY_WITH_PARENT,
-		"Cancel",
+		_("Cancel"),
 		GTK_RESPONSE_REJECT,
-		"OK",
+		_("OK"),
 		GTK_RESPONSE_ACCEPT,
 		nullptr);
 
 	auto entry = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
-	auto label = gtk_label_new("Minutes:");
+	auto label = gtk_label_new((std::string(_("Minutes")) + ":").c_str());
 	auto hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
 	gtk_entry_set_text(GTK_ENTRY(entry), this->config->get_string(SLEEP_TIMER_KEY, std::to_string(DEFAULT_SLEEP_TIMER_VALUE)).c_str());
@@ -636,7 +635,7 @@ bool AppindicatorGui::sleep_timer_dialog()
 			}
 			catch(std::invalid_argument& ex)
 			{
-				this->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Invalid sleep timer");
+				this->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, _("Invalid sleep timer"));
 
 				return false;
 			}
@@ -666,14 +665,14 @@ void AppindicatorGui::on_sleep_timer_menu_item(GtkWidget* /*widget*/, gpointer d
 
 		app->sleep_timer_id = 0;
 
-		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Sleep timer stopped");
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, _("Sleep timer stopped"));
 	}
 	else
 	{
 		if (app->sleep_timer_dialog())
 		{
 			app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
-				std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " minute sleep timer started");
+				std::to_string(app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE)) + " " + _("minute sleep timer started"));
 
 			app->sleep_timer_id = g_timeout_add(
 				app->config->get_uint32(SLEEP_TIMER_KEY, DEFAULT_SLEEP_TIMER_VALUE) * 60000, on_timer_event, data);
@@ -776,8 +775,7 @@ void AppindicatorGui::reload_bookmarks()
 
 void AppindicatorGui::run(int argc, char* argv[])
 {
-	gtk_init(&argc, &argv);
-
+    gtk_init(&argc, &argv);
 	const std::string icon_off{radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY, DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE))};
 
 	this->appindicator = app_indicator_new(APP_NAME, icon_off.c_str(), APP_INDICATOR_CATEGORY_APPLICATION_STATUS);

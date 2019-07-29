@@ -1,0 +1,153 @@
+# Russian translations for PACKAGE package.
+# Copyright (C) 2019 radiotray-ng team
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://github.com/ebruck/radiotray-ng/issues\n"
+"POT-Creation-Date: 2019-07-30 01:11+0300\n"
+"PO-Revision-Date: 2019-07-30 01:12+0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 2.2.3\n"
+
+#: ../../../radiotray_ng.cpp:595
+msgid "(Mute)"
+msgstr "(Выкл.)"
+
+#: ../appindicator_gui.cpp:483
+msgid "About"
+msgstr "О программе"
+
+#: ../appindicator_gui.cpp:271
+msgid "Bitrate"
+msgstr "Битрейт"
+
+#: ../appindicator_gui.cpp:456
+msgid "Bookmark Editor..."
+msgstr "Редактор закладок..."
+
+#: ../../../radiotray_ng.cpp:656
+msgid "Bookmarks Reload Failed"
+msgstr "Ошибка при чтении закладок"
+
+#: ../../../radiotray_ng.cpp:647
+msgid "Bookmarks Reloaded"
+msgstr "Закладки обновлены"
+
+#: ../appindicator_gui.cpp:591
+msgid "Bookmarks changed on disk"
+msgstr "Закладки изменены на диске"
+
+#: ../../../radiotray_ng.cpp:401
+msgid "Buffering"
+msgstr "Буферизация"
+
+#: ../appindicator_gui.cpp:603
+msgid "Cancel"
+msgstr "Отмена"
+
+#: ../appindicator_gui.cpp:279
+msgid "Codec"
+msgstr "Кодек"
+
+#: ../../../radiotray_ng.cpp:393
+msgid "Connecting"
+msgstr "Соединение"
+
+#: ../../../radiotray_ng.cpp:412
+msgid "Error"
+msgstr "Ошибка"
+
+#: ../../../radiotray_ng.cpp:536
+msgid "Failed to download playlist"
+msgstr "Ошибка при загрузке плейлиста"
+
+#: ../appindicator_gui.cpp:638
+msgid "Invalid sleep timer"
+msgstr "Неверный таймер сна"
+
+#: ../appindicator_gui.cpp:611
+msgid "Minutes"
+msgstr "Минут"
+
+#: ../appindicator_gui.cpp:605
+msgid "OK"
+msgstr "OK"
+
+#: ../appindicator_gui.cpp:341
+msgid "Playing"
+msgstr "Играет"
+
+#: ../appindicator_gui.cpp:449
+msgid "Preferences"
+msgstr "Настройки"
+
+#: ../appindicator_gui.cpp:492
+msgid "Quit"
+msgstr "Выйти"
+
+#: ../appindicator_gui.cpp:461
+msgid "Reload Bookmarks"
+msgstr "Перечитать закладки"
+
+#: ../appindicator_gui.cpp:470 ../appindicator_gui.cpp:600
+msgid "Sleep Timer"
+msgstr "Таймер сна"
+
+#: ../appindicator_gui.cpp:579
+msgid "Sleep timer expired"
+msgstr "Таймер сна истёк"
+
+#: ../appindicator_gui.cpp:668
+msgid "Sleep timer stopped"
+msgstr "Таймер сна остановлен"
+
+#: ../../../radiotray_ng.cpp:542
+msgid "Station Error"
+msgstr "Ошибка станции"
+
+#: ../appindicator_gui.cpp:384 ../../../radiotray_ng.cpp:64
+msgid "Stopped"
+msgstr "Остановлено"
+
+#: ../appindicator_gui.cpp:314
+msgid "Turn Off"
+msgstr "Выключить"
+
+#: ../appindicator_gui.cpp:296
+msgid "Turn On"
+msgstr "Включить"
+
+#: ../appindicator_gui.cpp:264 ../../../radiotray_ng.cpp:589
+#: ../../../radiotray_ng.cpp:632
+msgid "Volume"
+msgstr "Громкость"
+
+#: ../appindicator_gui.cpp:421
+msgid "action"
+msgstr "действие"
+
+#: ../../../radiotray_ng.cpp:353
+msgid "kb/s"
+msgstr "кб/с"
+
+#: ../appindicator_gui.cpp:675
+msgid "minute sleep timer started"
+msgstr "минут таймер сна запущен"
+
+#: ../appindicator_gui.cpp:399
+msgid "status"
+msgstr "статус"
+
+#: ../appindicator_gui.cpp:437
+msgid "volume"
+msgstr "громкость"

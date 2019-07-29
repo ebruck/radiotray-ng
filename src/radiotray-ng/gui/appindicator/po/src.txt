@@ -1,0 +1,2 @@
+../appindicator_gui.cpp
+../../../radiotray_ng.cpp

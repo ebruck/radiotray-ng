@@ -25,6 +25,9 @@
 #include <libappindicator/app-indicator.h>
 #include <memory>
 
+#include <libintl.h>
+#include <locale.h>
+
 class IConfig;
 class IBookmarks;
 class IPlayer;
