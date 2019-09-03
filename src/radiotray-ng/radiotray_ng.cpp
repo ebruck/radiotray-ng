@@ -586,24 +586,24 @@ void RadiotrayNG::volume_down_msg()
 
 void RadiotrayNG::mute()
 {
-    std::string msg  = std::string(_("Volume")) + ": " + this->volume + "% ";
+	std::string msg  = std::string(_("Volume")) + ": " + this->volume + "% ";
 
-    if (!this->player->is_muted())
-    {
-        this->player->mute();
+	if (!this->player->is_muted())
+	{
+		this->player->mute();
 
-        msg += _("(Mute)");
-    }
-    else
-    {
-        this->player->unmute();
-    }
+		msg += _("(Mute)");
+	}
+	else
+	{
+		this->player->unmute();
+	}
 
-    if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
-    {
-        this->notification.notify(msg, APP_NAME_DISPLAY,
-            radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
-    }
+	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+	{
+		this->notification.notify(msg, APP_NAME_DISPLAY,
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+	}
 }
 
 
@@ -626,14 +626,14 @@ void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 
 void RadiotrayNG::display_volume_level()
 {
-    if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
-    {
-        std::string volume_str =
-            std::string (_("Volume")) + ": " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
+	if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+	{
+		std::string volume_str =
+			std::string (_("Volume")) + ": " + std::to_string(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE)) + "%";
 
-        this->notification.notify(volume_str, APP_NAME_DISPLAY,
-            radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
-    }
+		this->notification.notify(volume_str, APP_NAME_DISPLAY,
+			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+	}
 }
 
 

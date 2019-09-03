@@ -22,7 +22,7 @@
 #include <rtng_user_agent.hpp>
 
 AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_ptr<IRadioTrayNG> radiotray_ng,
-	                             std::shared_ptr<IBookmarks> bookmarks, std::shared_ptr<IEventBus> event_bus)
+								 std::shared_ptr<IBookmarks> bookmarks, std::shared_ptr<IEventBus> event_bus)
 	: radiotray_ng(std::move(radiotray_ng))
 	, bookmarks(std::move(bookmarks))
 	, config(std::move(config))
@@ -775,7 +775,7 @@ void AppindicatorGui::reload_bookmarks()
 
 void AppindicatorGui::run(int argc, char* argv[])
 {
-    gtk_init(&argc, &argv);
+	gtk_init(&argc, &argv);
 	const std::string icon_off{radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_ICON_OFF_KEY, DEFAULT_RADIOTRAY_NG_ICON_OFF_VALUE))};
 
 	this->appindicator = app_indicator_new(APP_NAME, icon_off.c_str(), APP_INDICATOR_CATEGORY_APPLICATION_STATUS);

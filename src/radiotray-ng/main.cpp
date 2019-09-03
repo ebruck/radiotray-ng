@@ -231,21 +231,21 @@ bool process_command_line_args(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::locale::global(std::locale(""));
+	std::locale::global(std::locale(""));
 
 #if HAVE_GETTEXT
-    const char * i18n_domain = GETTEXT_DOMAIN;
+	const char * i18n_domain = GETTEXT_DOMAIN;
 
 #ifndef NDEBUG
-    // under debug build search .mo files in cwd
-    bindtextdomain (i18n_domain, ".");
+	// under debug build search .mo files in cwd
+	bindtextdomain (i18n_domain, ".");
 #endif
 
-    bind_textdomain_codeset(i18n_domain, "UTF-8");
-    textdomain (i18n_domain);
+	bind_textdomain_codeset(i18n_domain, "UTF-8");
+	textdomain (i18n_domain);
 #endif
 
-    if (!process_command_line_args(argc, argv))
+	if (!process_command_line_args(argc, argv))
 	{
 		return 0;
 	}
