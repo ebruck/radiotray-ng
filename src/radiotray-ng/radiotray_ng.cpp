@@ -510,7 +510,7 @@ void RadiotrayNG::play(const std::string& group, const std::string& station)
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_CONNECTING);
 
-		if (PlaylistDownloader(this->config).download_playlist(std.url, pls))
+		if (PlaylistDownloader(this->config).download_playlist(std, pls))
 		{
 			if (group != this->play_url_group)
 			{

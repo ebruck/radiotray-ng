@@ -394,7 +394,7 @@ IBookmarks::group_data_t Bookmarks::operator[](const size_t group_index)
 	for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 	{
 		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
-			this->get_station_notifications(station)});
+			this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 	}
 
 	return stations;
@@ -412,7 +412,7 @@ bool Bookmarks::get_group_stations(const std::string& group_name, std::vector<IB
 		for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 		{
 			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
-				this->get_station_notifications(station)});
+				this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 		}
 
 		return true;
@@ -435,6 +435,15 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 			station_data.url   = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY].asString();
 			station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
 			station_data.notifications = this->get_station_notifications(this->bookmarks[group_index][STATIONS_KEY][station_index]);
+
+			if (this->bookmarks[group_index][STATIONS_KEY][station_index].isMember(STATION_DIRECT_KEY))
+			{
+				station_data.direct = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_DIRECT_KEY].asBool();
+			}
+			else
+			{
+				station_data.direct = false;
+			}
 
 			// use group image if not overridden
 			if (station_data.image.empty())

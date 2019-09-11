@@ -35,11 +35,11 @@ public:
 	/**
 	 * Downloads playlist and runs the output through the list of supported decoders.
 	 *
-	 * @param url      playlist location
+	 * @param std      station data
 	 * @param playlist playlist
 	 * @return true if download and parsing was successful
 	 */
-	bool download_playlist(const std::string& url, playlist_t& playlist);
+	bool download_playlist(const IBookmarks::station_data_t& std, playlist_t& playlist);
 
 private:
 	std::shared_ptr<IPlaylistDecoder> inspect(const std::string& content_type, const std::string& content);
