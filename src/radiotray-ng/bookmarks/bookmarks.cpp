@@ -132,9 +132,14 @@ bool Bookmarks::add_group(const std::string& group_name, const std::string& imag
 
 	Json::Value& value = this->bookmarks.append(Json::Value(Json::objectValue));
 
-	value[GROUP_KEY]       = group_name;
-	value[GROUP_IMAGE_KEY] = image;
-	value[STATIONS_KEY]    = Json::Value(Json::arrayValue);
+	value[GROUP_KEY] = group_name;
+
+	if (!image.empty())
+	{
+		value[GROUP_IMAGE_KEY] = image;
+	}
+
+	value[STATIONS_KEY] = Json::Value(Json::arrayValue);
 
 	return true;
 }
@@ -161,7 +166,13 @@ bool Bookmarks::update_group(const std::string& group_name, const std::string& n
 
 	if (this->find_group(group_name, group_index))
 	{
-		this->bookmarks[group_index][GROUP_IMAGE_KEY] = new_group_image;
+		this->bookmarks[group_index].removeMember(GROUP_IMAGE_KEY);
+
+		if (!new_group_image.empty())
+		{
+			this->bookmarks[group_index][GROUP_IMAGE_KEY] = new_group_image;
+		}
+
 		return true;
 	}
 
@@ -200,8 +211,16 @@ bool Bookmarks::add_station(const std::string& group_name, const std::string& st
 
 			value[STATION_NAME_KEY]  = station_name;
 			value[STATION_URL_KEY]   = station_url;
-			value[STATION_IMAGE_KEY] = station_image;
-			value[STATION_NOTIFICATIONS_KEY] = notifications;
+
+			if (!station_image.empty())
+			{
+				value[STATION_IMAGE_KEY] = station_image;
+			}
+
+			if (!notifications)
+			{
+				value[STATION_NOTIFICATIONS_KEY] = notifications;
+			}
 
 			this->bookmarks[group_index][STATIONS_KEY].append(value);
 
@@ -266,9 +285,19 @@ bool Bookmarks::update_station(const std::string& group_name, const std::string&
 
 		if (this->find_station(group_index, station_name, station_index))
 		{
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY]   = new_station_url;
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NOTIFICATIONS_KEY] = new_notifications;
+			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY] = new_station_url;
+
+			this->bookmarks[group_index][STATIONS_KEY][station_index].removeMember(STATION_IMAGE_KEY);
+			if (!new_station_image.empty())
+			{
+				this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
+			}
+
+			this->bookmarks[group_index][STATIONS_KEY][station_index].removeMember(STATION_NOTIFICATIONS_KEY);
+			if (!new_notifications)
+			{
+				this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NOTIFICATIONS_KEY] = new_notifications;
+			}
 
 			return true;
 		}
@@ -389,11 +418,15 @@ IBookmarks::group_data_t Bookmarks::operator[](const size_t group_index)
 	IBookmarks::group_data_t stations;
 
 	stations.group = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_KEY].asString();
-	stations.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+
+	if (this->bookmarks[Json::ArrayIndex(group_index)].isMember(GROUP_IMAGE_KEY))
+	{
+		stations.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+	}
 
 	for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 	{
-		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
+		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), (station.isMember(STATION_IMAGE_KEY) ? station[STATION_IMAGE_KEY].asString() : ""),
 			this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 	}
 
@@ -411,7 +444,7 @@ bool Bookmarks::get_group_stations(const std::string& group_name, std::vector<IB
 
 		for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 		{
-			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
+			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station.isMember(STATION_IMAGE_KEY) ? station[STATION_IMAGE_KEY].asString() : "",
 				this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 		}
 
@@ -433,7 +466,16 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 		{
 			station_data.name  = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NAME_KEY].asString();
 			station_data.url   = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY].asString();
-			station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
+
+			if (this->bookmarks[group_index][STATIONS_KEY][station_index].isMember(STATION_IMAGE_KEY))
+			{
+				station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
+			}
+			else
+			{
+				station_data.image.clear();
+			}
+
 			station_data.notifications = this->get_station_notifications(this->bookmarks[group_index][STATIONS_KEY][station_index]);
 
 			if (this->bookmarks[group_index][STATIONS_KEY][station_index].isMember(STATION_DIRECT_KEY))
@@ -448,7 +490,10 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 			// use group image if not overridden
 			if (station_data.image.empty())
 			{
-				station_data.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+				if (this->bookmarks[Json::ArrayIndex(group_index)].isMember(GROUP_IMAGE_KEY))
+				{
+					station_data.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+				}
 			}
 
 			// clean up...
@@ -535,7 +580,7 @@ bool Bookmarks::add_station_from_json(const std::string& group_name, const std::
 		return false;
 	}
 
-	if (!station.isMember(STATION_NAME_KEY)|| !station.isMember(STATION_URL_KEY) ||	!station.isMember(STATION_IMAGE_KEY))
+	if (!station.isMember(STATION_NAME_KEY) || !station.isMember(STATION_URL_KEY))
 	{
 		LOG(warning) << "Insufficient station data ...\n<<" << json << "<<";
 		return false;
