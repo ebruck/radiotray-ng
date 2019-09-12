@@ -552,8 +552,10 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 		{
 			auto station = this->bookmarks[group_index][STATIONS_KEY][station_index];
 
-			// may not be there...
-			station[NOTIFICATION_KEY] = this->get_station_notifications(station);
+			if (!this->get_station_notifications(station))
+			{
+				station[NOTIFICATION_KEY] = false;
+			}
 
 			Json::StreamWriterBuilder wbuilder;
 			json = Json::writeString(wbuilder, station);
