@@ -30,6 +30,19 @@ endif(CCACHE_FOUND)
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Boost     REQUIRED filesystem system log program_options thread)
+
+# set up wxWidgets to prefer gtk3
+execute_process(COMMAND wx-config --selected-config --toolkit=gtk3
+		RESULT_VARIABLE ret
+		OUTPUT_QUIET)
+if(ret EQUAL "0")
+	message(STATUS "wxWidgets: Found gtk3 version, using it.")
+	set(wxWidgets_CONFIG_OPTIONS_DEFAULT "--toolkit=gtk3")
+else()
+	message(STATUS "wxWidgets: No gtk3 version found, falling back to default (likely gtk2)")
+endif()
+unset(ret)
+set(wxWidgets_CONFIG_OPTIONS "${wxWidgets_CONFIG_OPTIONS_DEFAULT}" ON STRING "wxWidgets toolkit options")
 find_package(wxWidgets REQUIRED core base adv)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
