@@ -54,7 +54,13 @@ if (LSB_RELEASE_EXECUTABLE)
         # no libcurl4 on Debian Stretch
         # https://bugs.launchpad.net/ubuntu/+source/curl/+bug/1754294
         if (${RELEASE} STREQUAL "16.04" OR ${CODENAME} STREQUAL "stretch")
-           string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+            string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+        endif()
+
+        # official packages for older distros will continue to use gtk2 for the editor
+        if (${RELEASE} STREQUAL "16.04" OR ${RELEASE} STREQUAL "18.04" OR ${RELEASE} STREQUAL "19.04" OR ${CODENAME} STREQUAL "stretch")
+            message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
+            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.0-0v5" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
