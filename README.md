@@ -232,6 +232,10 @@ Download a release or clone the repo and build the latest Debian package.
 
 https://github.com/ebruck/radiotray-ng/releases
 
+## Fedora Install ##
+```
+$ dnf install radiotray-ng
+``` 
 
 ## To Build on Ubuntu: ##
 
