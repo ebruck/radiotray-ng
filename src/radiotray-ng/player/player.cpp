@@ -20,13 +20,8 @@
 
 
 Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
-	: pipeline(nullptr)
-	, souphttpsrc(nullptr)
-	, clock(nullptr)
-	, clock_id(nullptr)
-	, event_bus(std::move(event_bus))
+	: event_bus(std::move(event_bus))
 	, config(std::move(config))
-	, gst_bus(nullptr)
 {
 	LOG(info) << "starting gstreamer";
 
@@ -39,6 +34,27 @@ Player::~Player()
 	LOG(info) << "stopping gstreamer";
 
 	this->gst_stop();
+}
+
+
+void Player::update_volume()
+{
+	gdouble volume;
+	g_object_get(G_OBJECT(this->pipeline), "volume", &volume, NULL);
+
+	// update volume as it may of been changed using another application...
+	const uint32_t new_volume = std::round(volume * 100);
+
+	// only save if it's different...
+	if (this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE) != new_volume)
+	{
+		LOG(debug) << "volume level changed: " << new_volume;
+
+		this->config->set_uint32(VOLUME_LEVEL_KEY, new_volume);
+		this->config->save();
+
+		this->event_bus->publish_only(IEventBus::event::volume_changed, VOLUME_LEVEL_KEY, std::to_string(new_volume));
+	}
 }
 
 
@@ -62,7 +78,14 @@ bool Player::play_next()
 
 		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size * buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
-		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+		if (!this->has_played)
+		{
+			const auto volume = this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE);
+
+			LOG(debug) << "setting startup volume: " << volume;
+
+			this->volume(volume);
+		}
 
 		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
 		{
@@ -123,10 +146,19 @@ void Player::stop()
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
-			LOG(info) << "canceling outstanding clock request";
+			LOG(debug) << "canceling outstanding timeout clock request";
 			gst_clock_id_unschedule(this->clock_id);
 			gst_clock_id_unref(this->clock_id);
 			this->clock_id = nullptr;
+		}
+
+		if (this->volume_clock_id)
+		{
+			LOG(debug) << "canceling outstanding volume clock request";
+			gst_clock_id_unschedule(this->volume_clock_id);
+			gst_clock_id_unref(this->volume_clock_id);
+			this->volume_clock_id = nullptr;
+			this->update_volume();
 		}
 
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
@@ -170,6 +202,8 @@ bool Player::is_muted()
 
 void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
 {
+	LOG(debug) << "notify_source_cb";
+
 	// set our user-agent...
 	if (g_object_class_find_property(G_OBJECT_GET_CLASS(obj), "source"))
 	{
@@ -203,6 +237,16 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 		gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
 		gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
 	}
+
+	return TRUE;
+}
+
+
+gboolean Player::volume_check_timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
+{
+	auto player{static_cast<Player*>(user_data)};
+
+	player->update_volume();
 
 	return TRUE;
 }
@@ -313,12 +357,19 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			GstState old_state;
 			GstState new_state;
 			gst_message_parse_state_changed(message, &old_state, &new_state, nullptr);
+			player->has_played = true;
 
 			if (GST_MESSAGE_SRC(message) == GST_OBJECT(player->pipeline))
 			{
 				if (new_state == GST_STATE_PLAYING)
 				{
 					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
+
+					if (!player->volume_clock_id)
+					{
+						player->volume_clock_id = gst_clock_new_periodic_id(player->clock, gst_clock_get_time(gst_system_clock_obtain())+GST_SECOND,GST_SECOND);
+						gst_clock_id_wait_async(player->volume_clock_id, static_cast<GstClockCallback>(&Player::volume_check_timer_cb), player, nullptr);
+					}
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{
@@ -459,6 +510,8 @@ void Player::gst_stop()
 		gst_object_unref(this->souphttpsrc);
 
 		gst_object_unref(G_OBJECT(this->clock));
+
+//		gst_object_unref(G_OBJECT(this->volume_check_timer_cb(k));
 
 		gst_deinit();
 	}

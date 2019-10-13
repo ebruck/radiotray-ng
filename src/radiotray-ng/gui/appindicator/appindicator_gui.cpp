@@ -82,8 +82,13 @@ void AppindicatorGui::on_state_event(const IEventBus::event& /*ev*/, IEventBus::
 }
 
 
-void AppindicatorGui::on_volume_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /*data*/)
+void AppindicatorGui::on_volume_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
+	if (data.count(VOLUME_LEVEL_KEY))
+	{
+		this->radiotray_ng->set_volume(data[VOLUME_LEVEL_KEY]);
+	}
+
 	this->update_volume_menu_item();
 }
 
