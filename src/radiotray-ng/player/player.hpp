@@ -48,9 +48,6 @@ private:
 	void gst_stop();
 
 	static gboolean handle_messages_cb(GstBus* bus, GstMessage* message, gpointer user_data);
-
-	static void notify_source_cb(GObject* obj, GParamSpec* param, gpointer user_data);
-
 	static gboolean timer_cb(GstClock* clock, GstClockTime time, GstClockID id, gpointer user_data);
 	static gboolean volume_check_timer_cb(GstClock* clock, GstClockTime time, GstClockID id, gpointer user_data);
 

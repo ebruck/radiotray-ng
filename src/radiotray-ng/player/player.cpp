@@ -16,7 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/player/player.hpp>
-#include <rtng_user_agent.hpp>
+#include <cmath>
 
 
 Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
@@ -200,27 +200,6 @@ bool Player::is_muted()
 }
 
 
-void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
-{
-	LOG(debug) << "notify_source_cb";
-
-	// set our user-agent...
-	if (g_object_class_find_property(G_OBJECT_GET_CLASS(obj), "source"))
-	{
-		GObject* source_element;
-		g_object_get(obj, "source", &source_element, NULL);
-
-		// todo: detect distro at runtime instead of what we were compiled on...
-		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source_element), "user-agent"))
-		{
-			g_object_set(source_element, "user-agent", RTNG_USER_AGENT, NULL);
-		}
-
-		g_object_unref(source_element);
-	}
-}
-
-
 gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
 {
 	auto player{static_cast<Player*>(user_data)};
@@ -367,7 +346,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 					if (!player->volume_clock_id)
 					{
-						player->volume_clock_id = gst_clock_new_periodic_id(player->clock, gst_clock_get_time(gst_system_clock_obtain())+GST_SECOND,GST_SECOND);
+						player->volume_clock_id = gst_clock_new_periodic_id(player->clock, gst_clock_get_time(gst_system_clock_obtain()) + GST_SECOND, GST_SECOND);
 						gst_clock_id_wait_async(player->volume_clock_id, static_cast<GstClockCallback>(&Player::volume_check_timer_cb), player, nullptr);
 					}
 				}
@@ -492,8 +471,6 @@ void Player::gst_start()
 	// setup callbacks...
 	this->gst_bus = gst_element_get_bus(this->pipeline);
 	gst_bus_add_watch(this->gst_bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
-
-	g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
 }
 
 
@@ -510,8 +487,6 @@ void Player::gst_stop()
 		gst_object_unref(this->souphttpsrc);
 
 		gst_object_unref(G_OBJECT(this->clock));
-
-//		gst_object_unref(G_OBJECT(this->volume_check_timer_cb(k));
 
 		gst_deinit();
 	}
