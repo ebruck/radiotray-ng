@@ -614,12 +614,7 @@ void RadiotrayNG::set_and_save_volume(uint32_t new_volume)
 	if (new_volume != volume)
 	{
 		this->volume = std::to_string(new_volume);
-
 		this->player->volume(new_volume);
-
-		LOG(debug) << "volume: " << this->volume;
-
-		this->config->save();
 	}
 }
 

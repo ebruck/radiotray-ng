@@ -49,19 +49,16 @@ private:
 
 	static gboolean handle_messages_cb(GstBus* bus, GstMessage* message, gpointer user_data);
 	static gboolean timer_cb(GstClock* clock, GstClockTime time, GstClockID id, gpointer user_data);
-	static gboolean volume_check_timer_cb(GstClock* clock, GstClockTime time, GstClockID id, gpointer user_data);
+	static gboolean notify_volume_cb(GstBus* bus, GstMessage* message, gpointer user_data);
 
 	static void for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer user_data);
 
 	bool play_next();
 
-	void update_volume();
-
 	GstElement* pipeline = nullptr;
 	GstElement* souphttpsrc = nullptr;
 	GstClock*   clock = nullptr;
 	GstClockID  clock_id = nullptr;
-	GstClockID  volume_clock_id = nullptr;
 	bool        buffering = false;
 	bool        has_played = false;
 

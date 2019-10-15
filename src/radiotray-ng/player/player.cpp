@@ -37,27 +37,6 @@ Player::~Player()
 }
 
 
-void Player::update_volume()
-{
-	gdouble volume;
-	g_object_get(G_OBJECT(this->pipeline), "volume", &volume, NULL);
-
-	// update volume as it may of been changed using another application...
-	const uint32_t new_volume = std::round(volume * 100);
-
-	// only save if it's different...
-	if (this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE) != new_volume)
-	{
-		LOG(debug) << "volume level changed: " << new_volume;
-
-		this->config->set_uint32(VOLUME_LEVEL_KEY, new_volume);
-		this->config->save();
-
-		this->event_bus->publish_only(IEventBus::event::volume_changed, VOLUME_LEVEL_KEY, std::to_string(new_volume));
-	}
-}
-
-
 bool Player::play_next()
 {
 	this->stop();
@@ -152,15 +131,6 @@ void Player::stop()
 			this->clock_id = nullptr;
 		}
 
-		if (this->volume_clock_id)
-		{
-			LOG(debug) << "canceling outstanding volume clock request";
-			gst_clock_id_unschedule(this->volume_clock_id);
-			gst_clock_id_unref(this->volume_clock_id);
-			this->volume_clock_id = nullptr;
-			this->update_volume();
-		}
-
 		this->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_STOPPED);
 	}
 }
@@ -221,11 +191,26 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 }
 
 
-gboolean Player::volume_check_timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
+gboolean Player::notify_volume_cb(GstBus* /*bus*/, GstMessage* /*message*/, gpointer user_data)
 {
 	auto player{static_cast<Player*>(user_data)};
 
-	player->update_volume();
+	gdouble volume;
+	g_object_get(G_OBJECT(player->pipeline), "volume", &volume, NULL);
+
+	// update volume as it may of been changed using another application...
+	const uint32_t new_volume = std::round(volume * 100);
+
+	// only save if it's different...
+	if (player->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE) != new_volume)
+	{
+		LOG(debug) << "volume level changed: " << new_volume;
+
+		player->config->set_uint32(VOLUME_LEVEL_KEY, new_volume);
+		player->config->save();
+
+		player->event_bus->publish_only(IEventBus::event::volume_changed, VOLUME_LEVEL_KEY, std::to_string(new_volume));
+	}
 
 	return TRUE;
 }
@@ -343,12 +328,6 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 				if (new_state == GST_STATE_PLAYING)
 				{
 					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_PLAYING);
-
-					if (!player->volume_clock_id)
-					{
-						player->volume_clock_id = gst_clock_new_periodic_id(player->clock, gst_clock_get_time(gst_system_clock_obtain()) + GST_SECOND, GST_SECOND);
-						gst_clock_id_wait_async(player->volume_clock_id, static_cast<GstClockCallback>(&Player::volume_check_timer_cb), player, nullptr);
-					}
 				}
 				else if (new_state == GST_STATE_PAUSED)
 				{
@@ -471,6 +450,7 @@ void Player::gst_start()
 	// setup callbacks...
 	this->gst_bus = gst_element_get_bus(this->pipeline);
 	gst_bus_add_watch(this->gst_bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
+	g_signal_connect(this->pipeline, "notify::volume", G_CALLBACK(&Player::notify_volume_cb), this);
 }
 
 
