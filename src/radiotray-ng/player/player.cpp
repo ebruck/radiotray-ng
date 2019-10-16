@@ -125,7 +125,7 @@ void Player::stop()
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
-			LOG(debug) << "canceling outstanding timeout clock request";
+			LOG(debug) << "canceling outstanding clock request";
 			gst_clock_id_unschedule(this->clock_id);
 			gst_clock_id_unref(this->clock_id);
 			this->clock_id = nullptr;
@@ -204,7 +204,7 @@ gboolean Player::notify_volume_cb(GstBus* /*bus*/, GstMessage* /*message*/, gpoi
 	// only save if it's different...
 	if (player->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE) != new_volume)
 	{
-		LOG(debug) << "volume level changed: " << new_volume;
+		LOG(debug) << "volume: " << new_volume;
 
 		player->config->set_uint32(VOLUME_LEVEL_KEY, new_volume);
 		player->config->save();
@@ -388,7 +388,7 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 			str = g_strdup_value_contents(gst_tag_list_get_value_index(list, tag, i));
 		}
 
-		// todo: for now ignore anything that looks encoded...
+		// Ignore anything that looks encoded...
 		if (std::string(str).find("<?xml") == std::string::npos)
 		{
 			event_data[gst_tag_get_nick(tag)] = str;
