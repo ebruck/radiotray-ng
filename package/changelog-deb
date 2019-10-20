@@ -1,3 +1,13 @@
+radiotray-ng (0.2.7) unstable; urgency=low
+
+      * Removed python2 dependency
+      * Bookmark saving no longer includes default entries
+      * Volume level changes using pavucontrol etc. are now detected
+      * Minor cleanup & bug fixes
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>
+
+
 radiotray-ng (0.2.6) unstable; urgency=low
 
       * Added disable-logging config option
