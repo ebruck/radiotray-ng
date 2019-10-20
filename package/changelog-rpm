@@ -1,3 +1,9 @@
+* Sun Oct 20 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.7
+- Removed python2 dependency
+- Bookmark saving no longer includes default entries
+- Volume level changes using pavucontrol etc. are now detected
+- Minor cleanup & bug fixes
+
 * Sun Jul 07 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.6
 - Added disable-logging config option
 - Added Yaru & Breeze icons

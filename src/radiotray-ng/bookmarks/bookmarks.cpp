@@ -35,12 +35,13 @@ bool Bookmarks::load()
 		std::ifstream ifile(this->bookmarks_file);
 		ifile.exceptions(std::ios::failbit);
 
-		Json::Reader reader;
+		Json::CharReaderBuilder rbuilder;
 		Json::Value new_bookmarks;
+		std::string parse_errors;
 
-		if (!reader.parse(ifile, new_bookmarks))
+		if (!Json::parseFromStream(rbuilder, ifile, &new_bookmarks, &parse_errors))
 		{
-			LOG(error) << "Failed to parse: " << this->bookmarks_file << " : " << reader.getFormattedErrorMessages();
+			LOG(error) << "Failed to parse: " << this->bookmarks_file << " : " << parse_errors;
 			return false;
 		}
 
@@ -78,7 +79,9 @@ bool Bookmarks::save_as(const std::string& new_filename)
 		std::ofstream ofile(filename);
 		ofile.exceptions(std::ios::failbit);
 
-		ofile << Json::StyledWriter().write(this->bookmarks);
+		Json::StreamWriterBuilder wbuilder;
+		std::unique_ptr<Json::StreamWriter> const writer(wbuilder.newStreamWriter());
+		writer->write(this->bookmarks, &ofile);
 	}
 	catch(std::exception& /*e*/)
 	{
@@ -129,9 +132,14 @@ bool Bookmarks::add_group(const std::string& group_name, const std::string& imag
 
 	Json::Value& value = this->bookmarks.append(Json::Value(Json::objectValue));
 
-	value[GROUP_KEY]       = group_name;
-	value[GROUP_IMAGE_KEY] = image;
-	value[STATIONS_KEY]    = Json::Value(Json::arrayValue);
+	value[GROUP_KEY] = group_name;
+
+	if (!image.empty())
+	{
+		value[GROUP_IMAGE_KEY] = image;
+	}
+
+	value[STATIONS_KEY] = Json::Value(Json::arrayValue);
 
 	return true;
 }
@@ -158,7 +166,13 @@ bool Bookmarks::update_group(const std::string& group_name, const std::string& n
 
 	if (this->find_group(group_name, group_index))
 	{
-		this->bookmarks[group_index][GROUP_IMAGE_KEY] = new_group_image;
+		this->bookmarks[group_index].removeMember(GROUP_IMAGE_KEY);
+
+		if (!new_group_image.empty())
+		{
+			this->bookmarks[group_index][GROUP_IMAGE_KEY] = new_group_image;
+		}
+
 		return true;
 	}
 
@@ -197,8 +211,16 @@ bool Bookmarks::add_station(const std::string& group_name, const std::string& st
 
 			value[STATION_NAME_KEY]  = station_name;
 			value[STATION_URL_KEY]   = station_url;
-			value[STATION_IMAGE_KEY] = station_image;
-			value[STATION_NOTIFICATIONS_KEY] = notifications;
+
+			if (!station_image.empty())
+			{
+				value[STATION_IMAGE_KEY] = station_image;
+			}
+
+			if (!notifications)
+			{
+				value[STATION_NOTIFICATIONS_KEY] = notifications;
+			}
 
 			this->bookmarks[group_index][STATIONS_KEY].append(value);
 
@@ -263,9 +285,19 @@ bool Bookmarks::update_station(const std::string& group_name, const std::string&
 
 		if (this->find_station(group_index, station_name, station_index))
 		{
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY]   = new_station_url;
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
-			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NOTIFICATIONS_KEY] = new_notifications;
+			this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY] = new_station_url;
+
+			this->bookmarks[group_index][STATIONS_KEY][station_index].removeMember(STATION_IMAGE_KEY);
+			if (!new_station_image.empty())
+			{
+				this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY] = new_station_image;
+			}
+
+			this->bookmarks[group_index][STATIONS_KEY][station_index].removeMember(STATION_NOTIFICATIONS_KEY);
+			if (!new_notifications)
+			{
+				this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NOTIFICATIONS_KEY] = new_notifications;
+			}
 
 			return true;
 		}
@@ -386,12 +418,16 @@ IBookmarks::group_data_t Bookmarks::operator[](const size_t group_index)
 	IBookmarks::group_data_t stations;
 
 	stations.group = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_KEY].asString();
-	stations.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+
+	if (this->bookmarks[Json::ArrayIndex(group_index)].isMember(GROUP_IMAGE_KEY))
+	{
+		stations.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+	}
 
 	for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 	{
-		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
-			this->get_station_notifications(station)});
+		stations.stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), (station.isMember(STATION_IMAGE_KEY) ? station[STATION_IMAGE_KEY].asString() : ""),
+			this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 	}
 
 	return stations;
@@ -408,8 +444,8 @@ bool Bookmarks::get_group_stations(const std::string& group_name, std::vector<IB
 
 		for(auto& station : this->bookmarks[Json::ArrayIndex(group_index)][STATIONS_KEY])
 		{
-			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station[STATION_IMAGE_KEY].asString(),
-				this->get_station_notifications(station)});
+			stations.push_back({station[STATION_NAME_KEY].asString(), station[STATION_URL_KEY].asString(), station.isMember(STATION_IMAGE_KEY) ? station[STATION_IMAGE_KEY].asString() : "",
+				this->get_station_notifications(station), station.isMember(STATION_DIRECT_KEY) ? station[STATION_DIRECT_KEY].asBool() : false});
 		}
 
 		return true;
@@ -430,13 +466,34 @@ bool Bookmarks::get_station(const std::string& group_name, const std::string& st
 		{
 			station_data.name  = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_NAME_KEY].asString();
 			station_data.url   = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_URL_KEY].asString();
-			station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
+
+			if (this->bookmarks[group_index][STATIONS_KEY][station_index].isMember(STATION_IMAGE_KEY))
+			{
+				station_data.image = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_IMAGE_KEY].asString();
+			}
+			else
+			{
+				station_data.image.clear();
+			}
+
 			station_data.notifications = this->get_station_notifications(this->bookmarks[group_index][STATIONS_KEY][station_index]);
+
+			if (this->bookmarks[group_index][STATIONS_KEY][station_index].isMember(STATION_DIRECT_KEY))
+			{
+				station_data.direct = this->bookmarks[group_index][STATIONS_KEY][station_index][STATION_DIRECT_KEY].asBool();
+			}
+			else
+			{
+				station_data.direct = false;
+			}
 
 			// use group image if not overridden
 			if (station_data.image.empty())
 			{
-				station_data.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+				if (this->bookmarks[Json::ArrayIndex(group_index)].isMember(GROUP_IMAGE_KEY))
+				{
+					station_data.image = this->bookmarks[Json::ArrayIndex(group_index)][GROUP_IMAGE_KEY].asString();
+				}
 			}
 
 			// clean up...
@@ -474,7 +531,9 @@ bool Bookmarks::get_group_as_json(const std::string& group_name, std::string& js
 
 	if (this->find_group(group_name, group_index))
 	{
-		json = Json::StyledWriter().write(this->bookmarks[Json::ArrayIndex(group_index)]);
+		Json::StreamWriterBuilder wbuilder;
+		json = Json::writeString(wbuilder, this->bookmarks[Json::ArrayIndex(group_index)]);
+
 		return true;
 	}
 
@@ -493,10 +552,14 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 		{
 			auto station = this->bookmarks[group_index][STATIONS_KEY][station_index];
 
-			// may not be there...
-			station[NOTIFICATION_KEY] = this->get_station_notifications(station);
+			if (!this->get_station_notifications(station))
+			{
+				station[NOTIFICATION_KEY] = false;
+			}
 
-			json = Json::StyledWriter().write(station);
+			Json::StreamWriterBuilder wbuilder;
+			json = Json::writeString(wbuilder, station);
+
 			return true;
 		}
 	}
@@ -508,16 +571,18 @@ bool Bookmarks::get_station_as_json(const std::string& group_name, const std::st
 bool Bookmarks::add_station_from_json(const std::string& group_name, const std::string& json, std::string& station_name)
 {
 	// first, validate the station
-	Json::Reader reader;
 	Json::Value station;
+	Json::CharReaderBuilder rbuilder;
+	std::unique_ptr<Json::CharReader> const reader(rbuilder.newCharReader());
+	std::string parse_errors;
 
-	if (!reader.parse(json, station))
+	if (!reader->parse(json.c_str(), json.c_str() + json.size(), &station, &parse_errors))
 	{
-		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << reader.getFormattedErrorMessages();
+		LOG(error) << "Failed to parse:\n<<" << json << ">>\n" << parse_errors;
 		return false;
 	}
 
-	if (!station.isMember(STATION_NAME_KEY)|| !station.isMember(STATION_URL_KEY) ||	!station.isMember(STATION_IMAGE_KEY))
+	if (!station.isMember(STATION_NAME_KEY) || !station.isMember(STATION_URL_KEY))
 	{
 		LOG(warning) << "Insufficient station data ...\n<<" << json << "<<";
 		return false;

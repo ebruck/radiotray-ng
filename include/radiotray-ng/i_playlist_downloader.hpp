@@ -18,6 +18,7 @@
 #pragma once
 
 #include <radiotray-ng/common.hpp>
+#include <radiotray-ng/i_bookmarks.hpp>
 
 
 class IPlaylistDownloader
@@ -25,5 +26,5 @@ class IPlaylistDownloader
 public:
 	virtual ~IPlaylistDownloader() = default;
 
-	virtual bool download_playlist(const std::string& url, playlist_t& playlist) = 0;
+	virtual bool download_playlist(const IBookmarks::station_data_t& std, playlist_t& playlist) = 0;
 };

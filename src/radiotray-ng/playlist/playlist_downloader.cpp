@@ -49,7 +49,7 @@ void PlaylistDownloader::install_decoders()
 }
 
 
-bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& playlist)
+bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std, playlist_t& playlist)
 {
 	playlist.clear();
 
@@ -60,17 +60,17 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 
 	for(auto& decoder : this->decoders)
 	{
-		if (decoder->is_url_direct_stream(url))
+		if (std.direct || decoder->is_url_direct_stream(std.url))
 		{
-			LOG(info) << "detected as a direct stream, decoder: " << decoder->get_name();
+			LOG(info) << "detected as a direct stream, decoder: " << ((std.direct) ? "direct=true" : decoder->get_name());
 
-			playlist.push_back(url);
+			playlist.push_back(std.url);
 			return true;
 		}
 	}
 
 	// Try downloading N bytes in case it's a media stream
-	if (!this->download(url, content_type, content, http_resp_code, 4096))
+	if (!this->download(std.url, content_type, content, http_resp_code, 4096))
 	{
 		LOG(error) << "Could not download playlist!";
 
@@ -78,7 +78,7 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 		{
 			// Must be a media stream?
 			LOG(info) << "decoder: none";
-			playlist.push_back(url);
+			playlist.push_back(std.url);
 			return true;
 		}
 
@@ -100,7 +100,7 @@ bool PlaylistDownloader::download_playlist(const std::string& url, playlist_t& p
 
 	LOG(info) << "no decoders, assuming direct media stream of content-type: " << content_type;
 
-	playlist.push_back(url);
+	playlist.push_back(std.url);
 
 	return true;
 }

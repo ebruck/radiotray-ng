@@ -31,7 +31,8 @@ int main(int argc, char** argv)
 		PlaylistDownloader pld(cfg);
 
 		playlist_t pls;
-		pld.download_playlist(argv[1], pls);
+		IBookmarks::station_data_t std{"", argv[1], "", false, false};
+		pld.download_playlist(std, pls);
 
 		for (auto& url: pls)
 		{

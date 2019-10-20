@@ -31,6 +31,7 @@ public:
 		std::string url;
 		std::string image;
 		bool notifications;
+		bool direct;
 	};
 
 	using group_data_t = struct

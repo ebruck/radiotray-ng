@@ -83,6 +83,7 @@ private:
 	const std::string STATION_URL_KEY{"url"};
 	const std::string STATION_IMAGE_KEY{"image"};
 	const std::string STATION_NOTIFICATIONS_KEY{"notifications"};
+	const std::string STATION_DIRECT_KEY{"direct"};
 
 	bool find_group(const std::string& group_name, Json::ArrayIndex& group_index);
 

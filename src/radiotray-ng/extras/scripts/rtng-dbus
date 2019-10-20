@@ -45,11 +45,11 @@ if [ "$#" -gt 0 ]; then
         DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
     fi
 
-    QDBUS_CMD="qdbus com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
+    DBUS_SEND_CMD="dbus-send --session --print-reply=literal --type=method_call --dest=com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
 
-    for arg in "${@:2}"; do ARGS="$ARGS '$arg'"; done
+    for arg in "${@:2}"; do ARGS="$ARGS 'string:$arg'"; done
 
-    eval $QDBUS_CMD $ARGS
+    eval $DBUS_SEND_CMD $ARGS
 
     if [ ! -z "${DBUS_SESSION_BUS_PID}" ]; then
         kill $DBUS_SESSION_BUS_PID

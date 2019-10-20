@@ -509,10 +509,6 @@ EditorFrame::onAbout(wxCommandEvent& /* event */)
 		version += "\n(" RTNG_GIT_VERSION ")";
 	}
 
-    std::string name = PROJECT_NAME;
-	name += "\n";
-    name += APPLICATION_NAME;
-
     aboutInfo.SetName(APPLICATION_NAME);
 	aboutInfo.SetDescription(version);
 

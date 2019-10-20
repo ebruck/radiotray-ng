@@ -16,17 +16,12 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <radiotray-ng/player/player.hpp>
-#include <rtng_user_agent.hpp>
+#include <cmath>
 
 
 Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
-	: pipeline(nullptr)
-	, souphttpsrc(nullptr)
-	, clock(nullptr)
-	, clock_id(nullptr)
-	, event_bus(std::move(event_bus))
+	: event_bus(std::move(event_bus))
 	, config(std::move(config))
-	, gst_bus(nullptr)
 {
 	LOG(info) << "starting gstreamer";
 
@@ -62,7 +57,14 @@ bool Player::play_next()
 
 		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size * buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
-		this->volume(this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE));
+		if (!this->has_played)
+		{
+			const auto volume = this->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE);
+
+			LOG(debug) << "setting startup volume: " << volume;
+
+			this->volume(volume);
+		}
 
 		if (gst_element_set_state(this->pipeline, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE)
 		{
@@ -123,7 +125,7 @@ void Player::stop()
 		// abort outstanding callback...
 		if (this->clock_id)
 		{
-			LOG(info) << "canceling outstanding clock request";
+			LOG(debug) << "canceling outstanding clock request";
 			gst_clock_id_unschedule(this->clock_id);
 			gst_clock_id_unref(this->clock_id);
 			this->clock_id = nullptr;
@@ -168,25 +170,6 @@ bool Player::is_muted()
 }
 
 
-void Player::notify_source_cb(GObject* obj, GParamSpec* /*param*/, gpointer /*user_data*/)
-{
-	// set our user-agent...
-	if (g_object_class_find_property(G_OBJECT_GET_CLASS(obj), "source"))
-	{
-		GObject* source_element;
-		g_object_get(obj, "source", &source_element, NULL);
-
-		// todo: detect distro at runtime instead of what we were compiled on...
-		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source_element), "user-agent"))
-		{
-			g_object_set(source_element, "user-agent", RTNG_USER_AGENT, NULL);
-		}
-
-		g_object_unref(source_element);
-	}
-}
-
-
 gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID /*id*/, gpointer user_data)
 {
 	auto player{static_cast<Player*>(user_data)};
@@ -202,6 +185,31 @@ gboolean Player::timer_cb(GstClock* /*clock*/, GstClockTime /*time*/, GstClockID
 		gst_element_set_state(player->pipeline, GST_STATE_NULL);
 		gst_element_set_state(player->souphttpsrc, GST_STATE_NULL);
 		gst_element_set_state(player->pipeline, GST_STATE_PAUSED);
+	}
+
+	return TRUE;
+}
+
+
+gboolean Player::notify_volume_cb(GstBus* /*bus*/, GstMessage* /*message*/, gpointer user_data)
+{
+	auto player{static_cast<Player*>(user_data)};
+
+	gdouble volume;
+	g_object_get(G_OBJECT(player->pipeline), "volume", &volume, NULL);
+
+	// update volume as it may of been changed using another application...
+	const uint32_t new_volume = std::round(volume * 100);
+
+	// only save if it's different...
+	if (player->config->get_uint32(VOLUME_LEVEL_KEY, DEFAULT_VOLUME_LEVEL_VALUE) != new_volume)
+	{
+		LOG(debug) << "volume: " << new_volume;
+
+		player->config->set_uint32(VOLUME_LEVEL_KEY, new_volume);
+		player->config->save();
+
+		player->event_bus->publish_only(IEventBus::event::volume_changed, VOLUME_LEVEL_KEY, std::to_string(new_volume));
 	}
 
 	return TRUE;
@@ -313,6 +321,7 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 			GstState old_state;
 			GstState new_state;
 			gst_message_parse_state_changed(message, &old_state, &new_state, nullptr);
+			player->has_played = true;
 
 			if (GST_MESSAGE_SRC(message) == GST_OBJECT(player->pipeline))
 			{
@@ -379,7 +388,7 @@ void Player::for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer 
 			str = g_strdup_value_contents(gst_tag_list_get_value_index(list, tag, i));
 		}
 
-		// todo: for now ignore anything that looks encoded...
+		// Ignore anything that looks encoded...
 		if (std::string(str).find("<?xml") == std::string::npos)
 		{
 			event_data[gst_tag_get_nick(tag)] = str;
@@ -441,8 +450,7 @@ void Player::gst_start()
 	// setup callbacks...
 	this->gst_bus = gst_element_get_bus(this->pipeline);
 	gst_bus_add_watch(this->gst_bus, static_cast<GstBusFunc>(&Player::handle_messages_cb), this);
-
-	g_signal_connect(G_OBJECT(this->pipeline), "notify::source",  G_CALLBACK(&Player::notify_source_cb), this);
+	g_signal_connect(this->pipeline, "notify::volume", G_CALLBACK(&Player::notify_volume_cb), this);
 }
 
 

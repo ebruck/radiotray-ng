@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(radiotray-ng VERSION 0.2.5 LANGUAGES CXX)
+project(radiotray-ng CXX)
 
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -13,7 +13,7 @@ endif()
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 6)
+set(PROJECT_VERSION_PATCH 7)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -30,6 +30,19 @@ endif(CCACHE_FOUND)
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Boost     REQUIRED filesystem system log program_options thread)
+
+# set up wxWidgets to prefer gtk3
+execute_process(COMMAND wx-config --selected-config --toolkit=gtk3
+		RESULT_VARIABLE ret
+		OUTPUT_QUIET)
+if(ret EQUAL "0")
+	message(STATUS "wxWidgets: Found gtk3 version, using it.")
+	set(wxWidgets_CONFIG_OPTIONS_DEFAULT "--toolkit=gtk3")
+else()
+	message(STATUS "wxWidgets: No gtk3 version found, falling back to default (likely gtk2)")
+endif()
+unset(ret)
+set(wxWidgets_CONFIG_OPTIONS "${wxWidgets_CONFIG_OPTIONS_DEFAULT}" ON STRING "wxWidgets toolkit options")
 find_package(wxWidgets REQUIRED core base adv)
 
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
@@ -43,7 +56,7 @@ endif(NOT APPLE)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
-set(warnings "-Wno-deprecated-declarations -Wall -Wextra -Werror -Wpedantic")
+set(warnings "-Wall -Wextra -Werror -Wpedantic")
 set(CMAKE_CXX_FLAGS ${warnings})
 set(CMAKE_C_FLAGS   ${warnings})
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")

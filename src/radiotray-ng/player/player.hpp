@@ -48,25 +48,24 @@ private:
 	void gst_stop();
 
 	static gboolean handle_messages_cb(GstBus* bus, GstMessage* message, gpointer user_data);
-
-	static void notify_source_cb(GObject* obj, GParamSpec* param, gpointer user_data);
-
 	static gboolean timer_cb(GstClock* clock, GstClockTime time, GstClockID id, gpointer user_data);
+	static gboolean notify_volume_cb(GstBus* bus, GstMessage* message, gpointer user_data);
 
 	static void for_each_tag_cb(const GstTagList* list, const gchar* tag, gpointer user_data);
 
 	bool play_next();
 
-	GstElement* pipeline;
-	GstElement* souphttpsrc;
-	GstClock*   clock;
-	GstClockID  clock_id;
+	GstElement* pipeline = nullptr;
+	GstElement* souphttpsrc = nullptr;
+	GstClock*   clock = nullptr;
+	GstClockID  clock_id = nullptr;
 	bool        buffering = false;
+	bool        has_played = false;
 
 	playlist_t current_playlist;
 
 	std::shared_ptr<IEventBus> event_bus;
 	std::shared_ptr<IConfig> config;
 
-	GstBus* gst_bus;
+	GstBus* gst_bus = nullptr;
 };
