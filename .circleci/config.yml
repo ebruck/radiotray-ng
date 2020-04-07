@@ -53,6 +53,12 @@ jobs:
       - image: "radiotrayng/circleci:ubuntu-19.10"
     environment:
       - CI_OS: linux
+  Ubuntu-20_04-build:
+    <<: *commonStepsUbuntu
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-20.04"
+    environment:
+      - CI_OS: linux
   Fedora-30-build:
     <<: *commonStepsFedora
     docker:
@@ -74,5 +80,6 @@ workflows:
       - Ubuntu-18_04-build
       - Ubuntu-19_04-build
       - Ubuntu-19_10-build
+      - Ubuntu-20_04-build
       - Fedora-30-build
       - Fedora-31-build
