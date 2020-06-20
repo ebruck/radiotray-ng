@@ -37,11 +37,11 @@ public:
 
 	void volume(uint32_t percent);
 
-    void mute();
+	void mute();
 
-    void unmute();
+	void unmute();
 
-    bool is_muted();
+	bool is_muted();
 
 private:
 	void gst_start();
