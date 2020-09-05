@@ -287,4 +287,4 @@ $ make package
 $ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|x86_64>.rpm
 ```
 
-### Thank you JetBrains for providing a free open source license for [CLion](https://www.jetbrains.com/clion/).
+### Thank you [JetBrains](https://www.jetbrains.com/?from=radiotray-ng) for providing a free open source license for [CLion](https://www.jetbrains.com/clion/?from=radiotray-ng).
