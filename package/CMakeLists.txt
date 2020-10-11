@@ -17,6 +17,7 @@ if (LSB_RELEASE_EXECUTABLE)
     endif()
 
     message( "Building version: ${PROJECT_VERSION} for ${DISTRIBUTOR_ID} ${RELEASE} -- ${CPACK_GENERATOR} packaging..." )
+    message(STATUS "DISTRIBUTOR: " ${DISTRIBUTOR_ID})
 
     set(CPACK_PACKAGE_VENDOR              "Edward G. Bruck")
     set(CPACK_PACKAGE_CONTACT             "ed.bruck1@gmail.com")
@@ -29,7 +30,12 @@ if (LSB_RELEASE_EXECUTABLE)
     set(DESTINATION_DIR                   /usr/share/radiotray-ng/)
 
     if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        set(CPACK_SYSTEM_NAME "i386")
+        if (CMAKE_SYSTEM_PROCESSOR  MATCHES "arm")
+            set(CPACK_SYSTEM_NAME "armhf")
+            message(STATUS "ARM Processor: " ${CMAKE_SYSTEM_PROCESSOR})
+        else()
+            set(CPACK_SYSTEM_NAME "i386")
+        endif()
     else()
         if (DISTRIBUTOR_ID STREQUAL "fedora")
             set(CPACK_SYSTEM_NAME "x86_64")
@@ -37,7 +43,7 @@ if (LSB_RELEASE_EXECUTABLE)
             set(CPACK_SYSTEM_NAME "amd64")
         endif()
     endif()
-
+    
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
 
     if (CPACK_GENERATOR MATCHES "DEB")

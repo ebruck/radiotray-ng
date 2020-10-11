@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 project(radiotray-ng CXX)
 
+# OS, Linux Kernel, Processor, Compiler, CMake Version
+message(STATUS "Operating System :" ${CMAKE_SYSTEM_NAME})
+message(STATUS "Linux Kernel Version: " ${CMAKE_SYSTEM})
+message(STATUS "System Processor: " ${CMAKE_SYSTEM_PROCESSOR})
+message(STATUS "Compiler Version: " ${CMAKE_CXX_COMPILER})
+message(STATUS "CMake Version :" ${CMAKE_SYSTEM_VERSION})
+
 # workaround for Eclipse
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 	set(CMAKE_CXX_COMPILER_ARG1 "-std=c++14"
