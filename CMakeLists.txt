@@ -44,7 +44,6 @@ endif()
 unset(ret)
 set(wxWidgets_CONFIG_OPTIONS "${wxWidgets_CONFIG_OPTIONS_DEFAULT}" ON STRING "wxWidgets toolkit options")
 find_package(wxWidgets REQUIRED core base adv)
-
 pkg_search_module(JSONCPP     REQUIRED jsoncpp)
 pkg_search_module(GSTREAMER   REQUIRED gstreamer-1.0)
 pkg_search_module(XDG_BASEDIR REQUIRED libxdg-basedir)
@@ -67,7 +66,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_D
 
 # notification & ncurses based on platform
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    pkg_search_module(APPINDICATOR REQUIRED appindicator3-0.1)
+    pkg_search_module(APPINDICATOR appindicator3-0.1)
+    if (NOT APPINDICATOR_FOUND)
+        pkg_search_module(APPINDICATOR REQUIRED ayatana-appindicator3-0.1)
+        if (APPINDICATOR_FOUND)
+            set(AYATANA_APPINDICATOR true)
+        endif()
+    endif()
 if (NOT APPINDICATOR_FOUND)
     pkg_search_module(NCURSES      REQUIRED ncurses)
 endif()

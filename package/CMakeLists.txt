@@ -57,6 +57,11 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
+        # Debian no longer supports libjsoncpp1
+        if (${CODENAME} STREQUAL "bullseye")
+            string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+        endif()
+
         # official packages for older distros will continue to use gtk2 for the editor
         if (${RELEASE} STREQUAL "16.04" OR ${RELEASE} STREQUAL "18.04" OR ${RELEASE} STREQUAL "19.04" OR ${CODENAME} STREQUAL "stretch")
             message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
