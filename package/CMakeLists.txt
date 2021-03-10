@@ -57,9 +57,10 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
-        # Debian no longer supports libjsoncpp1
+        # Debian no longer supports libjsoncpp1 and ubuntu appindicator package naming
         if (${CODENAME} STREQUAL "bullseye")
             string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
         # official packages for older distros will continue to use gtk2 for the editor
