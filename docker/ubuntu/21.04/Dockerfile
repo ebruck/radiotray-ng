@@ -1,10 +1,10 @@
-FROM ubuntu:16.04
+FROM ubuntu:21.04
 
 RUN set -ex; \
     apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ curl wget git openssh-client \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ make cmake curl wget git openssh-client \
                    lsb-release \
-                   libcurl3-openssl-dev \
+                   libcurl4-openssl-dev \
                    libjsoncpp-dev \
                    libxdg-basedir-dev \
                    libnotify-dev \
@@ -19,7 +19,6 @@ RUN set -ex; \
                    libbsd-dev \
                    libncurses5-dev \
                    libglibmm-2.4-dev \
-                   libwxgtk3.0-dev \
-                   libwxgtk3.0-0v5 \
-        && wget -qO- "https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz" | tar --strip-components=1 -xz -C /usr/local \
+                   libwxgtk3.0-gtk3-dev \
+                   libwxgtk3.0-gtk3-0v5 \
         && rm -rf /var/lib/apt/lists/*

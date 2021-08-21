@@ -29,12 +29,6 @@ commonStepsFedora: &commonStepsFedora
 version: 2.1
 
 jobs:
-  Ubuntu-16_04-build:
-    <<: *commonStepsUbuntu
-    docker:
-      - image: "radiotrayng/circleci:ubuntu-16.04"
-    environment:
-      - CI_OS: linux
   Ubuntu-18_04-build:
     <<: *commonStepsUbuntu
     docker:
@@ -47,18 +41,23 @@ jobs:
       - image: "radiotrayng/circleci:ubuntu-20.04"
     environment:
       - CI_OS: linux
-  Fedora-31-build:
-    <<: *commonStepsFedora
+  Ubuntu-21_04-build:
+    <<: *commonStepsUbuntu
     docker:
-      - image: "radiotrayng/circleci:fedora-31"
+      - image: "radiotrayng/circleci:ubuntu-21.04"
     environment:
       - CI_OS: linux
-
+  Fedora-34-build:
+    <<: *commonStepsFedora
+    docker:
+      - image: "radiotrayng/circleci:fedora-34"
+    environment:
+      - CI_OS: linux
 workflows:
   version: 2
   build:
     jobs:
-      - Ubuntu-16_04-build
       - Ubuntu-18_04-build
       - Ubuntu-20_04-build
-      - Fedora-31-build
+      - Ubuntu-21_04-build
+      - Fedora-34-build
