@@ -31,6 +31,8 @@ public:
 		, config(std::move(config))
 		, app_name(std::string(APP_NAME) + "-" + std::to_string(::getpid()))
 		, dbus_name("org.gnome.SettingsDaemon.MediaKeys")
+		, object_path("/org/gnome/SettingsDaemon/MediaKeys")
+		, interface_name("org.gnome.SettingsDaemon.MediaKeys")
 		, dbus_proxy(nullptr)
 	{
 		// install extra media key mappings?
@@ -58,10 +60,20 @@ public:
 
 			if (xdg_current_desktop)
 			{
-				// if not gnome then assume unity or something else...
-				if (radiotray_ng::to_lower(std::string(xdg_current_desktop)).find("gnome") == std::string::npos)
+				// test for MATE...
+				if (radiotray_ng::to_lower(std::string(xdg_current_desktop)).find("mate") != std::string::npos)
 				{
-					this->dbus_name = "org.gnome.SettingsDaemon";
+					this->dbus_name = "org.mate.SettingsDaemon";
+					this->object_path = "/org/mate/SettingsDaemon/MediaKeys";
+					this->interface_name = "org.mate.SettingsDaemon.MediaKeys";
+				}
+				else
+				{
+					// if not gnome then assume unity or something else...
+					if (radiotray_ng::to_lower(std::string(xdg_current_desktop)).find("gnome") == std::string::npos)
+					{
+						this->dbus_name = "org.gnome.SettingsDaemon";
+					}
 				}
 			}
 			else
@@ -104,6 +116,8 @@ private:
 	std::shared_ptr<IConfig> config;
 	const std::string app_name;
 	std::string dbus_name;
+	std::string object_path;
+	std::string interface_name;
 
 	std::map<std::string, std::function<void ()>> media_keys;
 
@@ -187,8 +201,8 @@ void media_keys_t::gio_start()
 		GDBusProxyFlags{G_DBUS_PROXY_FLAGS_NONE},
 		nullptr,
 		this->dbus_name.c_str(),
-		"/org/gnome/SettingsDaemon/MediaKeys",
-		"org.gnome.SettingsDaemon.MediaKeys",
+		this->object_path.c_str(),
+		this->interface_name.c_str(),
 		nullptr,
 		&error);
 

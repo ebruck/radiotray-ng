@@ -1,6 +1,10 @@
 add_executable(radiotray-ng main.cpp radiotray_ng.cpp radiotray_ng.hpp)
 
 if (APPINDICATOR_FOUND)
+    if (AYATANA_APPINDICATOR)
+        target_compile_definitions(radiotray-ng PRIVATE AYATANA_APPINDICATOR)
+    endif()
+
     target_link_libraries(
         radiotray-ng
         appindicator_gui

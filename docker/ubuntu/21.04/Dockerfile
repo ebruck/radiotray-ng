@@ -1,8 +1,8 @@
-FROM ubuntu:19.10
+FROM ubuntu:21.04
 
 RUN set -ex; \
     apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ cmake curl wget git openssh-client \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates gcc g++ make cmake curl wget git openssh-client \
                    lsb-release \
                    libcurl4-openssl-dev \
                    libjsoncpp-dev \

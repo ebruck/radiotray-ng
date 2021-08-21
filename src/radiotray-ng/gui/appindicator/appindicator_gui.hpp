@@ -22,7 +22,11 @@
 #include <radiotray-ng/file_monitor.hpp>
 
 #include <gtk/gtk.h>
+#ifndef AYATANA_APPINDICATOR
 #include <libappindicator/app-indicator.h>
+#else
+#include <libayatana-appindicator/app-indicator.h>
+#endif
 #include <memory>
 
 class IConfig;

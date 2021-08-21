@@ -1,3 +1,11 @@
+radiotray-ng (0.2.8) unstable; urgency=low
+
+      * MATE media key support
+      * Minor cleanup & bug fixes
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 21 Aug 2021 12:48:02 -0700
+
+
 radiotray-ng (0.2.7) unstable; urgency=low
 
       * Removed python2 dependency
