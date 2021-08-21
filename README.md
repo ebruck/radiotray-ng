@@ -10,7 +10,6 @@ The version here is what "I" wanted out of RadioTray.
 
 ## Radiotray-NG goals were: ##
 
-* Cross platform friendly design as I occasionally use a Mac.
 * Better gstreamer error handling and recovery.
 * Fix RadioTray's flawed bookmark format.
 * Build in the only RadioTray plugin that I felt I needed, which is a shutdown timer.
@@ -29,12 +28,6 @@ The version here is what "I" wanted out of RadioTray.
 * Media key support
 * Dbus interface for controlling Radiotray-NG and accessing stream meta data
 * --play command line option for resuming playback
-
-## Future: ##
-
-* ~~Cross platform bookmark editor application.~~
-* Cross compile on Mac (via brew packages) with icons, menu, media keys etc.
-* ~~Script to convert RadioTray's bookmarks.xml to the new format.~~
 
 **Icons:** [http://www.iconsplace.com/]
 **License:** Creative Commons Attribution-NoDerivs 3.0 Unported
