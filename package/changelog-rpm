@@ -1,3 +1,7 @@
+* Sat Aug 21 2021 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.8
+- MATE media key support
+- Minor cleanup & bug fixes
+
 * Sun Oct 20 2019 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.7
 - Removed python2 dependency
 - Bookmark saving no longer includes default entries
