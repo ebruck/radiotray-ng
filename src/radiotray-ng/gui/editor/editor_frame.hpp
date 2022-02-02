@@ -65,6 +65,8 @@ public:
     };
 
 private:
+    void enableMenus();
+
 	void onNew(wxCommandEvent& event);
     void onOpen(wxCommandEvent& event);
     void onSave(wxCommandEvent& event);
