@@ -102,7 +102,7 @@ private:
     void restoreConfiguration();
     void saveConfiguration();
 
-    void loadBookmarks(const std::string& filename);
+    void loadBookmarks(const std::string& filename, bool create_if_nonexistent = false);
     int saveBookmarks(bool ask_to_save = false, const std::string& file_to_save = std::string());
 
     wxSplitterWindow* splitter;

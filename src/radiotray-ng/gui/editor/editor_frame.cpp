@@ -127,7 +127,7 @@ EditorFrame::EditorFrame(wxFrame* frame, const wxString& title, const wxString& 
 		if (config->load())
 		{
 			std::string filename = config->get_string(BOOKMARKS_KEY, RTNG_DEFAULT_BOOKMARK_FILE);
-			this->loadBookmarks(filename);
+			this->loadBookmarks(filename, true);
 			SetStatusText(filename, 1);
 		}
 	}
@@ -546,7 +546,7 @@ EditorFrame::onStationActivated(wxListEvent& /* event */)
 }
 
 void
-EditorFrame::loadBookmarks(const std::string& filename)
+EditorFrame::loadBookmarks(const std::string& filename, bool create_if_nonexistent)
 {
 	if (this->editor_bookmarks.get())
 	{
@@ -564,6 +564,18 @@ EditorFrame::loadBookmarks(const std::string& filename)
 	this->editor_bookmarks = std::make_shared<EditorBookmarks>(filename);
 	if (this->group_list->loadBookmarks(this->editor_bookmarks) == false)
 	{
+		if (create_if_nonexistent)
+		{
+			std::ifstream ifile(filename);
+			if (errno == ENOENT)
+			{
+				this->editor_bookmarks->setDirty(true);
+				this->group_list->doNew(this->editor_bookmarks);
+				this->enableMenus();
+				return;
+			}
+		}
+
 		wxString msg("A failure occurred loading the bookmarks.");
 		wxMessageBox(msg, _("Error"));
 
