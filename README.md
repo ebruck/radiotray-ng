@@ -2,7 +2,7 @@
 [![CircleCI](https://circleci.com/gh/ebruck/radiotray-ng/tree/master.svg?style=shield)](https://circleci.com/gh/ebruck/radiotray-ng/tree/master)
 
 It became clear as one of the early contributors to the RadioTray project that it
-was not getting the attention it required and was probably dead. A lot of the 
+was not getting the attention it required and was probably dead. A lot of the
 technologies it used had moved on to newer versions and the bugs started piling up.
 I did my best to help users, but a new start was required.
 
@@ -70,7 +70,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "split-title" : true,
    "track-info-copy" : false,
    "ihr-title" : true,
-   "tag-info-verbose" : true,
+   "tag-info-verbose" : false,
    "volume-level" : 100,
    "volume-step" : 1,
    "volume-max-level" : 200,
@@ -106,11 +106,11 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
                split-title: attempts to reformat the notification into title/artist
                  ihr-title: extra parsing for iheartradio formatting (requires split-title)
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
-           track-info-copy: enable/disable track clicking to copy into clipboard 
+           track-info-copy: enable/disable track clicking to copy into clipboard
                volume-step: value used to increment/decrement the volume level
           volume-max-level: maximum volume level
            wrap-track-info: enable/disable the wrapping of title & artist menu text
-       wrap-track-info-len: maximum title & artist line length 
+       wrap-track-info-len: maximum title & artist line length
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
     media-key-next-station: media key to use for next station within current group
@@ -195,7 +195,7 @@ Available commands:
     previous_station
     next_station
     reload_bookmarks
-    set_volume 'level'        
+    set_volume 'level'
     volume_down
     volume_up
     mute
@@ -227,10 +227,14 @@ Download a release or clone the repo and build the latest Debian package.
 
 https://github.com/ebruck/radiotray-ng/releases
 
+Install Appindicator extension if not running Ubuntu.
+
+https://extensions.gnome.org/extension/615/appindicator-support/
+
 ## Fedora Install ##
 ```
 $ dnf install radiotray-ng
-``` 
+```
 
 ## To Build on Ubuntu: ##
 
