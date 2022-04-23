@@ -240,7 +240,9 @@ $ dnf install radiotray-ng
 
 Install these packages:
 ```
-lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libappindicator3-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5 cmake
+lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5 cmake
+
+# For Ubuntu 22.04 and newer install libayatana-appindicator3-dev otherwise use libappindicator3-dev
 ```
 
 ## Build Radiotray-NG & Debian Package ##
@@ -283,5 +285,3 @@ $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make package
 $ sudo dnf install ./radiotray-ng_x.y.z_<distro>_<i386|x86_64>.rpm
 ```
-
-### Thank you [JetBrains](https://www.jetbrains.com/?from=radiotray-ng) for providing a free open source license for [CLion](https://www.jetbrains.com/clion/?from=radiotray-ng).

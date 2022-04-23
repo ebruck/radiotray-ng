@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 
 RUN set -ex; \
     apt-get update \
@@ -10,7 +10,7 @@ RUN set -ex; \
                    libnotify-dev \
                    libboost-filesystem-dev \
                    libgstreamer1.0-dev \
-                   libappindicator3-dev \
+                   libayatana-appindicator3-dev \
                    libboost-log-dev \
                    libboost-program-options-dev \
                    libgtk-3-dev \

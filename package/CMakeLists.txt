@@ -55,6 +55,11 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
+        if (${RELEASE} STREQUAL "22.04")
+            string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+        endif()
+
         # no libcurl4 on Debian Stretch
         # https://bugs.launchpad.net/ubuntu/+source/curl/+bug/1754294
         if (${RELEASE} STREQUAL "16.04" OR ${CODENAME} STREQUAL "stretch")
