@@ -27,7 +27,7 @@ struct notify_t
 		notify_init(APP_NAME);
 		this->nn = notify_notification_new(nullptr, nullptr, nullptr);
 
-		notify_notification_set_urgency(this->nn, NOTIFY_URGENCY_LOW);
+		notify_notification_set_urgency(this->nn, NOTIFY_URGENCY_NORMAL);
 		notify_notification_set_timeout(this->nn, NOTIFY_EXPIRES_DEFAULT);
 	}
 
