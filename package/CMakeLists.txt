@@ -48,7 +48,7 @@ if (LSB_RELEASE_EXECUTABLE)
         set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE  ${CPACK_SYSTEM_NAME})
         set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "Edward G. Bruck <ed.bruck1@gmail.com>")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm;${PROJECT_SOURCE_DIR}/package/conffiles)
 
         if (${RELEASE} STREQUAL "21.04")
