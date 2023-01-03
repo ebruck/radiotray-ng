@@ -92,8 +92,9 @@ if (BUILD_TESTS)
 
     ExternalProject_Add(googletest
         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
-        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
-        URL_HASH SHA256=9bf1fe5182a604b4135edc1a425ae356c9ad15e9b23f9f12a02e80184c3a249c
+        URL https://github.com/google/googletest/archive/release-1.11.0.tar.gz
+        URL_HASH SHA256=b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5
+        DOWNLOAD_EXTRACT_TIMESTAMP true
         TIMEOUT 30
         DOWNLOAD_NO_PROGRESS true
         INSTALL_COMMAND "")
@@ -101,7 +102,7 @@ if (BUILD_TESTS)
     ExternalProject_Get_Property(googletest SOURCE_DIR)
     include_directories(${SOURCE_DIR}/googlemock/include ${SOURCE_DIR}/googletest/include)
     ExternalProject_Get_Property(googletest BINARY_DIR)
-    link_directories(${BINARY_DIR}/googlemock ${BINARY_DIR}/googlemock/gtest)
+    link_directories(${BINARY_DIR}/lib)
     set(GMOCK_BOTH_LIBRARIES gmock_main gmock gtest)
     set_property(DIRECTORY PROPERTY CLEAN_NO_CUSTOM "${CMAKE_CURRENT_BINARY_DIR}/googletest")
     unset(SOURCE_DIR)
