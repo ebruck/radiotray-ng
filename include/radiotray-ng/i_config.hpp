@@ -17,6 +17,7 @@
 
 #pragma once
 #include <string>
+#include <cstdint>
 
 // easier interface to work with than jsoncpp
 
