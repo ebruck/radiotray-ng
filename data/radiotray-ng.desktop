@@ -2,10 +2,8 @@
 Categories=AudioVideo;Audio;Player;GTK;
 Comment=Internet Radio Player for Linux
 Exec=/usr/bin/radiotray-ng
-Hidden=false
 Icon=/usr/share/icons/hicolor/256x256/apps/radiotray-ng-notification.png
 Name=Radiotray-NG
 StartupNotify=false
 Terminal=false
 Type=Application
-
