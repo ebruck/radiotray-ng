@@ -55,7 +55,7 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
-        if (${RELEASE} STREQUAL "22.04")
+        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04")
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
@@ -76,6 +76,12 @@ if (LSB_RELEASE_EXECUTABLE)
         if (${RELEASE} STREQUAL "16.04" OR ${RELEASE} STREQUAL "18.04" OR ${RELEASE} STREQUAL "19.04" OR ${CODENAME} STREQUAL "stretch")
             message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.0-0v5" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
+        endif()
+
+        # ubuntu lunar has newer libwsxgtk
+        if (${RELEASE} STREQUAL "23.04")
+            message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
+            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
