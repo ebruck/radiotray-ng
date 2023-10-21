@@ -112,7 +112,7 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright © 2017-2021 - The Radiotray-NG Authors"
+#define APP_COPYRIGHT                     "Copyright © 2017-2023 - The Radiotray-NG Authors"
 #define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"

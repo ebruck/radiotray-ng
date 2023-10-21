@@ -240,14 +240,14 @@ $ dnf install radiotray-ng
 
 Install these packages:
 ```
-lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
+lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libglibmm-2.4-dev cmake
 
-# before ubuntu 22.04:
-libappindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
-# For Ubuntu 22.04 install:
-libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
 # For Ubuntu 23.10 and newer install:
 libayatana-appindicator3-dev libwxgtk3.2-dev
+# For Ubuntu 22.04 install:
+libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+# Before ubuntu 22.04:
+libappindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
 ```
 
 ## Build Radiotray-NG & Debian Package ##

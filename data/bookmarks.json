@@ -50,10 +50,6 @@
             "url" : "http://provisioning.streamtheworld.com/pls/KDFCFM.pls"
          },
          {
-            "name" : "Classic FM",
-            "url" : "http://media-ice.musicradio.com/ClassicFMMP3.m3u"
-         },
-         {
             "name" : "WCPE",
             "url" : "http://www.ibiblio.org/wcpe/wcpe.pls"
          },
@@ -64,10 +60,6 @@
          {
             "name" : "WQXR",
             "url" : "http://www.wqxr.org/stream/wqxr/mp3.pls"
-         },
-         {
-            "name" : "BBC Radio 3",
-            "url" : "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p"
          }
       ]
    },
@@ -109,7 +101,7 @@
          },
          {
             "name" : "WNAR-AM Radio",
-            "url" : "http://live.wnar-am.com:8500/listen.pls"
+            "url" : "https://streaming.live365.com/a91284"
          }
       ]
    },
