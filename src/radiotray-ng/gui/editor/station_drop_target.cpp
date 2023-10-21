@@ -109,7 +109,7 @@ StationDragAndDrop::makeDragImage(const std::string& text, const wxColour* backg
 	wxBitmap tmp_bitmap(24, 24);
 	wxMemoryDC tmp_dc;
 	tmp_dc.SelectObject(tmp_bitmap);
-	tmp_dc.SetFont(wxFont(DRAG_FONT_POINT, wxSWISS, wxITALIC, wxBOLD));
+	tmp_dc.SetFont(wxFont(DRAG_FONT_POINT, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD));
 	int text_width, text_height;
 	tmp_dc.GetTextExtent(wxT("u"), &text_width, &text_height);
 
@@ -121,8 +121,8 @@ StationDragAndDrop::makeDragImage(const std::string& text, const wxColour* backg
 	dc.Clear();
 
 	// paint the background
-	dc.SetPen(wxPen(*textcolor, 1, wxSOLID));
-	dc.SetBrush(wxBrush(*background, wxSOLID));
+	dc.SetPen(wxPen(*textcolor, 1, wxPENSTYLE_SOLID));
+	dc.SetBrush(wxBrush(*background, wxBRUSHSTYLE_SOLID));
 	dc.DrawRectangle(0, 0, width, height);
 
 	std::string output = text;
@@ -131,7 +131,7 @@ StationDragAndDrop::makeDragImage(const std::string& text, const wxColour* backg
 		output = text.substr(0, MAX_DRAG_TEXT - DRAG_TAIL.size()) + DRAG_TAIL;
 	}
 	wxString tmpstr(output.c_str(), wxConvUTF8);
-	dc.SetFont(wxFont(DRAG_FONT_POINT, wxSWISS, wxITALIC, wxBOLD));
+	dc.SetFont(wxFont(DRAG_FONT_POINT, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD));
 	dc.SetTextForeground(*textcolor);
 	dc.DrawText(tmpstr, ((text_width / 2) + 1), (text_height / 2));
 
