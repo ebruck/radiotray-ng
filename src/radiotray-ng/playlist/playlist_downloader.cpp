@@ -49,6 +49,20 @@ void PlaylistDownloader::install_decoders()
 }
 
 
+bool PlaylistDownloader::is_url_direct_stream(const std::string& url)
+{
+	for(auto& decoder : this->decoders)
+	{
+		if (decoder->is_url_direct_stream(url))
+		{
+			LOG(info) << "detected as a direct stream, decoder: " << decoder->get_name();
+			return true;
+		}
+	}
+	return false;
+}
+
+
 bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std, playlist_t& playlist)
 {
 	playlist.clear();
@@ -58,19 +72,20 @@ bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std
 
 	long http_resp_code{0};
 
-	for(auto& decoder : this->decoders)
+	if (std.direct || this->is_url_direct_stream(std.url))
 	{
-		if (std.direct || decoder->is_url_direct_stream(std.url))
+		if (std.direct)
 		{
-			LOG(info) << "detected as a direct stream, decoder: " << ((std.direct) ? "direct=true" : decoder->get_name());
-
-			playlist.push_back(std.url);
-			return true;
+			LOG(info) << "detected as a direct stream: direct=true";
 		}
+
+		playlist.push_back(std.url);
+		return true;
 	}
 
 	// Try downloading N bytes in case it's a media stream
-	if (!this->download(std.url, content_type, content, http_resp_code, 4096))
+	std::string redirected_url;
+	if (!this->download(std.url, redirected_url, content_type, content, http_resp_code, 4096))
 	{
 		LOG(error) << "Could not download playlist!";
 
@@ -85,6 +100,16 @@ bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std
 		LOG(error) << "http_resp_code = " << http_resp_code;
 
 		return false;
+	}
+
+	// lets see if redirected url is a direct stream...
+	if (!redirected_url.empty())
+	{
+		if (this->is_url_direct_stream(redirected_url))
+		{
+			playlist.push_back(redirected_url);
+			return true;
+		}
 	}
 
 	// lets see what this is...
@@ -106,7 +131,7 @@ bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std
 }
 
 
-bool PlaylistDownloader::download(const std::string& url, std::string& content_type, std::string& content, long& http_resp_code, size_t max_bytes)
+bool PlaylistDownloader::download(const std::string& url, std::string& redirected_url, std::string& content_type, std::string& content, long& http_resp_code, size_t max_bytes)
 {
 	std::unique_ptr<CURL, std::function<void(CURL*)>> curl_handle(curl_easy_init(),
 		std::bind(curl_easy_cleanup, std::placeholders::_1));
@@ -166,7 +191,17 @@ bool PlaylistDownloader::download(const std::string& url, std::string& content_t
 		if (c_type)
 		{
 			content_type = c_type;
-		}
+
+			char* effective_url = nullptr;
+			curl_easy_getinfo(curl_handle.get(), CURLINFO_EFFECTIVE_URL, &effective_url);
+			if (effective_url)
+			{
+				if (std::string(effective_url) != url)
+				{
+					redirected_url = effective_url;
+				}
+			}
+        }
 
 		// probably a stream?
 		if (content.size() < max_bytes)

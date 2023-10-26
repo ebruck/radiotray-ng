@@ -44,9 +44,11 @@ public:
 private:
 	std::shared_ptr<IPlaylistDecoder> inspect(const std::string& content_type, const std::string& content);
 
-	bool download(const std::string& url, std::string& content_type, std::string& content, long& http_resp_code, size_t max_bytes);
+	bool download(const std::string& url, std::string& redirected_url, std::string& content_type, std::string& content, long& http_resp_code, size_t max_bytes);
 
 	void install_decoders();
+
+	bool is_url_direct_stream(const std::string& url);
 
 	using callback_pair_t = std::pair<std::string*, size_t>;
 
