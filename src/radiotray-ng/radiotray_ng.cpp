@@ -378,7 +378,10 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 		{
 			if (!this->playing_notification_sent)
 			{
-				this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+				{
+					this->notification.notify(this->get_station(), APP_NAME_DISPLAY, this->notification_image);
+				}
 
 				this->playing_notification_sent = true;
 			}
@@ -390,15 +393,20 @@ void RadiotrayNG::on_state_changed_event(const IEventBus::event& /*ev*/, IEventB
 		{
 			if (data[STATE_KEY] == STATE_CONNECTING)
 			{
-				this->notification.notify("Connecting", APP_NAME_DISPLAY, this->notification_image);
+				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+				{
+					this->notification.notify("Connecting", APP_NAME_DISPLAY, this->notification_image);
+				}
 				return;
 			}
 
 			if (data[STATE_KEY] == STATE_BUFFERING)
 			{
 				const auto station = this->get_station();
-
-				this->notification.notify("Buffering", (station.empty()) ? APP_NAME_DISPLAY : station, this->notification_image);
+				if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+				{
+					this->notification.notify("Buffering", (station.empty()) ? APP_NAME_DISPLAY : station, this->notification_image);
+				}
 				return;
 			}
 		}
@@ -638,9 +646,11 @@ bool RadiotrayNG::reload_bookmarks()
 
 	if (result)
 	{
-		// always show...
-		this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
-			radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+		if (this->config->get_bool(NOTIFICATION_KEY, DEFAULT_NOTIFICATION_VALUE))
+		{
+			this->notification.notify("Bookmarks Reloaded", APP_NAME_DISPLAY,
+				radiotray_ng::word_expand(this->config->get_string(RADIOTRAY_NG_NOTIFICATION_KEY, DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE)));
+		}
 
 		// force reloading of current groups station list...
 		this->set_station(this->group, this->station, this->station_notifications);
