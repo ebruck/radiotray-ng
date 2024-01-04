@@ -80,7 +80,7 @@ using playlist_t = std::vector<std::string>;
 #define LAST_STATION_KEY                  "last-station"
 #define LAST_STATION_NOTIFICATION_KEY     "last-station-notifications"
 #define MEDIA_KEY_MAPPING_KEY             "media-key-mapping"
-#define MEDIA_KEY_NEXT_STAITON_KEY        "media-key-next-station"
+#define MEDIA_KEY_NEXT_STATION_KEY        "media-key-next-station"
 #define MEDIA_KEY_PREVIOUS_STATION_KEY    "media-key-previous-station"
 #define MEDIA_KEY_VOLUME_DOWN_KEY         "media-key-volume-down"
 #define MEDIA_KEY_VOLUME_UP_KEY           "media-key-volume-up"
@@ -94,6 +94,9 @@ using playlist_t = std::vector<std::string>;
 #define SLEEP_TIMER_KEY                   "sleep-timer"
 #define SPLIT_TITLE_KEY                   "split-title"
 #define IHR_TITLE_KEY                     "ihr-title"
+#define TAG_INFO_IN_LABEL_KEY             "tag-info-in-label"
+#define TAG_INFO_IN_LABEL_LEN_KEY         "tag-info-in-label-len"
+#define TAG_INFO_IN_LABEL_ARTIST_KEY      "tag-info-in-label-artist"
 #define TAG_INFO_VERBOSE_KEY              "tag-info-verbose"
 #define TRACK_INFO_COPY_KEY               "track-info-copy"
 #define VOLUME_LEVEL_KEY                  "volume-level"
@@ -112,7 +115,7 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright © 2017-2023 - The Radiotray-NG Authors"
+#define APP_COPYRIGHT                     "Copyright © 2017-2024 - The Radiotray-NG Authors"
 #define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
@@ -144,6 +147,9 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_SPLIT_TITLE_VALUE                (true)
 #define DEFAULT_IHR_TITLE_KEY_VALUE              (true)
 #define DEFAULT_STATION_IMAGE_VALUE              ""
+#define DEFAULT_TAG_INFO_IN_LABEL_VALUE          (false)
+#define DEFAULT_TAG_INFO_IN_LABEL_LEN_VALUE      (80)
+#define DEFAULT_TAG_INFO_IN_LABEL_ARTIST_VALUE   (true)
 #define DEFAULT_TAG_INFO_VERBOSE_VALUE           (false)
 #define DEFAULT_STATION_NOTIFICATION_VALUE       (true)
 #define DEFAULT_TRACK_INFO_COPY_VALUE            (false)

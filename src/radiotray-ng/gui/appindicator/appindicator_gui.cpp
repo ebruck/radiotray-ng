@@ -63,6 +63,11 @@ void AppindicatorGui::on_state_event(const IEventBus::event& /*ev*/, IEventBus::
 {
 	const std::string state{data[STATE_KEY]};
 
+	if (this->config->get_bool(TAG_INFO_IN_LABEL_KEY, DEFAULT_TAG_INFO_IN_LABEL_VALUE))
+	{
+		app_indicator_set_label(this->appindicator, nullptr, nullptr);
+	}
+
 	this->update_status_menu_item(state);
 	this->update_action_menu_item(state);
 
@@ -369,6 +374,25 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 				gtk_widget_set_sensitive(this->status_menu_item, TRUE);
 			}
 
+			if (this->config->get_bool(TAG_INFO_IN_LABEL_KEY, DEFAULT_TAG_INFO_IN_LABEL_VALUE))
+			{
+				std::string label_text = title;
+
+				if (!artist.empty() && this->config->get_bool(TAG_INFO_IN_LABEL_ARTIST_KEY, DEFAULT_TAG_INFO_IN_LABEL_ARTIST_VALUE))
+				{
+					label_text += " - " + artist;
+				}
+
+				const uint32_t label_text_len = this->config->get_uint32(TAG_INFO_IN_LABEL_LEN_KEY, DEFAULT_TAG_INFO_IN_LABEL_LEN_VALUE);
+
+				if (label_text.length() > label_text_len)
+				{
+					label_text.resize(label_text_len);
+					label_text += "...";
+				}
+				app_indicator_set_label(this->appindicator, label_text.c_str(), nullptr);
+			}
+
 			// if wrap is disabled then we truncate at the wrap_len to prevent wide menus...
 			if (!wrap_enabled)
 			{
@@ -379,7 +403,6 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 				}
 			}
 		}
-
 
 		gtk_menu_item_set_label(GTK_MENU_ITEM(this->status_menu_item), status_text.c_str());
 		return;
