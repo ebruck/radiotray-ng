@@ -49,11 +49,11 @@ void PlaylistDownloader::install_decoders()
 }
 
 
-bool PlaylistDownloader::is_url_direct_stream(const std::string& url)
+bool PlaylistDownloader::is_url_direct_stream(const std::string& url,  const std::string& content_type)
 {
 	for(auto& decoder : this->decoders)
 	{
-		if (decoder->is_url_direct_stream(url))
+		if (decoder->is_url_direct_stream(url, content_type))
 		{
 			LOG(info) << "detected as a direct stream, decoder: " << decoder->get_name();
 			return true;
@@ -72,7 +72,7 @@ bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std
 
 	long http_resp_code{0};
 
-	if (std.direct || this->is_url_direct_stream(std.url))
+	if (std.direct || this->is_url_direct_stream(std.url, content_type))
 	{
 		if (std.direct)
 		{
@@ -105,7 +105,7 @@ bool PlaylistDownloader::download_playlist(const IBookmarks::station_data_t& std
 	// lets see if redirected url is a direct stream...
 	if (!redirected_url.empty())
 	{
-		if (this->is_url_direct_stream(redirected_url))
+		if (this->is_url_direct_stream(redirected_url, content_type))
 		{
 			playlist.push_back(redirected_url);
 			return true;

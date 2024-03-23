@@ -48,7 +48,7 @@ private:
 
 	void install_decoders();
 
-	bool is_url_direct_stream(const std::string& url);
+	bool is_url_direct_stream(const std::string& url, const std::string& content_type);
 
 	using callback_pair_t = std::pair<std::string*, size_t>;
 

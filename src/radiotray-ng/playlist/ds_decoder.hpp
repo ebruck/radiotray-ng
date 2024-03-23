@@ -25,7 +25,7 @@ class DsDecoder final : public IPlaylistDecoder
 public:
     virtual ~DsDecoder() = default;
 
-    bool is_url_direct_stream(const std::string& url);
+    bool is_url_direct_stream(const std::string& url, const std::string& content_type);
 
     bool is_decodable(const std::string& content_type, const std::string& content);
 

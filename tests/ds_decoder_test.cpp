@@ -23,8 +23,10 @@ TEST(DsDecoder, test_that_url_is_detected_as_a_direct_stream)
 {
     DsDecoder ds_decoder;
 
-    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.m3u8"));
-    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.M3u8"));
-    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mp3"));
-    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mP3"));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.m3u8", ""));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.M3u8",""));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mp3", ""));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream.mP3", ""));
+    ASSERT_TRUE(ds_decoder.is_url_direct_stream("http://example.com/stream/mp3", "audio/mpeg"));
+    ASSERT_FALSE(ds_decoder.is_url_direct_stream("http://example.com/stream/mp3", "image/png"));
 }
