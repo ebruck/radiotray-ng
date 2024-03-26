@@ -55,7 +55,7 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
-        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10")
+        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10" OR ${RELEASE} STREQUAL "23.1")
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
@@ -71,7 +71,7 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()       
+        endif()
 
         # Debian no longer supports libjsoncpp1 and ubuntu appindicator package naming
         if (${CODENAME} STREQUAL "bullseye")
