@@ -55,7 +55,7 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
-        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10")
+        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10" OR ${RELEASE} STREQUAL "24.04")
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
@@ -86,7 +86,7 @@ if (LSB_RELEASE_EXECUTABLE)
         endif()
 
         # ubuntu lunar has newer libwsxgtk
-        if (${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10")
+        if (${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10" OR ${RELEASE} STREQUAL "24.04")
             message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
