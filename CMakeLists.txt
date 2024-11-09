@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 OLD)
+endif()
+
 project(radiotray-ng CXX)
 
 # workaround for Eclipse
@@ -92,8 +96,8 @@ if (BUILD_TESTS)
 
     ExternalProject_Add(googletest
         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
-        URL https://github.com/google/googletest/archive/release-1.11.0.tar.gz
-        URL_HASH SHA256=b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5
+        URL https://github.com/google/googletest/releases/download/v1.15.2/googletest-1.15.2.tar.gz
+        URL_HASH SHA256=7b42b4d6ed48810c5362c265a17faebe90dc2373c885e5216439d37927f02926
         DOWNLOAD_EXTRACT_TIMESTAMP true
         TIMEOUT 30
         DOWNLOAD_NO_PROGRESS true

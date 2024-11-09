@@ -6,6 +6,11 @@ if (LSB_RELEASE_EXECUTABLE)
     execute_process(COMMAND lsb_release -i -s OUTPUT_VARIABLE DISTRIBUTOR_ID  OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+    # handle distros that identify release as n/a...
+    if (RELEASE STREQUAL "n/a")
+        set(RELEASE "na")
+    endif()
+
     # default to debian...
     string(TOLOWER ${DISTRIBUTOR_ID} DISTRIBUTOR_ID)
     if (NOT CPACK_GENERATOR)

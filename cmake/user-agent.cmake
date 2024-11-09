@@ -4,6 +4,12 @@ if (LSB_RELEASE_EXECUTABLE)
     execute_process(COMMAND lsb_release -i -s OUTPUT_VARIABLE USER_AGENT_DISTRO          OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE USER_AGENT_DISTRO_CODENAME OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE USER_AGENT_DISTRO_RELEASE  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    # handle distros that identify release as n/a...
+    if (USER_AGENT_DISTRO_RELEASE STREQUAL "n/a")
+        set(USER_AGENT_DISTRO_RELEASE "NA")
+    endif()
+
 else()
     if (APPLE)
         execute_process(COMMAND sw_vers -productName OUTPUT_VARIABLE USER_AGENT_DISTRO OUTPUT_STRIP_TRAILING_WHITESPACE)
