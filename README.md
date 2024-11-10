@@ -70,6 +70,9 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "split-title" : true,
    "track-info-copy" : false,
    "ihr-title" : true,
+   "tag-info-in-label" : false,
+   "tag-info-in-label-len" : 80,
+   "tag-info-in-label-artist": true,
    "tag-info-verbose" : false,
    "volume-level" : 100,
    "volume-step" : 1,
@@ -97,7 +100,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
              compact-menu : enable/disable the use of menu separators
              debug-logging: enable/disable verbose debug logging
            disable-logging: enable/disable logging
-              file-monitor: enable/disable notifcation of bookmark file changes
+              file-monitor: enable/disable notification of bookmark file changes
      file-monitor-interval: time in seconds to poll for bookmark file changes
               invert-menu : menu rendered in reverse order
       notification-verbose: more status information than normal
@@ -105,6 +108,9 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
                sleep-timer: value is in minutes
                split-title: attempts to reformat the notification into title/artist
                  ihr-title: extra parsing for iheartradio formatting (requires split-title)
+         tag-info-in-label: display title & artist next to icon
+     tag-info-in-label-len: maximum title & artist line length
+  tag-info-in-label-artist: include artist in icon label
           tag-info-verbose: displays in the menu stream information such as bitrate etc.
            track-info-copy: enable/disable track clicking to copy into clipboard
                volume-step: value used to increment/decrement the volume level
@@ -240,14 +246,19 @@ $ dnf install radiotray-ng
 
 Install these packages:
 ```
-lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libncurses5-dev libglibmm-2.4-dev cmake
-
-# before ubuntu 22.04:
-libappindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
-# For Ubuntu 22.04 install:
-libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libglibmm-2.4-dev cmake
+```
 # For Ubuntu 23.10 and newer install:
+```
 libayatana-appindicator3-dev libwxgtk3.2-dev
+```
+# For Ubuntu 22.04 install:
+```
+libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+```
+# Before ubuntu 22.04:
+```
+libappindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
 ```
 
 ## Build Radiotray-NG & Debian Package ##

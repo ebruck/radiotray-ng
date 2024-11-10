@@ -1,3 +1,8 @@
+* Sun Nov 10 2024 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.9
+- Added option to display title & artist next to tray icon
+- notification set to false now disables all messages
+- Minor build changes & bug fixes
+
 * Sat Aug 21 2021 Edward G. Bruck <ed.bruck1@gmail.com> - 0.2.8
 - MATE media key support
 - Minor cleanup & bug fixes

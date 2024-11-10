@@ -47,7 +47,7 @@ namespace
 
 ImageList::ImageList()
 {
-	this->image_list = std::make_shared<wxImageList>();
+	this->image_list = std::make_shared<wxImageList>(IMAGE_WIDTH_DEFAULT, IMAGE_HEIGHT_DEFAULT);
 }
 
 ImageList::~ImageList()

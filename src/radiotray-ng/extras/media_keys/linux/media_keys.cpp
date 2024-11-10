@@ -44,7 +44,7 @@ public:
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE))] =
 				std::bind(&IRadioTrayNG::volume_down_msg, this->radiotray_ng);
 
-			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
+			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_NEXT_STATION_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE))] =
 				std::bind(&IRadioTrayNG::next_station_msg, this->radiotray_ng);
 
 			this->media_keys[radiotray_ng::to_lower(this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE))] =
@@ -103,7 +103,7 @@ public:
 			<< this->config->get_string(MEDIA_KEY_VOLUME_DOWN_KEY, DEFAULT_MEDIA_KEY_VOLUME_DOWN_VALUE);
 
 		LOG(info) << "mapping station previous/next to: "<< this->config->get_string(MEDIA_KEY_PREVIOUS_STATION_KEY, DEFAULT_MEDIA_KEY_PREVIOUS_STATION_VALUE) << ", "
-			<< this->config->get_string(MEDIA_KEY_NEXT_STAITON_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE);
+			<< this->config->get_string(MEDIA_KEY_NEXT_STATION_KEY, DEFAULT_MEDIA_KEY_NEXT_STATION_VALUE);
 	}
 
 private:

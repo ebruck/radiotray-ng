@@ -26,13 +26,19 @@ std::string DsDecoder::get_name()
 }
 
 
-bool DsDecoder::is_url_direct_stream(const std::string& url)
+bool DsDecoder::is_url_direct_stream(const std::string& url, const std::string& content_type)
 {
     std::string tmp{url};
+    std::string tmp_ct{content_type};
 
     std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+    std::transform(tmp_ct.begin(), tmp_ct.end(), tmp_ct.begin(), ::tolower);
 
-    return boost::ends_with(tmp, ".m3u8") ||
+    return tmp_ct.find("audio/mpeg") != std::string::npos ||
+           tmp_ct.find("audio/mp4")  != std::string::npos ||
+           tmp_ct.find("audio/ogg")  != std::string::npos ||
+           tmp_ct.find("audio/vorbis") != std::string::npos ||
+           boost::ends_with(tmp, ".m3u8") ||
            boost::ends_with(tmp, ".mp3")  ||
            boost::ends_with(tmp, ".aac");
 }

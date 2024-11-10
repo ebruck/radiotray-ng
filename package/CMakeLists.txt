@@ -6,6 +6,11 @@ if (LSB_RELEASE_EXECUTABLE)
     execute_process(COMMAND lsb_release -i -s OUTPUT_VARIABLE DISTRIBUTOR_ID  OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+    # handle distros that identify release as n/a...
+    if (RELEASE STREQUAL "n/a")
+        set(RELEASE "na")
+    endif()
+
     # default to debian...
     string(TOLOWER ${DISTRIBUTOR_ID} DISTRIBUTOR_ID)
     if (NOT CPACK_GENERATOR)
@@ -41,29 +46,20 @@ if (LSB_RELEASE_EXECUTABLE)
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
 
     if (CPACK_GENERATOR MATCHES "DEB")
-        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY  "Simple Internet Radio Player\n Radiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY  "Simple Internet Radio Player\nRadiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
         set(BOOST_DEB_VERSION                  "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
         set(CPACK_DEBIAN_PACKAGE_SECTION       "sound")
         set(CPACK_DEBIAN_COMPRESSION_TYPE      "xz")
         set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE  ${CPACK_SYSTEM_NAME})
         set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "Edward G. Bruck <ed.bruck1@gmail.com>")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm;${PROJECT_SOURCE_DIR}/package/conffiles)
 
-        if (${RELEASE} STREQUAL "21.04")
-            string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10")
+        # ubuntu and mint
+        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "21.3" OR ${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # no libcurl4 on Debian Stretch
-        # https://bugs.launchpad.net/ubuntu/+source/curl/+bug/1754294
-        if (${RELEASE} STREQUAL "16.04" OR ${CODENAME} STREQUAL "stretch")
-            string(REPLACE "libcurl4" "libcurl3" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
         # Debian 12
@@ -71,7 +67,7 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()       
+        endif()
 
         # Debian no longer supports libjsoncpp1 and ubuntu appindicator package naming
         if (${CODENAME} STREQUAL "bullseye")
@@ -79,21 +75,14 @@ if (LSB_RELEASE_EXECUTABLE)
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
-        # official packages for older distros will continue to use gtk2 for the editor
-        if (${RELEASE} STREQUAL "16.04" OR ${RELEASE} STREQUAL "18.04" OR ${RELEASE} STREQUAL "19.04" OR ${CODENAME} STREQUAL "stretch")
-            message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.0-0v5" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # ubuntu lunar has newer libwsxgtk
-        if (${RELEASE} STREQUAL "23.04" OR ${RELEASE} STREQUAL "23.10")
-            message(STATUS "Official packaging assumes gtk2 dependency for 'rtng-bookmark-editor'")
+        # ubuntu noble and mint 22 has newer libwsxgtk
+        if (${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
+            message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
         endif()
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
 
-        # for 16.04
         execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/package/postinst)
         execute_process(COMMAND chmod 755 ${PROJECT_SOURCE_DIR}/package/postrm)
         execute_process(COMMAND chmod 644 ${PROJECT_SOURCE_DIR}/package/conffiles)

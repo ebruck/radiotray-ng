@@ -25,11 +25,11 @@ class M3uDecoder : public IPlaylistDecoder
 public:
 	virtual ~M3uDecoder() = default;
 
-	virtual bool is_url_direct_stream(const std::string& /*url*/) { return false; };
+	bool is_url_direct_stream(const std::string& /*url*/, const std::string& /*content_type*/) { return false; };
 
-	virtual bool is_decodable(const std::string& content_type, const std::string& content);
+	bool is_decodable(const std::string& content_type, const std::string& content);
 
-	virtual bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
+	bool decode(const std::string& content_type, const std::string& payload, playlist_t& playlist);
 
-	virtual std::string get_name();
+	std::string get_name();
 };

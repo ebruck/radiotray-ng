@@ -18,10 +18,6 @@
          {
             "name" : "Top Latino Radio",
             "url" : "http://online.radiodifusion.net:8020/listen.pls"
-         },
-         {
-            "name" : "Reggaeton 24/7",
-            "url" : "http://cc.net2streams.com/tunein.php/reggaeton/playlist.pls"
          }
       ]
    },
@@ -31,10 +27,6 @@
          {
             "name" : "181.FM Classic Hits",
             "url" : "http://www.181.fm/winamp.pls?station=181-greatoldies&file=181-greatoldies.pls"
-         },
-         {
-            "name" : ".977 Classic Rock",
-            "url" : "http://www.977music.com/tunein/web/classicrock.asx"
          },
          {
             "name" : "Covers",
@@ -50,10 +42,6 @@
             "url" : "http://provisioning.streamtheworld.com/pls/KDFCFM.pls"
          },
          {
-            "name" : "Classic FM",
-            "url" : "http://media-ice.musicradio.com/ClassicFMMP3.m3u"
-         },
-         {
             "name" : "WCPE",
             "url" : "http://www.ibiblio.org/wcpe/wcpe.pls"
          },
@@ -64,10 +52,6 @@
          {
             "name" : "WQXR",
             "url" : "http://www.wqxr.org/stream/wqxr/mp3.pls"
-         },
-         {
-            "name" : "BBC Radio 3",
-            "url" : "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p"
          }
       ]
    },
@@ -79,8 +63,8 @@
             "url" : "http://www.radioparadise.com/musiclinks/rp_128.m3u"
          },
          {
-            "name" : ".977 The Hitz Channel",
-            "url" : "http://www.977music.com/tunein/web/hitz.asx"
+            "name" : "SoftRockRadio.net",
+            "url" : "https://gold.streamguys1.com/softrock.mp3"
          },
          {
             "name" : "Indie Pop Rocks!",
@@ -109,7 +93,7 @@
          },
          {
             "name" : "WNAR-AM Radio",
-            "url" : "http://live.wnar-am.com:8500/listen.pls"
+            "url" : "https://streaming.live365.com/a91284"
          }
       ]
    },
@@ -179,10 +163,6 @@
             "url" : "http://somafm.com/brfm.pls"
          },
          {
-            "name" : "New Dance Radio",
-            "url" : "http://jbstream.net/tunein.php/blackoutworm/playlist.asx"
-         },
-         {
             "name" : "DubStep Beyond",
             "url" : "http://somafm.com/play/dubstep32"
          }
@@ -193,7 +173,7 @@
       "stations" : [
          {
             "name" : "Jupiter Broadcasting",
-            "url" : "http://jblive.stream/"
+            "url" : "http://jblive.fm/"
          }
       ]
    }

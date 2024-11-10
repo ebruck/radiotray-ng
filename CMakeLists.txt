@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 OLD)
+endif()
+
 project(radiotray-ng CXX)
 
 # workaround for Eclipse
@@ -13,7 +17,7 @@ endif()
 # version for user agent creation
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 2)
-set(PROJECT_VERSION_PATCH 8)
+set(PROJECT_VERSION_PATCH 9)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # output dir
@@ -55,7 +59,7 @@ endif(NOT APPLE)
 set(CMAKE_CXX_STANDARD 14)
 add_definitions("-DBOOST_LOG_DYN_LINK")
 add_compile_options("-fdiagnostics-color=auto")
-set(warnings "-Wall -Wextra -Werror -Wpedantic")
+set(warnings "-Wall -Wextra -Werror -Wpedantic -Wno-deprecated-declarations")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warnings}")
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${warnings}")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
@@ -70,7 +74,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     if (NOT APPINDICATOR_FOUND)
         pkg_search_module(APPINDICATOR REQUIRED ayatana-appindicator3-0.1)
         if (APPINDICATOR_FOUND)
-            set(AYATANA_APPINDICATOR true)
+            set(AYATANA_APPINDICATOR true CACHE BOOL "ayatana-appindicator")
         endif()
     endif()
 if (NOT APPINDICATOR_FOUND)
@@ -92,8 +96,9 @@ if (BUILD_TESTS)
 
     ExternalProject_Add(googletest
         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/googletest"
-        URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
-        URL_HASH SHA256=9bf1fe5182a604b4135edc1a425ae356c9ad15e9b23f9f12a02e80184c3a249c
+        URL https://github.com/google/googletest/releases/download/v1.15.2/googletest-1.15.2.tar.gz
+        URL_HASH SHA256=7b42b4d6ed48810c5362c265a17faebe90dc2373c885e5216439d37927f02926
+        DOWNLOAD_EXTRACT_TIMESTAMP true
         TIMEOUT 30
         DOWNLOAD_NO_PROGRESS true
         INSTALL_COMMAND "")
@@ -101,7 +106,7 @@ if (BUILD_TESTS)
     ExternalProject_Get_Property(googletest SOURCE_DIR)
     include_directories(${SOURCE_DIR}/googlemock/include ${SOURCE_DIR}/googletest/include)
     ExternalProject_Get_Property(googletest BINARY_DIR)
-    link_directories(${BINARY_DIR}/googlemock ${BINARY_DIR}/googlemock/gtest)
+    link_directories(${BINARY_DIR}/lib)
     set(GMOCK_BOTH_LIBRARIES gmock_main gmock gtest)
     set_property(DIRECTORY PROPERTY CLEAN_NO_CUSTOM "${CMAKE_CURRENT_BINARY_DIR}/googletest")
     unset(SOURCE_DIR)

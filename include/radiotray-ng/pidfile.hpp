@@ -45,14 +45,14 @@ namespace radiotray_ng
 
 			std::string pid_file{base_dir + "/" + app_name + ".pid"};
 
-			pid_t otherpid;
-			this->pfh = pidfile_open(pid_file.c_str(), 0600, &otherpid);
+			pid_t other_pid;
+			this->pfh = pidfile_open(pid_file.c_str(), 0600, &other_pid);
 
 			if (this->pfh == nullptr)
 			{
 				if (errno == EEXIST)
 				{
-					std::cerr << "An instance of " << app_name << " is already running, pid: " << otherpid << std::endl;
+					std::cerr << "An instance of " << app_name << " is already running, pid: " << other_pid << std::endl;
 
 					this->already_running = true;
 
