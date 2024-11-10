@@ -1,3 +1,12 @@
+radiotray-ng (0.2.9) unstable; urgency=low
+
+      * Added option to display title & artist next to tray icon
+      * notification set to false now disables all messages
+      * Minor build changes & bug fixes
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sun, 10 Nov 2024 11:22:05 -0800
+
+
 radiotray-ng (0.2.8) unstable; urgency=low
 
       * MATE media key support
