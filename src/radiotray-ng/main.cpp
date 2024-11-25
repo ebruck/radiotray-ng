@@ -289,7 +289,12 @@ int main(int argc, char* argv[])
 #endif
 
 	// addons etc.
-	MediaKeys mm(radiotray_ng, config);
+	std::unique_ptr<MediaKeys> mm;
+
+	if (config->get_bool(MEDIA_KEYS, DEFAULT_MEDIA_KEYS_VALUE))
+	{
+		mm = std::make_unique<MediaKeys>(radiotray_ng, config);
+	}
 
 	gui->run(argc, argv);
 
