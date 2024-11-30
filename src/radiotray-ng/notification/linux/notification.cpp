@@ -62,6 +62,8 @@ void Notification::notify(const std::string& title, const std::string& message, 
 {
 	LOG(debug) << "notify: " << title << ", " << message << ", " << image;
 
-	notify_notification_update(this->n->nn, title.c_str(), message.c_str(), radiotray_ng::word_expand(image).c_str());
+	notify_notification_clear_hints(this->n->nn);
+	notify_notification_update(this->n->nn, title.c_str(), message.c_str(), RADIOTRAY_NG_ICON_OFF_KEY);
+	notify_notification_set_hint(this->n->nn, "image-path", g_variant_new_string(radiotray_ng::word_expand(image).c_str()));
 	notify_notification_show(this->n->nn, nullptr);
 }
