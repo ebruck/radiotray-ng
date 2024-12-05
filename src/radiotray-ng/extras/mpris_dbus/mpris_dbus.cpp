@@ -107,7 +107,7 @@ namespace
 		"</interface>"
 		"</node>";
 	const char RTNG_DBUS_NAME[] = "org.mpris.MediaPlayer2.radiotray-ng";
-	const char RTNG_DBUS_OBJECT_PATH[] = "/org/mrpis/MediaPlayer2";
+	const char RTNG_DBUS_OBJECT_PATH[] = "/org/mpris/MediaPlayer2";
 }
 
 
