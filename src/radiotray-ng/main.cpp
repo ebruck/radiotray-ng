@@ -35,6 +35,10 @@
 #include <radiotray-ng/extras/rtng_dbus/rtng_dbus.hpp>
 #endif
 
+#ifdef MPRIS_DBUS
+#include <radiotray-ng/extras/mpris_dbus/mpris_dbus.hpp>
+#endif
+
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
@@ -285,9 +289,11 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef RTNG_DBUS
-	RtngDbus dbus(gui, radiotray_ng);
+	RtngDbus rtng_dbus(gui, radiotray_ng);
 #endif
-
+#ifdef MPRIS_DBUS
+	MprisDbus mpris_dbus(gui, radiotray_ng);
+#endif
 	// addons etc.
 	MediaKeys mm(radiotray_ng, config);
 
