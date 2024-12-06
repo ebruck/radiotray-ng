@@ -162,15 +162,23 @@ MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> ra
 		std::placeholders::_2), IEventBus::event_pos::any);
 	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&MprisDbus::on_state_event, this, std::placeholders::_1,
 		std::placeholders::_2), IEventBus::event_pos::any);
+	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&MprisDbus::on_volume_event, this, std::placeholders::_1,
+		std::placeholders::_2), IEventBus::event_pos::any);
+	
 }
 void MprisDbus::on_tags_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
 {
-	this->PlayerPropertyChanged("Metadata",this->create_metadata());
+	this->PlayerPropertyChanged("Metadata",this->get_metadata());
 }
 void MprisDbus::on_state_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
 {
-	this->PlayerPropertyChanged("PlaybackStatus",this->create_playbackstatus());
+	this->PlayerPropertyChanged("PlaybackStatus",this->get_playbackstatus());
 }
+void MprisDbus::on_volume_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
+{
+	this->PlayerPropertyChanged("Volume",this->get_volume());
+}
+
 MprisDbus::~MprisDbus()
 {
 	Gio::DBus::unown_name(this->own_name_id);
@@ -183,7 +191,7 @@ void MprisDbus::on_method_call(
 	const Glib::ustring& /*object_path*/,
 	const Glib::ustring& /*interface_name*/, 
 	const Glib::ustring& method_name, 
-	const Glib::VariantContainerBase& parameters, 
+	const Glib::VariantContainerBase& /*parameters*/,
 	const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
 	LOG(debug) << "method called: " << method_name;
@@ -237,27 +245,6 @@ void MprisDbus::on_method_call(
 		return;
 	}
 
-	if (method_name == "reload_bookmarks")
-	{
-		this->gui->reload_bookmarks();
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-
-	if (method_name == "volume_up")
-	{
-		this->radiotray_ng->volume_up_msg();
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-
-	if (method_name == "volume_down")
-	{
-		this->radiotray_ng->volume_down_msg();
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-
 	if (method_name == "Previous")
 	{
 		this->radiotray_ng->previous_station_msg();
@@ -272,65 +259,6 @@ void MprisDbus::on_method_call(
 		return;
 	}
 
-	if (method_name == "play_station")
-	{
-		Glib::Variant<Glib::ustring> param;
-
-		parameters.get_child(param, 0);
-		const Glib::ustring group = param.get();
-
-		parameters.get_child(param, 1);
-		const Glib::ustring station = param.get();
-
-		this->radiotray_ng->play(group, station);
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-	//TODO Implement OpenURI Properly
-	if (method_name == "play_url")
-	{
-		Glib::Variant<Glib::ustring> param;
-
-		parameters.get_child(param, 0);
-		const Glib::ustring url = param.get();
-
-		this->radiotray_ng->play_url(url);
-		invocation->return_value(Glib::VariantContainerBase());
-		return;
-	}
-
-	if (method_name == "get_bookmarks")
-	{
-		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_bookmarks());
-		invocation->return_value(Glib::VariantContainerBase::create_tuple(var));
-		return;
-	}
-
-	if (method_name == "get_config")
-	{
-		auto var = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_config());
-		invocation->return_value(Glib::VariantContainerBase::create_tuple(var));
-		return;
-	}
-
-	if (method_name == "set_volume")
-	{
-		Glib::Variant<Glib::ustring> param;
-
-		parameters.get_child(param, 0);
-		const Glib::ustring volume = param.get();
-
-		try
-		{
-			this->radiotray_ng->set_volume_msg(std::stoul(volume));
-			invocation->return_value(Glib::VariantContainerBase());
-		}
-		catch(std::invalid_argument& ex)
-		{
-			invocation->return_error(Gio::DBus::Error(Gio::DBus::Error::INVALID_ARGS, "volume not an integer"));
-		}
-		return;
-	}
 	// non-existent method on the interface...
 	invocation->return_error(Gio::DBus::Error(Gio::DBus::Error::UNKNOWN_METHOD, "method does not exist"));
 }
@@ -350,7 +278,7 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "CanSetFullscreen") {
 			property = Glib::Variant<bool>::create(false);
 		} else if (property_name == "DesktopEntry") {
-			property = Glib::Variant<Glib::ustring>::create("/usr/share/applications/vlc"); 
+			property = Glib::Variant<Glib::ustring>::create(""); //Unsure of the correct desktop entry to use
 		} else if (property_name == "Fullscreen") {
 			property = Glib::Variant<bool>::create(false);
 		} else if (property_name == "HasTrackList") {
@@ -376,17 +304,17 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "MaximumRate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "Metadata") {
-			property = this->create_metadata();
+			property = this->get_metadata();
 		} else if (property_name == "MinimumRate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "PlaybackStatus") {
-			property = this->create_playbackstatus();
+			property = this->get_playbackstatus();
 		} else if (property_name == "Position") {
 			property = Glib::Variant<long>::create(0);
 		} else if (property_name == "Rate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "Volume") {
-			property = Glib::Variant<double>::create(stoi(this->radiotray_ng->get_volume())/100);
+			property = this->get_volume();
 		} else if (property_name == "Shuffle") {
 			property = Glib::Variant<bool>::create(true); //Set to true since not processing through a playlist
 		} else if (property_name == "LoopStatus"){
@@ -407,6 +335,7 @@ bool MprisDbus::on_interface_set_property(
 			return false;
 		} else if (property_name == "Rate") {
 		} else if (property_name == "Volume") {
+			//Untesting: converts from 0-1.0 input range to 0-100 volume
 			double derived = (Glib::VariantBase::cast_dynamic<Glib::Variant<double>>(value)).get();
 			radiotray_ng->set_volume(std::to_string(int(derived*100)));
 		} else {
@@ -414,24 +343,24 @@ bool MprisDbus::on_interface_set_property(
 		}
 
 		return true;
-	} catch (...) {
+		} catch (...) {
+		}
+
+		return false;
 	}
 
-	return false;
-	}
-
-Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::create_metadata()
+Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::get_metadata()
 {
     std::map<Glib::ustring, Glib::VariantBase> metadata;
 
-    metadata["MprisDbus:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1");
+    metadata["mpris:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1"); // Have to have a trackid for metadata
     metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_title());
-    metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station());
+    metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station()); 
     metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({this->radiotray_ng->get_artist()});
 
     return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
 }
-Glib::Variant<Glib::ustring> MprisDbus::create_playbackstatus()
+Glib::Variant<Glib::ustring> MprisDbus::get_playbackstatus()
 {
     if (this->radiotray_ng->get_state() == STATE_PLAYING)
     {
@@ -442,27 +371,35 @@ Glib::Variant<Glib::ustring> MprisDbus::create_playbackstatus()
         return Glib::Variant<Glib::ustring>::create("Paused");
     }
 }
+Glib::Variant<double> MprisDbus::get_volume()
+{
+    return Glib::Variant<double>::create(stoi(this->radiotray_ng->get_volume())/100);
+}
+
 void MprisDbus::PlayerPropertyChanged(
 		const Glib::ustring &name,
 		const Glib::VariantBase &value) {
 	try {
-		const auto connection = Gio::DBus::Connection::get_sync(
-			Gio::DBus::BusType::BUS_TYPE_SESSION);
+		const auto connection = Gio::DBus::Connection::get_sync(Gio::DBus::BusType::BUS_TYPE_SESSION);
 
 		connection->emit_signal(
-			std::string(MPRIS_DBUS_OBJECT_PATH),
-			std::string("org.freedesktop.DBus.Properties"),
+			MPRIS_DBUS_OBJECT_PATH,
+			"org.freedesktop.DBus.Properties",
 			"PropertiesChanged",
 			{},
-			Glib::Variant<std::tuple<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>,std::vector<Glib::ustring>>>::create(
-				std::tuple<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>,std::vector<Glib::ustring>>{
-					Glib::ustring(std::string("org.mpris.MediaPlayer2.Player")),
-					std::map<Glib::ustring, Glib::VariantBase>{
-						{ name, value },
-					},
-					std::vector<Glib::ustring>{},
-			}));
+			Glib::Variant<std::tuple<
+				Glib::ustring,
+				std::map<Glib::ustring, Glib::VariantBase>,
+				std::vector<Glib::ustring>>>::create(
+					std::make_tuple(
+						"org.mpris.MediaPlayer2.Player", 	//Player Property change
+						std::map<Glib::ustring, Glib::VariantBase>{{name, value}},
+						std::vector<Glib::ustring>{}
+					)
+			)
+		);
 	} catch (...) {
+		LOG(error) << "emitting player property change failed: " << MPRIS_DBUS_OBJECT_PATH;
 	}
 }
 
