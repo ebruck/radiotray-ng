@@ -17,8 +17,11 @@
 
 #pragma once
 
+#include <radiotray-ng/i_event_bus.hpp>
+
 #include <giomm.h>
 #include <glibmm.h>
+
 #include <memory>
 
 class IRadioTrayNG;
@@ -28,7 +31,7 @@ class IGui;
 class MprisDbus
 {
 public:
-	MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng);
+	MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus);
 
 	~MprisDbus();
 
@@ -60,6 +63,11 @@ private:
 		const Glib::ustring& property_name, 
 		const Glib::VariantBase& value);
 
+	Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> create_metadata();
+	void PlayerPropertyChanged(
+		const Glib::ustring &name,
+		const Glib::VariantBase &value);
+
 	void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& name);
 
 	guint registered_id;
@@ -71,4 +79,5 @@ private:
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IGui> gui;
+	std::shared_ptr<IEventBus> event_bus;
 };

@@ -148,13 +148,14 @@ namespace
 }
 
 
-MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng)
+MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus)
 	: interface_vtable(
 		sigc::mem_fun(*this, &MprisDbus::on_method_call),
 		sigc::mem_fun(*this, &MprisDbus::on_interface_get_property),
 		sigc::mem_fun(*this, &MprisDbus::on_interface_set_property))
 	, radiotray_ng(std::move(radiotray_ng))
 	, gui(std::move(gui))
+	, event_bus(std::move(event_bus))
 {
 	this->dbus_setup();
 }
@@ -365,15 +366,7 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "MaximumRate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "Metadata") {
-			std::map<Glib::ustring, Glib::VariantBase> metadata;
-
-			metadata["MprisDbus:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1");
-			metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(radiotray_ng->get_title());
-			metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(radiotray_ng->get_station());
-			metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({radiotray_ng->get_artist()});
-			
-			property = Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
-
+			property = this->create_metadata();
 		} else if (property_name == "MinimumRate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "PlaybackStatus") {
@@ -388,7 +381,7 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "Rate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "Volume") {
-			property = Glib::Variant<double>::create(stoi(radiotray_ng->get_volume())/100);
+			property = Glib::Variant<double>::create(stoi(this->radiotray_ng->get_volume())/100);
 		} else if (property_name == "Shuffle") {
 			property = Glib::Variant<bool>::create(true); //Set to true since not processing through a playlist
 		} else if (property_name == "LoopStatus"){
@@ -422,6 +415,41 @@ bool MprisDbus::on_interface_set_property(
 	return false;
 	}
 
+Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::create_metadata()
+{
+    std::map<Glib::ustring, Glib::VariantBase> metadata;
+
+    metadata["MprisDbus:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1");
+    metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_title());
+    metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station());
+    metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({this->radiotray_ng->get_artist()});
+
+    return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
+}
+
+void PlayerPropertyChanged(
+		const Glib::ustring &name,
+		const Glib::VariantBase &value) {
+	try {
+		const auto connection = Gio::DBus::Connection::get_sync(
+			Gio::DBus::BusType::BUS_TYPE_SESSION);
+
+		connection->emit_signal(
+			std::string(MPRIS_DBUS_OBJECT_PATH),
+			std::string("org.freedesktop.DBus.Properties"),
+			"PropertiesChanged",
+			{},
+			Glib::Variant<std::tuple<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>,std::vector<Glib::ustring>>>::create(
+				std::tuple<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>,std::vector<Glib::ustring>>{
+					Glib::ustring(std::string("org.mpris.MediaPlayer2.Player")),
+					std::map<Glib::ustring, Glib::VariantBase>{
+						{ name, value },
+					},
+					std::vector<Glib::ustring>{},
+			}));
+	} catch (...) {
+	}
+}
 
 void MprisDbus::on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /*name*/)
 {
