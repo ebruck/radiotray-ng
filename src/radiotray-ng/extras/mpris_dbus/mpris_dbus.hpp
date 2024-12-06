@@ -36,6 +36,7 @@ public:
 	~MprisDbus();
 
 private:
+
 	void dbus_setup();
 
 	void on_method_call(
@@ -62,7 +63,8 @@ private:
 		const Glib::ustring& interface_name,
 		const Glib::ustring& property_name, 
 		const Glib::VariantBase& value);
-
+	
+	void on_tags_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
 	Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> create_metadata();
 	void PlayerPropertyChanged(
 		const Glib::ustring &name,

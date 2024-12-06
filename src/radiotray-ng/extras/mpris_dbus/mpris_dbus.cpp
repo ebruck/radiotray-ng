@@ -158,8 +158,13 @@ MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> ra
 	, event_bus(std::move(event_bus))
 {
 	this->dbus_setup();
+	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&MprisDbus::on_tags_event, this, std::placeholders::_1,
+		std::placeholders::_2), IEventBus::event_pos::any);
 }
-
+void MprisDbus::on_tags_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
+{
+	this->PlayerPropertyChanged("Metadata",this->create_metadata());
+}
 
 MprisDbus::~MprisDbus()
 {
@@ -427,7 +432,7 @@ Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::create_meta
     return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
 }
 
-void PlayerPropertyChanged(
+void MprisDbus::PlayerPropertyChanged(
 		const Glib::ustring &name,
 		const Glib::VariantBase &value) {
 	try {
