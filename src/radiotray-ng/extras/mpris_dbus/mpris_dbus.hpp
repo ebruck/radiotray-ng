@@ -66,6 +66,7 @@ private:
 	guint own_name_id;
 	Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 	Glib::RefPtr<Gio::DBus::NodeInfo> player_introspection_data;
+	// Glib::RefPtr<Gio::DBus::NodeInfo> tracklist_introspection_data;
 	const Gio::DBus::InterfaceVTable  interface_vtable;
 
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;

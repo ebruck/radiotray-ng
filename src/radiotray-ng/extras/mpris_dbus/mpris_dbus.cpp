@@ -28,32 +28,32 @@ namespace
 		"<interface name='org.mpris.MediaPlayer2'>"
 		"	<method name='Raise' />"
 		"	<method name='Quit'>"
-		"	<annotation name='org.freedesktop.DBus.Method.NoReply' value='true' />"
+		"		<annotation name='org.freedesktop.DBus.Method.NoReply' value='true' />"
 		"	</method>"
 		"	<property name='CanQuit' type='b' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='Fullscreen' type='b' access='readwrite' />"
 		"	<property name='CanSetFullscreen' type='b' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='CanRaise' type='b' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='HasTrackList' type='b' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='Identity' type='s' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='DesktopEntry' type='s' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='SupportedUriSchemes' type='as' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='SupportedMimeTypes' type='as' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"</interface>"
 		"</node>";
@@ -67,34 +67,34 @@ namespace
 		"	<method name='Stop' />"
 		"	<method name='Play' />"
 		"	<method name='Seek'>"
-		"	<arg name='Offset' type='x' direction='in' />"
+		"		<arg name='Offset' type='x' direction='in' />"
 		"	</method>"
 		"	<method name='SetPosition'>"
-		"	<arg name='TrackId' type='o' direction='in' />"
-		"	<arg name='Position' type='x' direction='in' />"
+		"		<arg name='TrackId' type='o' direction='in' />"
+		"		<arg name='Position' type='x' direction='in' />"
 		"	</method>"
 		"	<method name='OpenUri'>"
-		"	<arg name='Uri' type='s' direction='in' />"
+		"		<arg name='Uri' type='s' direction='in' />"
 		"	</method>"
 		"	<signal name='Seeked'>"
-		"	<arg name='Position' type='x' />"
+		"		<arg name='Position' type='x' />"
 		"	</signal>"
 		"	<property name='PlaybackStatus' type='s' access='read' />"
 		"	<property name='LoopStatus' type='s' access='readwrite' />"
 		"	<property name='Rate' type='d' access='readwrite'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='Shuffle' type='b' access='readwrite' />"
 		"	<property name='Metadata' type='a{sv}' access='read' />"
 		"	<property name='Volume' type='d' access='readwrite' />"
 		"	<property name='Position' type='x' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='false' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='false' />"
 		"	</property>"
 		"	<property name='MinimumRate' type='d' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='MaximumRate' type='d' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"	<property name='CanGoNext' type='b' access='read' />"
 		"	<property name='CanGoPrevious' type='b' access='read' />"
@@ -102,12 +102,49 @@ namespace
 		"	<property name='CanPause' type='b' access='read' />"
 		"	<property name='CanSeek' type='b' access='read' />"
 		"	<property name='CanControl' type='b' access='read'>"
-		"	<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
+		"		<annotation name='org.freedesktop.DBus.Property.EmitsChangedSignal' value='const' />"
 		"	</property>"
 		"</interface>"
 		"</node>";
-	const char RTNG_DBUS_NAME[] = "org.mpris.MediaPlayer2.radiotray-ng";
-	const char RTNG_DBUS_OBJECT_PATH[] = "/org/mpris/MediaPlayer2";
+	/* const char TRACKLIST_INTROSPECTION_XML[] =
+		"<node>"
+		"  <interface name='org.mpris.MediaPlayer2.TrackList'>"
+		"    <method name='GetTracksMetadata'>"
+		"      <arg direction='in' name='TrackIds' type='ao'/>"
+		"      <arg direction='out' name='Metadata' type='aa{sv}'/>"
+		"    </method>"
+		"    <method name='AddTrack'>"
+		"      <arg direction='in' name='Uri' type='s'/>"
+		"      <arg direction='in' name='AfterTrack' type='o'/>"
+		"      <arg direction='in' name='SetAsCurrent' type='b'/>"
+		"    </method>"
+		"    <method name='RemoveTrack'>"
+		"      <arg direction='in' name='TrackId' type='o'/>"
+		"    </method>"
+		"    <method name='GoTo'>"
+		"      <arg direction='in' name='TrackId' type='o'/>"
+		"    </method>"
+		"    <signal name='TrackListReplaced'>"
+		"      <arg name='Tracks' type='ao'/>"
+		"      <arg name='CurrentTrack' type='o'/>"
+		"    </signal>"
+		"    <signal name='TrackAdded'>"
+		"      <arg name='Metadata' type='a{sv}'/>"
+		"      <arg name='AfterTrack' type='o'/>"
+		"    </signal>"
+		"    <signal name='TrackRemoved'>"
+		"      <arg name='TrackId' type='o'/>"
+		"    </signal>"
+		"    <signal name='TrackMetadataChanged'>"
+		"      <arg name='TrackId' type='o'/>"
+		"      <arg name='Metadata' type='a{sv}'/>"
+		"    </signal>"
+		"    <property name='Tracks' type='ao' access='read'/>"
+		"    <property name='CanEditTracks' type='b' access='read'/>"
+		"  </interface>"
+		"</node>"; */
+	const char MPRIS_DBUS_NAME[] = "org.mpris.MediaPlayer2.radiotray-ng";
+	const char MPRIS_DBUS_OBJECT_PATH[] = "/org/mpris/MediaPlayer2";
 }
 
 
@@ -283,7 +320,6 @@ void MprisDbus::on_method_call(
 		}
 		return;
 	}
-
 	// non-existent method on the interface...
 	invocation->return_error(Gio::DBus::Error(Gio::DBus::Error::UNKNOWN_METHOD, "method does not exist"));
 }
@@ -386,18 +422,21 @@ bool MprisDbus::on_interface_set_property(
 	return false;
 	}
 
+
 void MprisDbus::on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /*name*/)
 {
 	try
 	{
-		this->registered_id = connection->register_object(RTNG_DBUS_OBJECT_PATH, this->introspection_data->lookup_interface(),
+		this->registered_id = connection->register_object(MPRIS_DBUS_OBJECT_PATH, this->introspection_data->lookup_interface(),
 			this->interface_vtable);
-		this->registered_id = connection->register_object(RTNG_DBUS_OBJECT_PATH, this->player_introspection_data->lookup_interface(),
+		this->registered_id = connection->register_object(MPRIS_DBUS_OBJECT_PATH, this->player_introspection_data->lookup_interface(),
 			this->interface_vtable);
+		/* this->registered_id = connection->register_object(MPRIS_DBUS_OBJECT_PATH, this->tracklist_introspection_data->lookup_interface(),
+			this->interface_vtable); */
 	}
 	catch (const Glib::Error& ex)
 	{
-		LOG(error) << "register_object of object failed: " << RTNG_DBUS_OBJECT_PATH;
+		LOG(error) << "register_object of object failed: " << MPRIS_DBUS_OBJECT_PATH;
 	}
 }
 
@@ -412,6 +451,8 @@ void MprisDbus::dbus_setup()
 	{
 		this->introspection_data = Gio::DBus::NodeInfo::create_for_xml(INTROSPECTION_XML);
 		this->player_introspection_data = Gio::DBus::NodeInfo::create_for_xml(PLAYER_INTROSPECTION_XML);
+		// this->tracklist_introspection_data = Gio::DBus::NodeInfo::create_for_xml(TRACKLIST_INTROSPECTION_XML);
+	 
 	 
 	}
 	catch (const Glib::Error& ex)
@@ -421,7 +462,7 @@ void MprisDbus::dbus_setup()
 		return;
 	}
 
-	this->own_name_id = Gio::DBus::own_name(Gio::DBus::BusType::BUS_TYPE_SESSION, RTNG_DBUS_NAME,
+	this->own_name_id = Gio::DBus::own_name(Gio::DBus::BusType::BUS_TYPE_SESSION, MPRIS_DBUS_NAME,
 		sigc::mem_fun(*this, &MprisDbus::on_bus_acquired),
 		Gio::DBus::SlotNameAcquired(),
 		[this](const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&)
