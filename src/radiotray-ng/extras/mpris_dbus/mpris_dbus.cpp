@@ -160,12 +160,17 @@ MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> ra
 	this->dbus_setup();
 	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&MprisDbus::on_tags_event, this, std::placeholders::_1,
 		std::placeholders::_2), IEventBus::event_pos::any);
+	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&MprisDbus::on_state_event, this, std::placeholders::_1,
+		std::placeholders::_2), IEventBus::event_pos::any);
 }
 void MprisDbus::on_tags_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
 {
 	this->PlayerPropertyChanged("Metadata",this->create_metadata());
 }
-
+void MprisDbus::on_state_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
+{
+	this->PlayerPropertyChanged("PlaybackStatus",this->create_playbackstatus());
+}
 MprisDbus::~MprisDbus()
 {
 	Gio::DBus::unown_name(this->own_name_id);
@@ -375,12 +380,7 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "MinimumRate") {
 			property = Glib::Variant<double>::create(1.0);
 		} else if (property_name == "PlaybackStatus") {
-			if(radiotray_ng->get_state()==STATE_PLAYING){
-				property = Glib::Variant<Glib::ustring>::create("Playing");
-			}
-			else{
-				property = Glib::Variant<Glib::ustring>::create("Paused");
-			}
+			property = this->create_playbackstatus();
 		} else if (property_name == "Position") {
 			property = Glib::Variant<long>::create(0);
 		} else if (property_name == "Rate") {
@@ -431,7 +431,17 @@ Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::create_meta
 
     return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
 }
-
+Glib::Variant<Glib::ustring> MprisDbus::create_playbackstatus()
+{
+    if (this->radiotray_ng->get_state() == STATE_PLAYING)
+    {
+        return Glib::Variant<Glib::ustring>::create("Playing");
+    }
+    else
+    {
+        return Glib::Variant<Glib::ustring>::create("Paused");
+    }
+}
 void MprisDbus::PlayerPropertyChanged(
 		const Glib::ustring &name,
 		const Glib::VariantBase &value) {

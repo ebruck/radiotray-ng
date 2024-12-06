@@ -36,6 +36,8 @@ public:
 	~MprisDbus();
 
 private:
+	void on_tags_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
+	void on_state_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
 
 	void dbus_setup();
 
@@ -64,8 +66,9 @@ private:
 		const Glib::ustring& property_name, 
 		const Glib::VariantBase& value);
 	
-	void on_tags_event(const IEventBus::event& ev, IEventBus::event_data_t& data);
+	Glib::Variant<Glib::ustring> create_playbackstatus();
 	Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> create_metadata();
+	
 	void PlayerPropertyChanged(
 		const Glib::ustring &name,
 		const Glib::VariantBase &value);
