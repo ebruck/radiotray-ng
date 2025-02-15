@@ -178,6 +178,7 @@ void MprisDbus::on_tags_event(const IEventBus::event& /*ev*/, IEventBus::event_d
 void MprisDbus::on_state_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
 {
 	this->PlayerPropertyChanged("PlaybackStatus",this->get_playbackstatus());
+	this->PlayerPropertyChanged("Metadata",this->get_metadata()); //When state changes, metadata changes
 }
 void MprisDbus::on_volume_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)
 {
@@ -356,15 +357,33 @@ bool MprisDbus::on_interface_set_property(
 
 Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::get_metadata()
 {
-    std::map<Glib::ustring, Glib::VariantBase> metadata;
+    // Initialize title and artist
+    std::string title, artist;
 
-    metadata["mpris:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1"); // Have to have a trackid for metadata
-    metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_title());
-    metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station()); 
-    metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({this->radiotray_ng->get_artist()});
+    // When not playing, title will be state
+    if (this->radiotray_ng->get_state() == STATE_PLAYING) {
+        title = this->radiotray_ng->get_title();
+        artist = this->radiotray_ng->get_artist();
+
+        // Fallbacks for empty title/artist
+        if (title.empty()) title = this->radiotray_ng->get_station();
+        if (artist.empty()) artist = APP_NAME_DISPLAY;
+    } else {
+        title = radiotray_ng->get_state();
+        if (!title.empty()) title[0] = toupper(title[0]);  // Capitalize state
+        artist = APP_NAME_DISPLAY;
+    }
+
+    // Build metadata map
+    std::map<Glib::ustring, Glib::VariantBase> metadata;
+    metadata["mpris:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1");
+    metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(title);
+    metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station());
+    metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({artist});
 
     return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
 }
+
 Glib::Variant<Glib::ustring> MprisDbus::get_playbackstatus()
 {
     if (this->radiotray_ng->get_state() == STATE_PLAYING)
