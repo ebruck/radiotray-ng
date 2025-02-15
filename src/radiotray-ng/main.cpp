@@ -292,9 +292,7 @@ int main(int argc, char* argv[])
 	RtngDbus rtng_dbus(gui, radiotray_ng);
 #endif
 #ifdef MPRIS_DBUS
-	if (config->get_bool(MPRIS_KEY, DEFAULT_MPRIS)){
-		MprisDbus mpris_dbus(gui, radiotray_ng,event_bus);
-	}
+	MprisDbus mpris_dbus(config, gui, radiotray_ng, event_bus);
 #endif
 	// addons etc.
 	MediaKeys mm(radiotray_ng, config);

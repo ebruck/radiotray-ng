@@ -18,8 +18,10 @@
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
 #include <radiotray-ng/i_gui.hpp>
+#include <radiotray-ng/i_config.hpp>
 #include "mpris_dbus.hpp"
 
+class IConfig;
 
 namespace
 {
@@ -148,8 +150,8 @@ namespace
 }
 
 
-MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus)
-	: interface_vtable(
+MprisDbus::MprisDbus(std::shared_ptr<IConfig> config, std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus)
+	:interface_vtable(
 		sigc::mem_fun(*this, &MprisDbus::on_method_call),
 		sigc::mem_fun(*this, &MprisDbus::on_interface_get_property),
 		sigc::mem_fun(*this, &MprisDbus::on_interface_set_property))
@@ -157,13 +159,16 @@ MprisDbus::MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> ra
 	, gui(std::move(gui))
 	, event_bus(std::move(event_bus))
 {
-	this->dbus_setup();
-	this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&MprisDbus::on_tags_event, this, std::placeholders::_1,
-		std::placeholders::_2), IEventBus::event_pos::any);
-	this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&MprisDbus::on_state_event, this, std::placeholders::_1,
-		std::placeholders::_2), IEventBus::event_pos::any);
-	this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&MprisDbus::on_volume_event, this, std::placeholders::_1,
-		std::placeholders::_2), IEventBus::event_pos::any);
+	bool mpris_enabled = config->get_bool(MPRIS_KEY, DEFAULT_MPRIS);
+	if(mpris_enabled){
+		this->dbus_setup();
+		this->event_bus->subscribe(IEventBus::event::tags_changed, std::bind(&MprisDbus::on_tags_event, this, std::placeholders::_1,
+			std::placeholders::_2), IEventBus::event_pos::any);
+		this->event_bus->subscribe(IEventBus::event::state_changed, std::bind(&MprisDbus::on_state_event, this, std::placeholders::_1,
+			std::placeholders::_2), IEventBus::event_pos::any);
+		this->event_bus->subscribe(IEventBus::event::volume_changed, std::bind(&MprisDbus::on_volume_event, this, std::placeholders::_1,
+			std::placeholders::_2), IEventBus::event_pos::any);
+	}
 	
 }
 void MprisDbus::on_tags_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& /* data */)

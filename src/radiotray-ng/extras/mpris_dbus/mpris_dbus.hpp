@@ -26,12 +26,12 @@
 
 class IRadioTrayNG;
 class IGui;
-
+class IConfig;
 
 class MprisDbus
 {
 public:
-	MprisDbus(std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus);
+	MprisDbus(std::shared_ptr<IConfig> config, std::shared_ptr<IGui> gui, std::shared_ptr<IRadioTrayNG> radiotray_ng, std::shared_ptr<IEventBus> event_bus);
 
 	~MprisDbus();
 
@@ -87,4 +87,5 @@ private:
 	std::shared_ptr<IRadioTrayNG> radiotray_ng;
 	std::shared_ptr<IGui> gui;
 	std::shared_ptr<IEventBus> event_bus;
+	std::shared_ptr<IConfig> config;
 };
