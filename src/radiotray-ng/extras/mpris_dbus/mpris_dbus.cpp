@@ -284,13 +284,13 @@ void MprisDbus::on_interface_get_property(
 		} else if (property_name == "CanSetFullscreen") {
 			property = Glib::Variant<bool>::create(false);
 		} else if (property_name == "DesktopEntry") {
-			property = Glib::Variant<Glib::ustring>::create(""); //Unsure of the correct desktop entry to use
+			property = Glib::Variant<Glib::ustring>::create("/usr/share/applications/radiotray-ng.desktop");
 		} else if (property_name == "Fullscreen") {
 			property = Glib::Variant<bool>::create(false);
 		} else if (property_name == "HasTrackList") {
 			property = Glib::Variant<bool>::create(false);
 		} else if (property_name == "Identity") {
-			property = Glib::Variant<Glib::ustring>::create("radiotray-ng");
+			property = Glib::Variant<Glib::ustring>::create(APP_NAME);
 		} else if (property_name == "SupportedMimeTypes") {
 			property = Glib::Variant<std::vector<Glib::ustring>>::create({});
 		} else if (property_name == "SupportedUriSchemes") {
@@ -377,10 +377,11 @@ Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>> MprisDbus::get_metadat
     // Build metadata map
     std::map<Glib::ustring, Glib::VariantBase> metadata;
     metadata["mpris:trackid"] = Glib::Variant<Glib::DBusObjectPathString>::create("/Track1");
-    metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(title);
+    metadata["mpris:artUrl"] = Glib::Variant<Glib::ustring>::create(std::string("file://") + RTNG_DEFAULT_INSTALL_DIR + RADIOTRAY_NG_LOGO_ICON);
+	metadata["xesam:title"] = Glib::Variant<Glib::ustring>::create(title);
     metadata["xesam:album"] = Glib::Variant<Glib::ustring>::create(this->radiotray_ng->get_station());
     metadata["xesam:artist"] = Glib::Variant<std::vector<Glib::ustring>>::create({artist});
-
+	
     return Glib::Variant<std::map<Glib::ustring, Glib::VariantBase>>::create(metadata);
 }
 
