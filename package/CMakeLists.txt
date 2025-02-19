@@ -1,12 +1,22 @@
 # gather system info...
 find_program(LSB_RELEASE_EXECUTABLE NAMES lsb_release)
+find_program(UNAME_EXECUTABLE NAMES uname)
 
-if (LSB_RELEASE_EXECUTABLE)
-    execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE CODENAME        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND lsb_release -i -s OUTPUT_VARIABLE DISTRIBUTOR_ID  OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND lsb_release -r -s OUTPUT_VARIABLE RELEASE         OUTPUT_STRIP_TRAILING_WHITESPACE)
+	if (LSB_RELEASE_EXECUTABLE)
+		execute_process(COMMAND ${LSB_RELEASE_EXECUTABLE} -c -s OUTPUT_VARIABLE CODENAME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+		execute_process(COMMAND ${LSB_RELEASE_EXECUTABLE} -i -s OUTPUT_VARIABLE DISTRIBUTOR_ID OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+		execute_process(COMMAND ${LSB_RELEASE_EXECUTABLE} -r -s OUTPUT_VARIABLE RELEASE OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+	else()
+        message(AUTHOR_WARNING "lsb_release not found!")
+    endif()
 
-    # handle distros that identify release as n/a...
+	if (UNAME_EXECUTABLE)
+		execute_process(COMMAND ${UNAME_EXECUTABLE} -m OUTPUT_VARIABLE ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+	else()
+        message(AUTHOR_WARNING "uname not found!")
+    endif()
+    	
+	# handle distros that identify release as n/a...
     if (RELEASE STREQUAL "n/a")
         set(RELEASE "na")
     endif()
@@ -33,15 +43,34 @@ if (LSB_RELEASE_EXECUTABLE)
     set(CPACK_PACKAGE_RELOCATABLE         FALSE)
     set(DESTINATION_DIR                   /usr/share/radiotray-ng/)
 
-    if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        set(CPACK_SYSTEM_NAME "i386")
+# arm64 & armh compile detet option by 2lay! 
+if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+        if (ARCHITECTURE MATCHES "arm")
+            set(CPACK_SYSTEM_NAME "armhf")
+            message(STATUS "Architecture: ${ARCHITECTURE}")
+        elseif (ARCHITECTURE MATCHES "aarch64")
+            set(CPACK_SYSTEM_NAME "arm64")
+            message(STATUS "Architecture: ${ARCHITECTURE}")
+        else()
+            set(CPACK_SYSTEM_NAME "i386")
+        endif()
     else()
-        if (DISTRIBUTOR_ID STREQUAL "fedora")
+        if (ARCHITECTURE MATCHES "aarch64")
+            set(CPACK_SYSTEM_NAME "arm64")
+        elseif (DISTRIBUTOR_ID STREQUAL "fedora")
             set(CPACK_SYSTEM_NAME "x86_64")
         else()
             set(CPACK_SYSTEM_NAME "amd64")
         endif()
     endif()
+
+# Ensure CMAKE_SYSTEM_PROCESSOR is correctly set
+if (ARCHITECTURE MATCHES "aarch64")
+    set(CMAKE_SYSTEM_PROCESSOR "arm64")
+elseif (ARCHITECTURE MATCHES "arm")
+    set(CMAKE_SYSTEM_PROCESSOR "armhf")
+endif()
+
 
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
 
@@ -159,6 +188,3 @@ if (LSB_RELEASE_EXECUTABLE)
     install(PROGRAMS  ${PROJECT_BINARY_DIR}/rtng-bookmark-editor                    DESTINATION /usr/bin/)
 
     include(CPack)
-else()
-    message(AUTHOR_WARNING "lsb_release not found! -- packaging disabled")
-endif()
