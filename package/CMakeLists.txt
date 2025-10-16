@@ -60,9 +60,9 @@ if (LSB_RELEASE_EXECUTABLE)
         if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "21.3" OR ${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
             string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
             string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.10
+        # support for Ubuntu 25.04 and 25.10
         else()
-             if (${RELEASE} STREQUAL "25.10")
+             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
                  string(REPLACE "libjsoncpp1" "libjsoncpp26" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
                  string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
              endif()
@@ -92,9 +92,9 @@ if (LSB_RELEASE_EXECUTABLE)
         if (${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
             message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
             string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.10
+        # support for Ubuntu 25.04 and 25.10
         else()
-             if (${RELEASE} STREQUAL "25.10")
+             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
                  message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
                  string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1t64" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
              endif()
