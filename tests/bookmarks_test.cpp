@@ -215,7 +215,7 @@ TEST(Bookmarks, test_that_stations_are_added_and_removed_from_a_group_and_moved)
 	ASSERT_FALSE(bm[0].stations[0].notifications);
 
 	// vector only throws when using at()
-	EXPECT_THROW(bm[0].stations.at(100), std::out_of_range);
+	EXPECT_THROW(auto r = bm[0].stations.at(100), std::out_of_range);
 	EXPECT_THROW(bm[1], std::out_of_range);
 }
 

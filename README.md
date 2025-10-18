@@ -6,7 +6,7 @@ was not getting the attention it required and was probably dead. A lot of the
 technologies it used had moved on to newer versions and the bugs started piling up.
 I did my best to help users, but a new start was required.
 
-The version here is what "I" wanted out of RadioTray.
+The version here is what I wanted out of RadioTray.
 
 ## Radiotray-NG goals were: ##
 
