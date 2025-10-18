@@ -15,12 +15,6 @@ commonStepsUbuntu: &commonStepsUbuntu
 version: 2.1
 
 jobs:
-  Ubuntu-20_04-build:
-    <<: *commonStepsUbuntu
-    docker:
-      - image: "radiotrayng/circleci:ubuntu-20.04"
-    environment:
-      - CI_OS: linux
   Ubuntu-22_04-build:
     <<: *commonStepsUbuntu
     docker:
@@ -33,10 +27,16 @@ jobs:
       - image: "radiotrayng/circleci:ubuntu-24.04"
     environment:
       - CI_OS: linux
+  Ubuntu-25_10-build:
+    <<: *commonStepsUbuntu
+    docker:
+      - image: "radiotrayng/circleci:ubuntu-25.10"
+    environment:
+      - CI_OS: linux
 workflows:
   version: 2
   build:
     jobs:
-      - Ubuntu-20_04-build
       - Ubuntu-22_04-build
       - Ubuntu-24_04-build
+      - Ubuntu-25_10-build

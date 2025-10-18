@@ -6,7 +6,7 @@ was not getting the attention it required and was probably dead. A lot of the
 technologies it used had moved on to newer versions and the bugs started piling up.
 I did my best to help users, but a new start was required.
 
-The version here is what "I" wanted out of RadioTray.
+The version here is what I wanted out of RadioTray.
 
 ## Radiotray-NG goals were: ##
 
@@ -85,6 +85,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "media-key-volume-up" : "",
    "media-key-volume-down" : "",
    "media-keys-old-dbus-name" : false,
+   "media-keys" : true,
    "radiotray-ng-on" : "radiotray-ng-on",
    "radiotray-ng-off" : "radiotray-ng-off",
    "radiotray-ng-notification" : "radiotray-ng-notification",
@@ -117,6 +118,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
           volume-max-level: maximum volume level
            wrap-track-info: enable/disable the wrapping of title & artist menu text
        wrap-track-info-len: maximum title & artist line length
+                media-keys: enable/disable media keys
          media-key-mapping: enable the mapping of media keys to volume up/down etc. (Previous, Next, Rewind, FastForward etc.)
 media-key-previous-station: media key to use for previous station within current group
     media-key-next-station: media key to use for next station within current group
