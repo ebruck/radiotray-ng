@@ -18,6 +18,7 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_libraries(radiotray-ng rtng_dbus)
+    target_link_libraries(radiotray-ng mpris_dbus)
 endif()
 
 target_link_libraries(

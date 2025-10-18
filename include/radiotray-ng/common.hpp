@@ -105,7 +105,7 @@ using playlist_t = std::vector<std::string>;
 #define VOLUME_STEP_KEY                   "volume-step"
 #define WRAP_TRACK_INFO_KEY               "wrap-track-info"
 #define WRAP_TRACK_INFO_LEN_KEY           "wrap-track-info-len"
-
+#define MPRIS_KEY                         "mpris"
 // conf files etc.
 #define RTNG_BOOKMARK_FILE                "bookmarks.json"
 #define RTNG_CONFIG_FILE                  "radiotray-ng.json"
@@ -160,3 +160,4 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_VOLUME_STEP_VALUE                uint32_t(1)
 #define DEFAULT_WRAP_TRACK_INFO_VALUE            (true)
 #define DEFAULT_WRAP_TRACK_INFO_LEN_VALUE        (40)
+#define DEFAULT_MPRIS                            (false)
