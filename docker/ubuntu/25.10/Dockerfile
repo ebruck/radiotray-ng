@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:25.10
 
 RUN set -ex; \
     apt-get update \
@@ -10,15 +10,14 @@ RUN set -ex; \
                    libnotify-dev \
                    libboost-filesystem-dev \
                    libgstreamer1.0-dev \
-                   libappindicator3-dev \
+                   libayatana-appindicator3-dev \
                    libboost-log-dev \
                    libboost-program-options-dev \
                    libgtk-3-dev \
                    libnotify-dev \
                    lsb-release \
                    libbsd-dev \
-                   libncurses5-dev \
                    libglibmm-2.4-dev \
-                   libwxgtk3.0-gtk3-dev \
-                   libwxgtk3.0-gtk3-0v5 \
+                   libwxgtk3.2-dev \
+                   libwxgtk3.2-1t64 \
         && rm -rf /var/lib/apt/lists/*
