@@ -33,7 +33,7 @@ endif(CCACHE_FOUND)
 # search for libs
 find_package(CURL      REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(Boost     REQUIRED filesystem system log program_options thread)
+find_package(Boost     REQUIRED filesystem log program_options thread)
 
 # set up wxWidgets to prefer gtk3
 execute_process(COMMAND wx-config --selected-config --toolkit=gtk3
