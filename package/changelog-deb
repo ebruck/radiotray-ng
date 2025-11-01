@@ -1,3 +1,10 @@
+radiotray-ng (0.2.10.1) unstable; urgency=low
+
+     * Build update
+     * No binaries released
+
+ -- Edward G. Bruck <ed.bruck1@gmail.com>  Sat, 01 Nov 2025 10:27:51 -0700
+
 radiotray-ng (0.2.10) unstable; urgency=low
 
       * Added option to enable/disable media keys
