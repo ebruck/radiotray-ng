@@ -1,7 +1,7 @@
 [Desktop Entry]
 Categories=AudioVideo;Audio;Player;GTK;
 Comment=Internet Radio Player for Linux
-Exec=env GDK_BACKEND=x11 /usr/bin/radiotray-ng
+Exec=/usr/bin/radiotray-ng
 Icon=/usr/share/icons/hicolor/256x256/apps/radiotray-ng-notification.png
 Name=Radiotray-NG
 StartupNotify=false
