@@ -18,6 +18,8 @@
 #include <radiotray-ng/common.hpp>
 #include <radiotray-ng/notification/notification.hpp>
 #include <libnotify/notify.h>
+#include <thread>
+#include <chrono>
 
 // lazy pimpl...
 struct notify_t
@@ -26,6 +28,7 @@ struct notify_t
 	{
 		notify_init(APP_NAME);
 		this->nn = notify_notification_new(nullptr, nullptr, nullptr);
+		this->last_notification = 0;
 
 		notify_notification_set_urgency(this->nn, NOTIFY_URGENCY_NORMAL);
 		notify_notification_set_timeout(this->nn, NOTIFY_EXPIRES_DEFAULT);
@@ -38,6 +41,7 @@ struct notify_t
 		notify_uninit();
 	}
 	NotifyNotification* nn;
+	uint64_t last_notification;
 };
 
 
@@ -60,6 +64,19 @@ void Notification::notify(const std::string& title, const std::string& message)
 
 void Notification::notify(const std::string& title, const std::string& message, const std::string& image)
 {
+	auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::system_clock::now().time_since_epoch()
+	).count();
+
+	auto notify_ts = now - this->n->last_notification;
+
+	if (notify_ts < DEFAULT_NOTIFICATION_DELAY_VALUE) {
+		notify_ts = DEFAULT_NOTIFICATION_DELAY_VALUE - notify_ts;
+		LOG(debug) << "Delaying notification: " << notify_ts << "ms";
+		std::this_thread::sleep_for(std::chrono::milliseconds(notify_ts));
+	}
+	this->n->last_notification = now;
+
 	LOG(debug) << "notify: " << title << ", " << message << ", " << image;
 
 	notify_notification_update(this->n->nn, title.c_str(), message.c_str(), radiotray_ng::word_expand(image).c_str());

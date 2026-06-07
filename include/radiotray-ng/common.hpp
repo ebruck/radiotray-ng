@@ -143,6 +143,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE  "radiotray-ng-notification"
 #define DEFAULT_ROOT_GROUP_BOTTOM_POS_VALUE      (true)
 #define DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE    (false)
+#define DEFAULT_NOTIFICATION_DELAY_VALUE         (1000)
 #define DEFAULT_NOTIFICATION_VALUE               (true)
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
 #define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)
