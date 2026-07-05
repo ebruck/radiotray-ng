@@ -17,6 +17,7 @@
 
 #pragma once
 #include <radiotray-ng/i_notification.hpp>
+#include <radiotray-ng/i_config.hpp>
 #include <memory>
 
 struct notify_t;
@@ -25,7 +26,7 @@ struct notify_t;
 class Notification final : public INotification
 {
 public:
-	Notification();
+	Notification(std::shared_ptr<IConfig> config);
 
 	virtual ~Notification();
 
@@ -35,4 +36,5 @@ public:
 
 private:
 	std::unique_ptr<notify_t> n;
+	std::shared_ptr<IConfig> config;
 };

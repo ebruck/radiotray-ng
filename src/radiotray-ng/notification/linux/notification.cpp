@@ -21,6 +21,8 @@
 #include <thread>
 #include <chrono>
 
+#define NOTIFICATION_DELAY	(1000)
+
 // lazy pimpl...
 struct notify_t
 {
@@ -45,8 +47,9 @@ struct notify_t
 };
 
 
-Notification::Notification()
+Notification::Notification(std::shared_ptr<IConfig> config)
 	: n(new notify_t())
+	, config(std::move(config))
 {
 }
 
@@ -64,19 +67,21 @@ void Notification::notify(const std::string& title, const std::string& message)
 
 void Notification::notify(const std::string& title, const std::string& message, const std::string& image)
 {
-	auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch()
-	).count();
+	if (this->config->get_bool(NOTIFICATION_DELAY_KEY, DEFAULT_NOTIFICATION_DELAY_VALUE))
+	{
+		auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::system_clock::now().time_since_epoch()
+		).count();
 
-	auto notify_ts = now - this->n->last_notification;
+		auto notify_ts = now - this->n->last_notification;
 
-	if (notify_ts < DEFAULT_NOTIFICATION_DELAY_VALUE) {
-		notify_ts = DEFAULT_NOTIFICATION_DELAY_VALUE - notify_ts;
-		LOG(debug) << "Delaying notification: " << notify_ts << "ms";
-		std::this_thread::sleep_for(std::chrono::milliseconds(notify_ts));
+		if (notify_ts < NOTIFICATION_DELAY) {
+			notify_ts = NOTIFICATION_DELAY - notify_ts;
+			LOG(debug) << "Delaying notification: " << notify_ts << "ms";
+			std::this_thread::sleep_for(std::chrono::milliseconds(notify_ts));
+		}
+		this->n->last_notification = now;
 	}
-	this->n->last_notification = now;
-
 	LOG(debug) << "notify: " << title << ", " << message << ", " << image;
 
 	notify_notification_update(this->n->nn, title.c_str(), message.c_str(), radiotray_ng::word_expand(image).c_str());

@@ -64,6 +64,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
    "invert-menu" : false,
    "last-station" : "",
    "last-station-group" : "",
+   "notification-delay" : "false",
    "notification-verbose" : true,
    "notifications" : true,
    "sleep-timer" : 30,
@@ -104,6 +105,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
               file-monitor: enable/disable notification of bookmark file changes
      file-monitor-interval: time in seconds to poll for bookmark file changes
               invert-menu : menu rendered in reverse order
+        notification-delay: try to avoid gnome-shell JS errors causing notifications to stop working
       notification-verbose: more status information than normal
              notifications: turns on/off notification messages
                sleep-timer: value is in minutes

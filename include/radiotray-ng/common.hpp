@@ -87,6 +87,7 @@ using playlist_t = std::vector<std::string>;
 #define MEDIA_KEY_VOLUME_UP_KEY           "media-key-volume-up"
 #define MEDIA_KEY_OLD_DBUS_NAME_KEY       "media-keys-old-dbus-name"
 #define NOTIFICATION_KEY                  "notifications"
+#define NOTIFICATION_DELAY_KEY            "notification-delay"
 #define NOTIFICATION_VERBOSE_KEY          "notification-verbose"
 #define RADIOTRAY_NG_ICON_ON_KEY          "radiotray-ng-on"
 #define RADIOTRAY_NG_ICON_OFF_KEY         "radiotray-ng-off"
@@ -116,7 +117,7 @@ using playlist_t = std::vector<std::string>;
 #define ROOT_BOOKMARK_GROUP               "root"
 #define APP_NAME_DISPLAY                  "Radiotray-NG"
 #define APP_NAME                          "radiotray-ng"
-#define APP_COPYRIGHT                     "Copyright © 2017-2025 - The Radiotray-NG Authors"
+#define APP_COPYRIGHT                     "Copyright © 2017-2026 - The Radiotray-NG Authors"
 #define APP_AUTHOR                        "Edward G. Bruck"
 #define APP_WEBSITE                       "https://www.github.com/ebruck/radiotray-ng"
 #define RADIOTRAY_NG_LOGO_ICON            "radiotray-ng.png"
@@ -143,7 +144,7 @@ using playlist_t = std::vector<std::string>;
 #define DEFAULT_RADIOTRAY_NG_NOTIFICATION_VALUE  "radiotray-ng-notification"
 #define DEFAULT_ROOT_GROUP_BOTTOM_POS_VALUE      (true)
 #define DEFAULT_MEDIA_KEY_OLD_DBUS_NAME_VALUE    (false)
-#define DEFAULT_NOTIFICATION_DELAY_VALUE         (1000)
+#define DEFAULT_NOTIFICATION_DELAY_VALUE         (false)
 #define DEFAULT_NOTIFICATION_VALUE               (true)
 #define DEFAULT_NOTIFICATION_VERBOSE_VALUE       (true)
 #define DEFAULT_SLEEP_TIMER_VALUE                uint32_t(60)

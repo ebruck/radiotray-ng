@@ -28,11 +28,12 @@
 
 RadiotrayNG::RadiotrayNG(std::shared_ptr<IConfig> config, std::shared_ptr<IBookmarks> bookmarks,
 	std::shared_ptr<IPlayer> player, std::shared_ptr<IEventBus> event_bus)
-	: config(std::move(config))
+	: config(config)
 	, bookmarks(std::move(bookmarks))
 	, player(std::move(player))
 	, event_bus(std::move(event_bus))
 	, state(STATE_STOPPED)
+	, notification(std::move(config))
 	, current_station_index(-1)
 	, play_url_group("PLAY-URL:" + boost::uuids::to_string(boost::uuids::random_generator()()))
 {
