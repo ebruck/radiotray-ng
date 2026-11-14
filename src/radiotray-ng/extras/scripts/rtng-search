@@ -19,7 +19,7 @@
 
 import dbus
 import json
-import os
+import subprocess
 import urllib.parse
 
 try:
@@ -28,7 +28,11 @@ try:
 
     if player_state['state'] == "playing":
         if len(player_state['artist']) or len(player_state['title']):
-            os.system('xdg-open http://www.google.com/search?q=' +
-                      urllib.parse.quote(player_state['artist'] + ', ' + player_state['title']) + ' > /dev/null 2>&1')
+            query = urllib.parse.quote(player_state['artist'] + ', ' + player_state['title'])
+            subprocess.Popen(
+                ['xdg-open', 'https://www.google.com/search?q=' + query],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True)
 except Exception as msg:
     print(msg)

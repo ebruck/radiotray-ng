@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
 
-set -xe
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
 
-docker build -t radiotrayng/circleci:ubuntu-22.04 - <ubuntu/22.04/Dockerfile
-docker push radiotrayng/circleci:ubuntu-22.04
-
-docker build -t radiotrayng/circleci:ubuntu-24.04 - <ubuntu/24.04/Dockerfile
-docker push radiotrayng/circleci:ubuntu-24.04
-
-docker build -t radiotrayng/circleci:ubuntu-25.10 - <ubuntu/25.10/Dockerfile
-docker push radiotrayng/circleci:ubuntu-25.10
+for version in 22.04 24.04 26.04; do
+    image="radiotrayng/circleci:ubuntu-${version}"
+    docker build -t "$image" "ubuntu/${version}"
+    docker push "$image"
+done

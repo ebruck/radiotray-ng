@@ -70,16 +70,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_D
 
 # notification & ncurses based on platform
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    pkg_search_module(APPINDICATOR appindicator3-0.1)
-    if (NOT APPINDICATOR_FOUND)
-        pkg_search_module(APPINDICATOR REQUIRED ayatana-appindicator3-0.1)
-        if (APPINDICATOR_FOUND)
-            set(AYATANA_APPINDICATOR true CACHE BOOL "ayatana-appindicator")
-        endif()
-    endif()
-if (NOT APPINDICATOR_FOUND)
-    pkg_search_module(NCURSES      REQUIRED ncurses)
-endif()
+    # Native D-Bus StatusNotifierItem backend; no Ayatana/AppIndicator runtime.
+    pkg_search_module(GTK3 REQUIRED gtk+-3.0)
+    set(RTNG_STATUS_NOTIFIER_GUI_FOUND true)
     pkg_search_module(NOTIFY       REQUIRED libnotify)
     pkg_search_module(GLIBMM       REQUIRED glibmm-2.4)
     pkg_search_module(GIOMM        REQUIRED giomm-2.4)
@@ -87,7 +80,7 @@ else()
     set(NCURSES_FOUND true)
     set(NCURSES_LIBRARIES ncurses)
     set(NOTIFY_FOUND true)
-    set(APPINDICATOR_FOUND false)
+    set(RTNG_STATUS_NOTIFIER_GUI_FOUND false)
 endif()
 
 # build tests? Then we need googletest...
@@ -136,8 +129,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 # which gui?
-if (APPINDICATOR_FOUND)
-    target_compile_definitions(radiotray-ng PRIVATE APPINDICATOR_GUI)
+if (RTNG_STATUS_NOTIFIER_GUI_FOUND)
+    target_compile_definitions(radiotray-ng PRIVATE STATUS_NOTIFIER_GUI)
     add_subdirectory(src/radiotray-ng/gui/appindicator)
 else()
     add_subdirectory(src/radiotray-ng/gui/ncurses)

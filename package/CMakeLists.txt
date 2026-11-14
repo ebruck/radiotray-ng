@@ -47,58 +47,66 @@ if (LSB_RELEASE_EXECUTABLE)
 
     if (CPACK_GENERATOR MATCHES "DEB")
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY  "Simple Internet Radio Player\nRadiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
-        set(BOOST_DEB_VERSION                  "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
         set(CPACK_DEBIAN_PACKAGE_SECTION       "sound")
         set(CPACK_DEBIAN_COMPRESSION_TYPE      "xz")
         set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE  ${CPACK_SYSTEM_NAME})
         set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "Edward G. Bruck <ed.bruck1@gmail.com>")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
+
+        # Derive runtime library package names from the binaries we actually
+        # build. This survives distro package renames, t64 transitions and
+        # library SONAME changes without hard-coded substitutions.
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+        # CPack runs dpkg-shlibdeps from a temporary package root. On modern
+        # Debian/Ubuntu multiarch systems, explicitly pass the host library
+        # search directories so libc, compiler runtimes and third-party
+        # libraries are all resolvable.
+        set(_RTNG_DEB_MULTIARCH "${CMAKE_LIBRARY_ARCHITECTURE}")
+        if (NOT _RTNG_DEB_MULTIARCH)
+            find_program(DPKG_ARCHITECTURE_EXECUTABLE NAMES dpkg-architecture)
+            if (DPKG_ARCHITECTURE_EXECUTABLE)
+                execute_process(
+                    COMMAND ${DPKG_ARCHITECTURE_EXECUTABLE} -qDEB_HOST_MULTIARCH
+                    OUTPUT_VARIABLE _RTNG_DEB_MULTIARCH
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+            endif()
+        endif()
+
+        set(_RTNG_SHLIBDEPS_DIRS)
+        if (_RTNG_DEB_MULTIARCH)
+            list(APPEND _RTNG_SHLIBDEPS_DIRS
+                "/lib/${_RTNG_DEB_MULTIARCH}"
+                "/usr/lib/${_RTNG_DEB_MULTIARCH}"
+                "/usr/local/lib/${_RTNG_DEB_MULTIARCH}")
+        endif()
+
+        # Include the compiler/linker's native search directories too. This
+        # covers libstdc++, libgcc and distro-specific layouts without
+        # hard-coding compiler versions.
+        list(APPEND _RTNG_SHLIBDEPS_DIRS
+            ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+            ${CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES}
+            "/lib" "/usr/lib" "/usr/local/lib")
+        list(FILTER _RTNG_SHLIBDEPS_DIRS INCLUDE REGEX ".+")
+        list(REMOVE_DUPLICATES _RTNG_SHLIBDEPS_DIRS)
+
+        set(_RTNG_EXISTING_SHLIBDEPS_DIRS)
+        foreach(_dir IN LISTS _RTNG_SHLIBDEPS_DIRS)
+            if (IS_DIRECTORY "${_dir}")
+                list(APPEND _RTNG_EXISTING_SHLIBDEPS_DIRS "${_dir}")
+            endif()
+        endforeach()
+
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+            "${_RTNG_EXISTING_SHLIBDEPS_DIRS}")
+
+        # Runtime/data dependencies that dpkg-shlibdeps cannot infer from ELF
+        # NEEDED entries.
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS
+            "python3, python3-lxml, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly")
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm;${PROJECT_SOURCE_DIR}/package/conffiles)
-
-        # ubuntu and mint
-        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "21.3" OR ${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
-            string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.04 and 25.10
-        else()
-             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
-                 string(REPLACE "libjsoncpp1" "libjsoncpp26" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-                 string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-             endif()
-        endif()
-
-        # Debian 13
-        if (${CODENAME} STREQUAL "trixie")
-            string(REPLACE "libjsoncpp1" "libjsoncpp26" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # Debian 12
-        if (${CODENAME} STREQUAL "bookworm")
-            string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # Debian no longer supports libjsoncpp1 and ubuntu appindicator package naming
-        if (${CODENAME} STREQUAL "bullseye")
-            string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # ubuntu noble and mint 22 has newer libwsxgtk
-        if (${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
-            message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.04 and 25.10
-        else()
-             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
-                 message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
-                 string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1t64" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-             endif()
-        endif()
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
 

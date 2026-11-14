@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright 2019 Edward G. Bruck <ed.bruck1@gmail.com>
 #
@@ -8,50 +8,72 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-#
-# Radiotray-NG is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
-# Issue dbus commands from a cron job.
-#
-# Usage: rtng-dbus <command> [ARG1] [ARG2]
-#
-# Available commands:
-#
-#    get_bookmarks
-#    get_config
-#    get_player_state
-#    mute
-#    next_station
-#    play
-#    play_station 'group' 'station'
-#    play_url 'url'
-#    previous_station
-#    quit
-#    reload_bookmarks
-#    set_volume 'level'
-#    stop
-#    volume_down
-#    volume_up
+set -euo pipefail
 
-if [ "$#" -gt 0 ]; then
-    if [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]; then
-        export $(dbus-launch)
-        DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
-    fi
+usage() {
+    cat <<'USAGE'
+Usage: rtng-dbus <command> [ARG1] [ARG2]
 
-    DBUS_SEND_CMD="dbus-send --session --print-reply=literal --type=method_call --dest=com.github.radiotray_ng /com/github/radiotray_ng com.github.radiotray_ng.$1"
+Commands:
+  get_bookmarks
+  get_config
+  get_player_state
+  mute
+  next_station
+  play
+  play_station <group> <station>
+  play_url <url>
+  previous_station
+  quit
+  reload_bookmarks
+  set_volume <level>
+  stop
+  volume_down
+  volume_up
+USAGE
+}
 
-    for arg in "${@:2}"; do ARGS="$ARGS 'string:$arg'"; done
+if (($# == 0)); then
+    usage
+    exit 1
+fi
 
-    eval $DBUS_SEND_CMD $ARGS
+command_name="$1"
+shift
 
-    if [ ! -z "${DBUS_SESSION_BUS_PID}" ]; then
-        kill $DBUS_SESSION_BUS_PID
+case "$command_name" in
+    get_bookmarks|get_config|get_player_state|mute|next_station|play|play_station|play_url|previous_station|quit|reload_bookmarks|set_volume|stop|volume_down|volume_up)
+        ;;
+    *)
+        printf 'Unknown RadioTray-NG D-Bus command: %s\n' "$command_name" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
+
+# RadioTray-NG lives on the login session bus. Creating a new private bus
+# would not contain the already-running RadioTray-NG service.
+if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
+    runtime_bus="/run/user/$(id -u)/bus"
+    if [[ -S "$runtime_bus" ]]; then
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=${runtime_bus}"
+    else
+        printf 'RadioTray-NG session bus not found at %s.\n' "$runtime_bus" >&2
+        exit 3
     fi
 fi
+
+args=()
+for arg in "$@"; do
+    args+=("string:${arg}")
+done
+
+dbus-send \
+    --session \
+    --print-reply=literal \
+    --type=method_call \
+    --dest=com.github.radiotray_ng \
+    /com/github/radiotray_ng \
+    "com.github.radiotray_ng.${command_name}" \
+    "${args[@]}"

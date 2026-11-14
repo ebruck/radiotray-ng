@@ -58,12 +58,25 @@ namespace radiotray_ng
 			// any spaces then we can't use wordexp...
 			if (s.find(' ') == std::string::npos)
 			{
-				std::string tmp;
-				wordexp_t exp_result;
-				wordexp(s.c_str(), &exp_result, 0);
-				tmp = exp_result.we_wordv[0];
-				wordfree(&exp_result);
-				return tmp;
+				wordexp_t exp_result{};
+				const int rc = wordexp(s.c_str(), &exp_result, WRDE_NOCMD);
+
+				if (rc == 0)
+				{
+					std::string expanded{s};
+
+					if (exp_result.we_wordc > 0 && exp_result.we_wordv != nullptr && exp_result.we_wordv[0] != nullptr)
+					{
+						expanded = exp_result.we_wordv[0];
+					}
+
+					wordfree(&exp_result);
+					return expanded;
+				}
+
+				// Invalid expansion (including command substitution) is treated as a
+				// literal path/config value instead of executing or dereferencing it.
+				return s;
 			}
 		}
 		return s;
