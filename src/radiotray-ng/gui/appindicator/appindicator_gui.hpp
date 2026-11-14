@@ -64,6 +64,7 @@ private:
 	static void on_reload_bookmarks_menu_item(GtkWidget* widget, gpointer data);
 	static void on_bookmark_editor_menu_item(GtkWidget* widget, gpointer data);
 	static void on_sleep_timer_menu_item(GtkWidget* widget, gpointer data);
+	static void on_buffering_menu_item(GtkWidget* widget, gpointer data);
 	static gboolean on_timer_event(gpointer data);
 	static gboolean on_file_monitor_timer_event(gpointer data);
 	static void on_indicator_scrolled(GtkWidget* w, gint delta ,GdkScrollDirection direction, gpointer data);
