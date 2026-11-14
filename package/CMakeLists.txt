@@ -43,62 +43,43 @@ if (LSB_RELEASE_EXECUTABLE)
         endif()
     endif()
 
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${PROJECT_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
+    # Give commits distinct Debian package versions. The application version itself
+    # remains PROJECT_VERSION, but APT should not treat every local build as 0.2.10.1.
+    if (CPACK_GENERATOR STREQUAL "DEB")
+        find_program(RTNG_GIT_EXECUTABLE NAMES git)
+        if (RTNG_GIT_EXECUTABLE)
+            execute_process(
+                COMMAND "${RTNG_GIT_EXECUTABLE}" -C "${PROJECT_SOURCE_DIR}" rev-parse --verify --short=12 HEAD
+                RESULT_VARIABLE RTNG_REV_STATUS
+                OUTPUT_VARIABLE RTNG_REV
+                OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+            execute_process(
+                COMMAND "${RTNG_GIT_EXECUTABLE}" -C "${PROJECT_SOURCE_DIR}" show -s --format=%cd --date=format:%Y%m%d%H%M%S HEAD
+                RESULT_VARIABLE RTNG_DATE_STATUS
+                OUTPUT_VARIABLE RTNG_COMMIT_DATE
+                OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+            if (RTNG_REV_STATUS EQUAL 0 AND RTNG_DATE_STATUS EQUAL 0 AND RTNG_REV AND RTNG_COMMIT_DATE)
+                set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}+git${RTNG_COMMIT_DATE}.g${RTNG_REV}")
+            endif()
+        endif()
+    endif()
+
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${DISTRIBUTOR_ID}_${RELEASE}_${CPACK_SYSTEM_NAME})
 
     if (CPACK_GENERATOR MATCHES "DEB")
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY  "Simple Internet Radio Player\nRadiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
-        set(BOOST_DEB_VERSION                  "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+        # Derive ABI/library dependencies from the built ELF executables rather than
+        # hard-coding library sonames that vary between Debian stable, testing and sid.
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        # Runtime requirements not always visible in ELF dependency scanning.
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS
+            "python3, python3-lxml, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly")
         set(CPACK_DEBIAN_PACKAGE_SECTION       "sound")
         set(CPACK_DEBIAN_COMPRESSION_TYPE      "xz")
         set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE  ${CPACK_SYSTEM_NAME})
         set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "Edward G. Bruck <ed.bruck1@gmail.com>")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS       "libc6, libbsd0, libcurl4, libjsoncpp1, libxdg-basedir1, libnotify4, python3, python3-lxml, libglibmm-2.4-1v5, libboost-filesystem${BOOST_DEB_VERSION}, libboost-system${BOOST_DEB_VERSION}, libboost-log${BOOST_DEB_VERSION}, libboost-thread${BOOST_DEB_VERSION}, libboost-program-options${BOOST_DEB_VERSION}, libgstreamer1.0-0, libappindicator3-1, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, libwxgtk3.0-gtk3-0v5")
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm;${PROJECT_SOURCE_DIR}/package/conffiles)
-
-        # ubuntu and mint
-        if (${RELEASE} STREQUAL "22.04" OR ${RELEASE} STREQUAL "21.3" OR ${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
-            string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.04 and 25.10
-        else()
-             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
-                 string(REPLACE "libjsoncpp1" "libjsoncpp26" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-                 string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-             endif()
-        endif()
-
-        # Debian 13
-        if (${CODENAME} STREQUAL "trixie")
-            string(REPLACE "libjsoncpp1" "libjsoncpp26" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # Debian 12
-        if (${CODENAME} STREQUAL "bookworm")
-            string(REPLACE "libjsoncpp1" "libjsoncpp25" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # Debian no longer supports libjsoncpp1 and ubuntu appindicator package naming
-        if (${CODENAME} STREQUAL "bullseye")
-            string(REPLACE "libjsoncpp1" "libjsoncpp24" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-            string(REPLACE "libappindicator3-1" "libayatana-appindicator3-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        endif()
-
-        # ubuntu noble and mint 22 has newer libwsxgtk
-        if (${RELEASE} STREQUAL "22" OR ${RELEASE} STREQUAL "24.04" OR ${RELEASE} STREQUAL "24.10")
-            message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
-            string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-        # support for Ubuntu 25.04 and 25.10
-        else()
-             if (${RELEASE} STREQUAL "25.04" OR ${RELEASE} STREQUAL "25.10")
-                 message(STATUS "Official packaging assumes gtk3 dependency for 'rtng-bookmark-editor'")
-                 string(REPLACE "libwxgtk3.0-gtk3-0v5" "libwxgtk3.2-1t64" CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS})
-             endif()
-        endif()
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
 
