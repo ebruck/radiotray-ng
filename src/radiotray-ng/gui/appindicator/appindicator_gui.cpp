@@ -16,6 +16,7 @@
 // along with Radiotray-NG.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "appindicator_gui.hpp"
+#include <algorithm>
 #include <radiotray-ng/i_config.hpp>
 #include <radiotray-ng/i_bookmarks.hpp>
 #include <radiotray-ng/i_radiotray_ng.hpp>
@@ -68,7 +69,6 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 	, bookmarks(std::move(bookmarks))
 	, config(std::move(config))
 	, event_bus(std::move(event_bus))
-	, appindicator(nullptr)
 	, direct_sni(nullptr)
 	, menu(nullptr)
 	, action_menu_item(nullptr)
@@ -103,12 +103,6 @@ AppindicatorGui::AppindicatorGui(std::shared_ptr<IConfig> config, std::shared_pt
 void AppindicatorGui::on_state_event(const IEventBus::event& /*ev*/, IEventBus::event_data_t& data)
 {
 	const std::string state{data[STATE_KEY]};
-
-	if (this->appindicator != nullptr &&
-		this->config->get_bool(TAG_INFO_IN_LABEL_KEY, DEFAULT_TAG_INFO_IN_LABEL_VALUE))
-	{
-		app_indicator_set_label(this->appindicator, nullptr, nullptr);
-	}
 
 	this->update_status_menu_item(state);
 	this->update_action_menu_item(state);
@@ -617,26 +611,6 @@ void AppindicatorGui::update_status_menu_item(const std::string& state)
 				gtk_widget_set_sensitive(this->status_menu_item, TRUE);
 			}
 
-			if (this->appindicator != nullptr &&
-				this->config->get_bool(TAG_INFO_IN_LABEL_KEY, DEFAULT_TAG_INFO_IN_LABEL_VALUE))
-			{
-				std::string label_text = title;
-
-				if (!artist.empty() && this->config->get_bool(TAG_INFO_IN_LABEL_ARTIST_KEY, DEFAULT_TAG_INFO_IN_LABEL_ARTIST_VALUE))
-				{
-					label_text += " - " + artist;
-				}
-
-				const uint32_t label_text_len = this->config->get_uint32(TAG_INFO_IN_LABEL_LEN_KEY, DEFAULT_TAG_INFO_IN_LABEL_LEN_VALUE);
-
-				if (label_text.length() > label_text_len)
-				{
-					label_text.resize(label_text_len);
-					label_text += "...";
-				}
-				app_indicator_set_label(this->appindicator, label_text.c_str(), nullptr);
-			}
-
 			// if wrap is disabled then we truncate at the wrap_len to prevent wide menus...
 			if (!wrap_enabled)
 			{
@@ -697,11 +671,6 @@ void AppindicatorGui::build_action_menu_item()
 
 	g_signal_connect(G_OBJECT(this->action_menu_item), "activate", G_CALLBACK(on_action_menu_item), gpointer(this));
 
-	if (this->appindicator != nullptr)
-	{
-		app_indicator_set_secondary_activate_target(this->appindicator, this->action_menu_item);
-	}
-
 	this->update_action_menu_item(STATE_STOPPED);
 }
 
@@ -738,6 +707,77 @@ void AppindicatorGui::build_preferences_menu()
 	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
 	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_reload_bookmarks_menu_item), gpointer(this));
 	gtk_widget_show(sub_menu_item);
+
+	sub_menu_item = gtk_menu_item_new_with_label("Buffering...");
+	gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu_items), sub_menu_item);
+	g_signal_connect(G_OBJECT(sub_menu_item), "activate", G_CALLBACK(on_buffering_menu_item), gpointer(this));
+	gtk_widget_show(sub_menu_item);
+}
+
+
+void AppindicatorGui::on_buffering_menu_item(GtkWidget* /*widget*/, gpointer data)
+{
+	auto app = static_cast<AppindicatorGui*>(data);
+
+	auto dialog = gtk_dialog_new_with_buttons("Buffering Settings",
+		nullptr, GTK_DIALOG_MODAL,
+		"_Cancel", GTK_RESPONSE_CANCEL,
+		"_Save", GTK_RESPONSE_ACCEPT,
+		nullptr);
+
+	auto content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+	gtk_container_set_border_width(GTK_CONTAINER(content), 12);
+	gtk_box_set_spacing(GTK_BOX(content), 10);
+
+	auto row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+	auto label = gtk_label_new("Buffer duration (seconds):");
+	auto spin = gtk_spin_button_new_with_range(1.0, 120.0, 1.0);
+	gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(spin), TRUE);
+	const uint32_t saved = app->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
+	const uint32_t current = std::min(std::max(saved, uint32_t(1)), uint32_t(120));
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin), current);
+	gtk_box_pack_start(GTK_BOX(row), label, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(row), spin, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(content), row, FALSE, FALSE, 0);
+
+	auto help = gtk_label_new(
+		"Default: 2 seconds. Try 10-15 seconds if stations stutter.\n"
+		"A larger buffer may improve stability but increases startup delay\n"
+		"and puts playback further behind the live broadcast.\n"
+		"Saving reconnects the current station to apply the change.");
+	gtk_label_set_xalign(GTK_LABEL(help), 0.0f);
+	gtk_box_pack_start(GTK_BOX(content), help, FALSE, FALSE, 0);
+
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
+	gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+	gtk_widget_show_all(dialog);
+
+	const gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+	const uint32_t seconds = static_cast<uint32_t>(gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spin)));
+	gtk_widget_destroy(dialog);
+
+	if (response != GTK_RESPONSE_ACCEPT || seconds == saved)
+	{
+		return;
+	}
+
+	app->config->set_uint32(BUFFER_DURATION_KEY, seconds);
+	if (!app->config->save())
+	{
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY, "Unable to save buffering setting");
+		return;
+	}
+
+	const std::string state{app->radiotray_ng->get_state()};
+	if (state == STATE_PLAYING || state == STATE_BUFFERING || state == STATE_CONNECTING)
+	{
+		app->radiotray_ng->play();
+	}
+	else
+	{
+		app->event_bus->publish_only(IEventBus::event::message, MESSAGE_KEY,
+			"Buffer set to " + std::to_string(seconds) + " seconds");
+	}
 }
 
 
@@ -835,10 +875,6 @@ void AppindicatorGui::build_menu()
 		this->build_quit_menu_item();
 	}
 
-	if (this->appindicator != nullptr)
-	{
-		app_indicator_set_menu(this->appindicator, GTK_MENU(this->menu));
-	}
 }
 
 
