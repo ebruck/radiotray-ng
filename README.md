@@ -22,7 +22,7 @@ The version here is what I wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Full AppIndicator support
+* Direct D-Bus StatusNotifierItem tray integration with native GTK3 menus (no Ayatana/AppIndicator library)
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
@@ -46,6 +46,14 @@ The version here is what I wanted out of RadioTray.
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
 
+
+## Stream buffering ##
+
+Open **Preferences → Buffering...** to adjust the network buffer from 1 to 120 seconds (default: 2).
+Try 10–15 seconds for stuttering streams. Saving reconnects the current station.
+On Linux the status icon is implemented using D-Bus StatusNotifierItem, without
+linking to the deprecated Ayatana/AppIndicator library. GNOME still requires a
+StatusNotifierItem-capable panel host to display the tray icon.
 
 ## Config File ##
 
