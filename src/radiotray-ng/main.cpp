@@ -25,7 +25,7 @@
 #include <radiotray-ng/extras/media_keys/media_keys.hpp>
 #include <rtng_user_agent.hpp>
 
-#ifdef APPINDICATOR_GUI
+#ifdef STATUS_NOTIFIER_GUI
 #include <radiotray-ng/gui/appindicator/appindicator_gui.hpp>
 #else
 #include <radiotray-ng/gui/ncurses/ncurses_gui.hpp>
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
 
 	auto radiotray_ng = std::make_shared<RadiotrayNG>(config, bookmarks, player, event_bus);
 
-#ifdef APPINDICATOR_GUI
+#ifdef STATUS_NOTIFIER_GUI
 	auto gui = std::make_shared<AppindicatorGui>(config, radiotray_ng, bookmarks, event_bus);
 #else
 	auto gui = std::make_shared<NCursesGui>(radiotray_ng, event_bus);
