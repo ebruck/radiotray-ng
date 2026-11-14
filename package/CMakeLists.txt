@@ -71,6 +71,38 @@ if (LSB_RELEASE_EXECUTABLE)
         # Derive ABI/library dependencies from the built ELF executables rather than
         # hard-coding library sonames that vary between Debian stable, testing and sid.
         set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+        # Some Debian merged-/usr configurations fail to expose public library
+        # directories to dpkg-shlibdeps, even though the linker/loader find
+        # those libraries. Include existing host multiarch directories in the
+        # shlibdeps lookup explicitly. This does not change the binary's RPATH.
+        find_program(RTNG_DPKG_ARCHITECTURE NAMES dpkg-architecture)
+        if (RTNG_DPKG_ARCHITECTURE)
+            execute_process(
+                COMMAND "${RTNG_DPKG_ARCHITECTURE}" -qDEB_HOST_MULTIARCH
+                OUTPUT_VARIABLE RTNG_DEB_MULTIARCH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET)
+        endif()
+        set(RTNG_SHLIBDEPS_SEARCH_DIRS)
+        if (RTNG_DEB_MULTIARCH)
+            foreach(RTNG_LIBDIR IN ITEMS
+                    "/lib/${RTNG_DEB_MULTIARCH}"
+                    "/usr/lib/${RTNG_DEB_MULTIARCH}")
+                if (IS_DIRECTORY "${RTNG_LIBDIR}")
+                    list(APPEND RTNG_SHLIBDEPS_SEARCH_DIRS "${RTNG_LIBDIR}")
+                endif()
+            endforeach()
+        endif()
+        foreach(RTNG_LIBDIR IN ITEMS /lib /usr/lib /lib64 /usr/lib64)
+            if (IS_DIRECTORY "${RTNG_LIBDIR}")
+                list(APPEND RTNG_SHLIBDEPS_SEARCH_DIRS "${RTNG_LIBDIR}")
+            endif()
+        endforeach()
+        list(REMOVE_DUPLICATES RTNG_SHLIBDEPS_SEARCH_DIRS)
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+            "${RTNG_SHLIBDEPS_SEARCH_DIRS}")
+        message(STATUS "Debian shlibdeps library search paths: ${RTNG_SHLIBDEPS_SEARCH_DIRS}")
         # Runtime requirements not always visible in ELF dependency scanning.
         set(CPACK_DEBIAN_PACKAGE_DEPENDS
             "python3, python3-lxml, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly")
