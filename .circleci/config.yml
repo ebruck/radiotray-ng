@@ -1,42 +1,62 @@
-commonStepsUbuntu: &commonStepsUbuntu
-    steps:
-      # Each step starts in the checked-out source directory.
-      - checkout
-      - run: git fetch --tags && git tag
-      - run:
-          name: Make project
-          command: 'mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make package'
-      - run:
-          name: Copy artifacts to tmp
-          command: 'mkdir /artifacts && cd build && cp *.deb /artifacts'
-      - store_artifacts:
-          path: /artifacts
-
 version: 2.1
+
+commonStepsUbuntu: &commonStepsUbuntu
+  steps:
+    - run:
+        name: Install build dependencies
+        command: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates gcc g++ make cmake git openssh-client pkg-config dpkg-dev \
+            lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev \
+            libnotify-dev libboost-filesystem-dev libboost-log-dev \
+            libboost-program-options-dev libboost-thread-dev libgstreamer1.0-dev \
+            libayatana-appindicator3-dev libgtk-3-dev libbsd-dev libglibmm-2.4-dev \
+            "${WX_DEV_PACKAGE}"
+          rm -rf /var/lib/apt/lists/*
+    - checkout
+    - run:
+        name: Show source version
+        command: git fetch --tags && git describe --tags --always --dirty
+    - run:
+        name: Build and package
+        command: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel "$(nproc)"
+          cmake --build build --target package --parallel "$(nproc)"
+    - run:
+        name: Copy artifacts
+        command: |
+          mkdir -p /artifacts
+          cp build/*.deb /artifacts/
+    - store_artifacts:
+        path: /artifacts
 
 jobs:
   Ubuntu-22_04-build:
     <<: *commonStepsUbuntu
     docker:
-      - image: "radiotrayng/circleci:ubuntu-22.04"
+      - image: ubuntu:22.04
     environment:
-      - CI_OS: linux
+      WX_DEV_PACKAGE: libwxgtk3.0-gtk3-dev
+
   Ubuntu-24_04-build:
     <<: *commonStepsUbuntu
     docker:
-      - image: "radiotrayng/circleci:ubuntu-24.04"
+      - image: ubuntu:24.04
     environment:
-      - CI_OS: linux
-  Ubuntu-25_10-build:
+      WX_DEV_PACKAGE: libwxgtk3.2-dev
+
+  Ubuntu-26_04-build:
     <<: *commonStepsUbuntu
     docker:
-      - image: "radiotrayng/circleci:ubuntu-25.10"
+      - image: ubuntu:26.04
     environment:
-      - CI_OS: linux
+      WX_DEV_PACKAGE: libwxgtk3.2-dev
+
 workflows:
-  version: 2
   build:
     jobs:
       - Ubuntu-22_04-build
       - Ubuntu-24_04-build
-      - Ubuntu-25_10-build
+      - Ubuntu-26_04-build

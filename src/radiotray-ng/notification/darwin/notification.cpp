@@ -17,18 +17,23 @@
 
 #include <radiotray-ng/notification/notification.hpp>
 #include <radiotray-ng/helpers.hpp>
-#include <stdlib.h>
+#include <cerrno>
+#include <fcntl.h>
+#include <spawn.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+extern char** environ;
 
 // lazy pimpl...
 struct notify_t
 {
-	notify_t()
-	{
-	}
-
-	~notify_t()
-	{
-	}
+    notify_t() = default;
+    ~notify_t() = default;
 };
 
 
@@ -49,7 +54,46 @@ void Notification::notify(const std::string& title, const std::string& message)
 
 void Notification::notify(const std::string& title, const std::string& message, const std::string& image)
 {
-	std::string cmd = "terminal-notifier -title \"" + title + "\" -message \"" + message + "\" -appIcon \"" + radiotray_ng::word_expand(image) + "\"";
-	cmd += " > /dev/null 2>&1";
-	system(cmd.c_str());
+    // Pass notification text as argv, not through a shell. Track metadata can
+    // contain quotes or shell metacharacters and must never become executable
+    // command text.
+    std::string expanded_image = radiotray_ng::word_expand(image);
+
+    std::vector<char*> argv{
+        const_cast<char*>("terminal-notifier"),
+        const_cast<char*>("-title"),
+        const_cast<char*>(title.c_str()),
+        const_cast<char*>("-message"),
+        const_cast<char*>(message.c_str()),
+        const_cast<char*>("-appIcon"),
+        const_cast<char*>(expanded_image.c_str()),
+        nullptr
+    };
+
+    posix_spawn_file_actions_t actions;
+    if (posix_spawn_file_actions_init(&actions) != 0)
+        return;
+
+    // Match the old quiet behaviour without constructing shell redirections.
+    posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0);
+    posix_spawn_file_actions_addopen(&actions, STDERR_FILENO, "/dev/null", O_WRONLY, 0);
+
+    pid_t child = 0;
+    const int rc = posix_spawnp(
+        &child,
+        argv[0],
+        &actions,
+        nullptr,
+        argv.data(),
+        environ);
+
+    posix_spawn_file_actions_destroy(&actions);
+
+    if (rc == 0)
+    {
+        int status = 0;
+        while (waitpid(child, &status, 0) == -1 && errno == EINTR)
+        {
+        }
+    }
 }

@@ -1,28 +1,24 @@
 add_executable(radiotray-ng main.cpp radiotray_ng.cpp radiotray_ng.hpp)
 
-if (APPINDICATOR_FOUND)
-    if (AYATANA_APPINDICATOR)
-        target_compile_definitions(radiotray-ng PRIVATE AYATANA_APPINDICATOR)
-    endif()
-
+if (RTNG_STATUS_NOTIFIER_GUI_FOUND)
     target_link_libraries(
         radiotray-ng
         appindicator_gui
-        ${APPINDICATOR_LIBRARIES})
+        ${GTK3_LIBRARIES})
 else()
     target_link_libraries(
         radiotray-ng
         ncurses_gui
         ${NCURSES_LIBRARIES})
-endif()    
+endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_libraries(radiotray-ng rtng_dbus)
 endif()
 
 target_link_libraries(
-  radiotray-ng  
-  bookmarks  
+  radiotray-ng
+  bookmarks
   config
   event_bus
   player
@@ -41,4 +37,4 @@ target_link_libraries(
 )
 
 add_dependencies(radiotray-ng user-agent)
-target_include_directories(radiotray-ng SYSTEM PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${APPINDICATOR_INCLUDE_DIRS} ${GIOMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})
+target_include_directories(radiotray-ng SYSTEM PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${GSTREAMER_INCLUDE_DIRS} ${GTK3_INCLUDE_DIRS} ${GIOMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS})

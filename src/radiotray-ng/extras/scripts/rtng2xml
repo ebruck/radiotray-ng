@@ -77,9 +77,10 @@ def generate_xml_playlist(bookmarks):
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('usage: rtng2xml <path to radiotray-ng bookmark file>')
-        exit(1)
+        sys.exit(1)
 
     if os.path.exists(sys.argv[1]):
-        print(generate_xml_playlist(json.load(open(sys.argv[1]))))
+        with open(sys.argv[1], encoding='utf-8') as bookmark_file:
+            print(generate_xml_playlist(json.load(bookmark_file)))
     else:
         print(sys.argv[1], 'not found!')

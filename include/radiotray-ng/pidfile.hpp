@@ -45,25 +45,37 @@ namespace radiotray_ng
 
 			std::string pid_file{base_dir + "/" + app_name + ".pid"};
 
-			pid_t other_pid;
+			pid_t other_pid = 0;
+			errno = 0;
 			this->pfh = pidfile_open(pid_file.c_str(), 0600, &other_pid);
 
 			if (this->pfh == nullptr)
 			{
-				if (errno == EEXIST)
+				if (errno == EEXIST || errno == EAGAIN || errno == EINVAL)
 				{
-					std::cerr << "An instance of " << app_name << " is already running, pid: " << other_pid << std::endl;
-
-					this->already_running = true;
-
-					return;
+					std::cerr << "An instance of " << app_name << " is already running";
+					if (other_pid > 0)
+					{
+						std::cerr << ", pid: " << other_pid;
+					}
+					std::cerr << std::endl;
+				}
+				else
+				{
+					std::cerr << "Could not acquire single-instance lock: " << pid_file << std::endl;
 				}
 
-				std::cerr << "Could not create: " << pid_file << std::endl;
+				// Never run without the lock: doing so can create duplicate tray indicators.
+				this->already_running = true;
+				return;
 			}
-			else
+
+			if (pidfile_write(this->pfh) != 0)
 			{
-				pidfile_write(pfh);
+				std::cerr << "Could not write single-instance lock: " << pid_file << std::endl;
+				pidfile_remove(this->pfh);
+				this->pfh = nullptr;
+				this->already_running = true;
 			}
 		}
 
@@ -74,7 +86,10 @@ namespace radiotray_ng
 
 		~Pidfile()
 		{
-			 pidfile_remove(this->pfh);
+			if (this->pfh != nullptr)
+			{
+				pidfile_remove(this->pfh);
+			}
 		}
 
 	private:

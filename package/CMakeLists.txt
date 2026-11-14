@@ -68,17 +68,65 @@ if (LSB_RELEASE_EXECUTABLE)
 
     if (CPACK_GENERATOR MATCHES "DEB")
         set(CPACK_PACKAGE_DESCRIPTION_SUMMARY  "Simple Internet Radio Player\nRadiotray-NG runs in the system tray allowing you to\n select and play configured radio stations.")
-        # Derive ABI/library dependencies from the built ELF executables rather than
-        # hard-coding library sonames that vary between Debian stable, testing and sid.
-        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        # Runtime requirements not always visible in ELF dependency scanning.
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS
-            "python3, python3-lxml, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly")
         set(CPACK_DEBIAN_PACKAGE_SECTION       "sound")
         set(CPACK_DEBIAN_COMPRESSION_TYPE      "xz")
         set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE  ${CPACK_SYSTEM_NAME})
         set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
         set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "Edward G. Bruck <ed.bruck1@gmail.com>")
+
+        # Derive runtime library package names from the binaries we actually
+        # build. This survives distro package renames, t64 transitions and
+        # library SONAME changes without hard-coded substitutions.
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+        # CPack runs dpkg-shlibdeps from a temporary package root. On modern
+        # Debian/Ubuntu multiarch systems, explicitly pass the host library
+        # search directories so libc, compiler runtimes and third-party
+        # libraries are all resolvable.
+        set(_RTNG_DEB_MULTIARCH "${CMAKE_LIBRARY_ARCHITECTURE}")
+        if (NOT _RTNG_DEB_MULTIARCH)
+            find_program(DPKG_ARCHITECTURE_EXECUTABLE NAMES dpkg-architecture)
+            if (DPKG_ARCHITECTURE_EXECUTABLE)
+                execute_process(
+                    COMMAND ${DPKG_ARCHITECTURE_EXECUTABLE} -qDEB_HOST_MULTIARCH
+                    OUTPUT_VARIABLE _RTNG_DEB_MULTIARCH
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+            endif()
+        endif()
+
+        set(_RTNG_SHLIBDEPS_DIRS)
+        if (_RTNG_DEB_MULTIARCH)
+            list(APPEND _RTNG_SHLIBDEPS_DIRS
+                "/lib/${_RTNG_DEB_MULTIARCH}"
+                "/usr/lib/${_RTNG_DEB_MULTIARCH}"
+                "/usr/local/lib/${_RTNG_DEB_MULTIARCH}")
+        endif()
+
+        # Include the compiler/linker's native search directories too. This
+        # covers libstdc++, libgcc and distro-specific layouts without
+        # hard-coding compiler versions.
+        list(APPEND _RTNG_SHLIBDEPS_DIRS
+            ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES}
+            ${CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES}
+            "/lib" "/usr/lib" "/usr/local/lib")
+        list(FILTER _RTNG_SHLIBDEPS_DIRS INCLUDE REGEX ".+")
+        list(REMOVE_DUPLICATES _RTNG_SHLIBDEPS_DIRS)
+
+        set(_RTNG_EXISTING_SHLIBDEPS_DIRS)
+        foreach(_dir IN LISTS _RTNG_SHLIBDEPS_DIRS)
+            if (IS_DIRECTORY "${_dir}")
+                list(APPEND _RTNG_EXISTING_SHLIBDEPS_DIRS "${_dir}")
+            endif()
+        endforeach()
+
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+            "${_RTNG_EXISTING_SHLIBDEPS_DIRS}")
+
+        # Runtime/data dependencies that dpkg-shlibdeps cannot infer from ELF
+        # NEEDED entries.
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS
+            "python3, python3-lxml, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly")
         set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA ${PROJECT_SOURCE_DIR}/package/postinst;${PROJECT_SOURCE_DIR}/package/postrm;${PROJECT_SOURCE_DIR}/package/conffiles)
 
         execute_process(COMMAND gzip -n -9 -c "${PROJECT_SOURCE_DIR}/package/changelog-deb" WORKING_DIRECTORY ${PROJECT_BINARY_DIR} OUTPUT_FILE "${PROJECT_BINARY_DIR}/changelog.Debian.gz")
