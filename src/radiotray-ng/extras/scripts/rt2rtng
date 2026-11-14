@@ -75,12 +75,13 @@ def prune_empty_groups():
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("usage: rt2rtng <path to radiotray bookmarks.xml>")
-        exit(1)
+        sys.exit(1)
 
     if os.path.exists(sys.argv[1]):
-        root = etree.parse(sys.argv[1]).getroot()
+        parser = etree.XMLParser(resolve_entities=False, no_network=True)
+        root = etree.parse(sys.argv[1], parser).getroot()
         walk_bookmarks(root, group_callback, bookmark_callback)
-        prune_empty_groups()        
+        prune_empty_groups()
         print(json.dumps(bookmarks, indent=4))
     else:
         print(sys.argv[1], "not found!")

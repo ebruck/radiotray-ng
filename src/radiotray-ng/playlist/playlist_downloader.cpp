@@ -158,7 +158,10 @@ bool PlaylistDownloader::download(const std::string& url, std::string& redirecte
 		curl_easy_setopt(curl_handle.get(), CURLOPT_FOLLOWLOCATION, 1L);
 		curl_easy_setopt(curl_handle.get(), CURLOPT_FAILONERROR, 1L);
 
-		curl_easy_setopt(curl_handle.get(), CURLOPT_SSL_VERIFYHOST, 0);
+		// Keep libcurl certificate validation enabled and require the
+		// certificate hostname to match the requested HTTPS host.
+		curl_easy_setopt(curl_handle.get(), CURLOPT_SSL_VERIFYPEER, 1L);
+		curl_easy_setopt(curl_handle.get(), CURLOPT_SSL_VERIFYHOST, 2L);
 
 		const uint32_t http_timeout = this->config->get_uint32(HTTP_TIMEOUT_KEY, DEFAULT_HTTP_TIMEOUT_VALUE);
 
@@ -191,17 +194,14 @@ bool PlaylistDownloader::download(const std::string& url, std::string& redirecte
 		if (c_type)
 		{
 			content_type = c_type;
+		}
 
-			char* effective_url = nullptr;
-			curl_easy_getinfo(curl_handle.get(), CURLINFO_EFFECTIVE_URL, &effective_url);
-			if (effective_url)
-			{
-				if (std::string(effective_url) != url)
-				{
-					redirected_url = effective_url;
-				}
-			}
-        }
+		char* effective_url = nullptr;
+		curl_easy_getinfo(curl_handle.get(), CURLINFO_EFFECTIVE_URL, &effective_url);
+		if (effective_url != nullptr && std::string(effective_url) != url)
+		{
+			redirected_url = effective_url;
+		}
 
 		// probably a stream?
 		if (content.size() < max_bytes)
@@ -216,28 +216,45 @@ bool PlaylistDownloader::download(const std::string& url, std::string& redirecte
 
 size_t PlaylistDownloader::curl_write_callback(char* buffer, size_t size, size_t nitems, void* userdata)
 {
-	size_t data_size = size * nitems;
+	if (size != 0 && nitems > (static_cast<size_t>(-1) / size))
+	{
+		return 0;
+	}
 
+	const size_t data_size = size * nitems;
 	auto cb_pair = reinterpret_cast<callback_pair_t*>(userdata);
-	cb_pair->first->append(buffer, data_size);
 
-	// should we read all of it?
+	if (cb_pair == nullptr || cb_pair->first == nullptr)
+	{
+		return 0;
+	}
+
+	// A zero limit means read the full response.
 	if (cb_pair->second == 0)
 	{
+		cb_pair->first->append(buffer, data_size);
 		return data_size;
 	}
 
-	// we only want to read up to a specified size...
-	if (cb_pair->first->size() >= cb_pair->second)
+	const size_t current_size = cb_pair->first->size();
+	if (current_size >= cb_pair->second)
 	{
-		// stop write operation...
-		LOG(warning) << "Content exceeds our limit of " << cb_pair->second << " bytes!";
+		return 0;
+	}
+
+	const size_t remaining = cb_pair->second - current_size;
+	const size_t to_copy = std::min(data_size, remaining);
+	cb_pair->first->append(buffer, to_copy);
+
+	if (to_copy != data_size)
+	{
+		// Deliberately stop libcurl once the inspection buffer is full.
+		LOG(debug) << "Content reached inspection limit of " << cb_pair->second << " bytes";
 		return 0;
 	}
 
 	return data_size;
 }
-
 
 std::shared_ptr<IPlaylistDecoder> PlaylistDownloader::inspect(const std::string& content_type, const std::string& content)
 {

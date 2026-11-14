@@ -60,3 +60,9 @@ local.properties
 build/
 
 cmake-build-debug/
+# Local RadioTray-NG build/audit output
+/working/
+/build-fixed/
+/build-audit/
+**/__pycache__/
+*.py[cod]

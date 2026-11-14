@@ -22,7 +22,7 @@ The version here is what I wanted out of RadioTray.
 * RadioTray functionality
 * Theme support
 * Debian packaging
-* Full AppIndicator support
+* Direct D-Bus StatusNotifierItem tray integration with native GTK3 menus (no Ayatana/AppIndicator library)
 * No groups within groups by design to keep the interface clean.
 * Volume up/down support using mouse wheel (left/right can also be used)
 * Media key support
@@ -46,6 +46,14 @@ The version here is what I wanted out of RadioTray.
 ![Screenshot](images/screenshot_6.png)
 ![Screenshot](images/screenshot_5.png)
 
+
+## Stream buffering ##
+
+Open **Preferences → Buffering...** to adjust the network buffer from 1 to 120 seconds (default: 2).
+Try 10–15 seconds for stuttering streams. Saving reconnects the current station.
+On Linux the status icon is implemented using D-Bus StatusNotifierItem, without
+linking to the deprecated Ayatana/AppIndicator library. GNOME still requires a
+StatusNotifierItem-capable panel host to display the tray icon.
 
 ## Config File ##
 
@@ -246,22 +254,37 @@ $ dnf install radiotray-ng
 
 ## To Build on Ubuntu: ##
 
-Install these packages:
+Install the common build/package dependencies:
 ```
-lsb-release libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev libboost-filesystem-dev libgstreamer1.0-dev libboost-log-dev libboost-program-options-dev libgtk-3-dev libnotify-dev lsb-release libbsd-dev libglibmm-2.4-dev cmake
+ca-certificates gcc g++ make cmake git pkg-config dpkg-dev lsb-release \
+libcurl4-openssl-dev libjsoncpp-dev libxdg-basedir-dev libnotify-dev \
+libboost-filesystem-dev libboost-log-dev libboost-program-options-dev \
+libboost-thread-dev libgstreamer1.0-dev libgtk-3-dev libbsd-dev \
+libglibmm-2.4-dev
 ```
-# For Ubuntu 23.10 and newer install:
+For supported Ubuntu 24.04 LTS and 26.04 LTS, also install:
 ```
 libayatana-appindicator3-dev libwxgtk3.2-dev
 ```
-# For Ubuntu 22.04 install:
+For Ubuntu 22.04 LTS, also install:
 ```
-libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+libayatana-appindicator3-dev libwxgtk3.0-gtk3-dev
 ```
-# Before ubuntu 22.04:
+
+## Build and install this GNOME/AppIndicator branch ##
+
+On Debian/Ubuntu, this branch also includes a guarded build/install helper. It
+performs a clean Release build, verifies shared-library resolution, asks CPack to
+derive Debian library dependencies with `dpkg-shlibdeps`, simulates installation
+with APT, installs only if dependencies resolve, and then applies the RadioTray-only
+GNOME AppIndicator bridge:
+
 ```
-libappindicator3-dev libwxgtk3.0-gtk3-dev libwxgtk3.0-gtk3-0v5
+$ ./build-install-fixed.sh
 ```
+
+On GNOME Wayland, log out and back in after applying the bridge so GNOME Shell
+loads the updated extension code.
 
 ## Build Radiotray-NG & Debian Package ##
 ```
@@ -270,9 +293,8 @@ $ cd radiotray-ng
 $ mkdir build
 $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
-$ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
-$ sudo apt-get install -f
+$ cmake --build . --target package --parallel "$(nproc)"
+$ sudo apt install ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 ```
 
 ## Build Radiotray-NG + Tests & Debian Package ##
@@ -282,9 +304,8 @@ $ cd radiotray-ng
 $ mkdir build
 $ cd build
 $ cmake .. -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
-$ make package
-$ sudo dpkg -i ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
-$ sudo apt-get install -f
+$ cmake --build . --target package --parallel "$(nproc)"
+$ sudo apt install ./radiotray-ng_x.y.z_<distro>_<i386|amd64>.deb
 ```
 
 ## To Build on Fedora: ##

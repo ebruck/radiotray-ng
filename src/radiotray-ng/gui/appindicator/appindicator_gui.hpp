@@ -20,13 +20,9 @@
 #include <radiotray-ng/i_gui.hpp>
 #include <radiotray-ng/i_event_bus.hpp>
 #include <radiotray-ng/file_monitor.hpp>
+#include "direct_sni.hpp"
 
 #include <gtk/gtk.h>
-#ifndef AYATANA_APPINDICATOR
-#include <libappindicator/app-indicator.h>
-#else
-#include <libayatana-appindicator/app-indicator.h>
-#endif
 #include <memory>
 
 class IConfig;
@@ -64,9 +60,12 @@ private:
 	static void on_reload_bookmarks_menu_item(GtkWidget* widget, gpointer data);
 	static void on_bookmark_editor_menu_item(GtkWidget* widget, gpointer data);
 	static void on_sleep_timer_menu_item(GtkWidget* widget, gpointer data);
+	static void on_buffering_menu_item(GtkWidget* widget, gpointer data);
 	static gboolean on_timer_event(gpointer data);
 	static gboolean on_file_monitor_timer_event(gpointer data);
 	static void on_indicator_scrolled(GtkWidget* w, gint delta ,GdkScrollDirection direction, gpointer data);
+	static void position_native_menu(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
+	void show_native_menu(gint x, gint y);
 
 	void build_menu();
 	void build_action_menu_item();
@@ -99,14 +98,16 @@ private:
 		std::string group;
 		std::string station;
 
-		static void free_cb_data(gpointer* p,  GClosure* /*closure*/)
+		static void free_cb_data(gpointer p, GClosure* /*closure*/)
 		{
 			delete reinterpret_cast<menu_item_data*>(p);
 		}
 	};
 
-	AppIndicator*     appindicator;
+	std::unique_ptr<DirectSni> direct_sni;
 	GtkWidget*        menu;
+	gint              native_menu_x = 0;
+	gint              native_menu_y = 0;
 	GtkWidget*        action_menu_item;
 	GtkWidget*        volume_menu_item;
 	GtkWidget*        status_menu_item;
