@@ -17,6 +17,8 @@
 
 #include <radiotray-ng/player/player.hpp>
 #include <cmath>
+#include <algorithm>
+#include <limits>
 
 
 Player::Player(std::shared_ptr<IConfig> config, std::shared_ptr<IEventBus> event_bus)
@@ -49,13 +51,18 @@ bool Player::play_next()
 
 		this->current_playlist.erase(this->current_playlist.begin());
 
-		const uint32_t buffer_size  = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
-		const uint32_t buffer_duration = this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE);
+		const uint32_t buffer_size = this->config->get_uint32(BUFFER_SIZE_KEY, DEFAULT_BUFFER_SIZE_VALUE);
+		const uint32_t buffer_duration = std::min(
+			std::max(this->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE), uint32_t(1)),
+			uint32_t(120));
+		// Use a wide intermediate to prevent buffer-size multiplication from overflowing.
+		const guint buffer_bytes = static_cast<guint>(std::min(
+			uint64_t(buffer_size) * buffer_duration, uint64_t(std::numeric_limits<guint>::max())));
 
-		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_size * buffer_duration, NULL);
-		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", buffer_duration * GST_SECOND, NULL);
+		g_object_set(G_OBJECT(this->pipeline), "buffer-size", buffer_bytes, NULL);
+		g_object_set(G_OBJECT(this->pipeline), "buffer-duration", static_cast<gint64>(buffer_duration) * GST_SECOND, NULL);
 
-		LOG(debug) << BUFFER_SIZE_KEY << "=" << std::to_string(buffer_size * buffer_duration) << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
+		LOG(debug) << BUFFER_SIZE_KEY << "=" << buffer_bytes << ", " << BUFFER_DURATION_KEY << "=" << buffer_duration;
 
 		if (!this->has_played)
 		{
@@ -348,8 +355,13 @@ gboolean Player::handle_messages_cb(GstBus* /*bus*/, GstMessage* message, gpoint
 
 					player->event_bus->publish_only(IEventBus::event::state_changed, STATE_KEY, STATE_BUFFERING);
 
-					// start timer to abort if buffering stalls...
-					player->clock_id = gst_clock_new_single_shot_id(player->clock, gst_clock_get_time(player->clock) + (10 * GST_SECOND));
+					// Allow enough time for the configured buffer to fill before assuming a stall.
+					const uint32_t duration = std::min(
+						std::max(player->config->get_uint32(BUFFER_DURATION_KEY, DEFAULT_BUFFER_DURATION_VALUE), uint32_t(1)),
+						uint32_t(120));
+					const uint32_t timeout_seconds = std::max(uint32_t(10), duration + uint32_t(10));
+					player->clock_id = gst_clock_new_single_shot_id(player->clock,
+						gst_clock_get_time(player->clock) + (static_cast<GstClockTime>(timeout_seconds) * GST_SECOND));
 					gst_clock_id_wait_async(player->clock_id, static_cast<GstClockCallback>(&Player::timer_cb), player, nullptr);
 				}
 			}

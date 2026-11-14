@@ -93,6 +93,7 @@ A config (radiotray-ng.json) is created in your ~/.config/radiotray-ng directory
 }
 ```
 * **Installed config will only include commonly edited entries, all others are using default values shown above.**
+* **Preferences → Buffering...** in the tray menu lets you change the buffer duration from 1 to 120 seconds. The default remains 2 seconds for existing users. Try 10–15 seconds if an unreliable stream frequently stutters. Saving reconnects a currently playing station so the setting takes effect. Larger values take longer to start and run further behind the live feed. The setting is stored as `buffer-duration` in `radiotray-ng.json`.
 ```
                  bookmarks: location of bookmarks file
            bookmark-editor: bookmark editor to launch
